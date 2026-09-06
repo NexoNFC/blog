@@ -1,0 +1,33 @@
+---
+description: Documentación, pruebas, no destructividad y calidad del cambio
+alwaysApply: true
+---
+
+# Calidad y buenas prácticas
+
+## Documentación
+
+README alineado al producto real (plataforma FESC + NFC). Mantener `docs/modelo-de-negocio.md` y `docs/convenciones-de-desarrollo.md` coherentes con el alcance definido. Incluir: descripción, objetivo, tecnologías, requisitos, instalación, configuración, ejecución, estructura, BD, usuarios de prueba (si existen) y comandos importantes. No inventar funcionalidades inexistentes.
+
+## Pruebas
+
+Validar funcionalidades importantes antes de integrar a `main`. Preferir pruebas Laravel en: auth, autorización, validaciones, CRUD, relaciones y reglas de negocio. No crear tests solo para inflar cobertura.
+
+## No destructividad
+
+Antes de eliminar archivos, tablas, columnas, rutas, controladores, componentes o paquetes: comprobar dependencias. Si un cambio puede romper algo existente, advertirlo antes.
+
+## Configuración
+
+No modificar `composer.json`, `package.json`, config de Laravel, Docker, BD o auth sin razón clara e impacto analizado.
+
+## Checklist antes de cambiar
+
+- ¿Pertenece a la tarea actual?
+- ¿Respeta la arquitectura y la separación de responsabilidades?
+- ¿Es necesario y mantenible?
+- ¿Puede romper algo existente?
+- ¿Puede explicarse técnicamente?
+- ¿Tiene trazabilidad (tarea → rama → commit)?
+
+Si alguna respuesta es negativa: detenerse y analizar.

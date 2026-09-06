@@ -1,0 +1,44 @@
+---
+description: Tareas, ramas, commits, Pull Requests y flujo de desarrollo
+alwaysApply: true
+---
+
+# Git y flujo de trabajo
+
+- No desarrollar directamente en `main` (`main` = estable).
+- Cada cambio importante: tarea → rama → commits → PR → merge.
+- Una rama = una tarea; no mezclar funcionalidades no dependientes.
+
+## Tareas
+
+Toda tarea debe definir: qué se necesita, por qué, comportamiento esperado y criterios de aceptación.
+
+## Ramas
+
+`feature/TASK-XXX-nombre-descriptivo`  
+`fix/TASK-XXX-...` · `docs/TASK-XXX-...` · `chore/TASK-XXX-...`
+
+Evitar: `feature/nueva`, `prueba`, `final`, `arreglo`, `cambios`.
+
+## Commits (español, Conventional Commits)
+
+`tipo: descripción` — tipos: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `style`.
+
+Commits pequeños y lógicos. Evitar genéricos (`cambios`, `update`, `final`) y cualquier referencia a herramientas de asistencia.
+
+## Pull Requests
+
+Título: `[TASK-XXX] Descripción`  
+Incluir: objetivo, cambios, módulos afectados, validación, consideraciones.
+
+## Flujo por funcionalidad
+
+1. Tarea y criterios de aceptación  
+2. Rama  
+3. Analizar código existente (no duplicar)  
+4. Implementar solo lo de la tarea  
+5. Validar / pruebas  
+6. Commits claros → PR → merge a `main`  
+7. Documentar si aplica  
+
+No marcar como terminado lo no implementado, no validado o incompleto (rutas, vistas, migraciones, validaciones). Diferenciar: implementado / validado / pendiente / requiere revisión.
