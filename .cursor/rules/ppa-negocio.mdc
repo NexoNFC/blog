@@ -1,0 +1,40 @@
+---
+description: Modelo de negocio FESC, NFC y reglas de dominio del producto
+alwaysApply: true
+---
+
+# Modelo de negocio
+
+Plataforma web de difusión y consulta de información para la comunidad de la Fundación de Estudios Superiores Comfanorte (FESC). Producto del PPA de Ingeniería de Software.
+
+No es “un blog al que se le agregaron NFC”. El NFC es parte central de la propuesta de valor:
+
+espacio físico → NFC → plataforma → experiencia de información → estadísticas
+
+## Acceso
+
+- Público, sin login obligatorio para consultar.
+- Canal web tradicional y canal NFC coexisten; la plataforma no depende solo de los chips.
+
+## Puntos NFC
+
+- El chip guarda una URL permanente de un **punto** (`/nfc/{codigo}`), no de una noticia fija.
+- El contenido asociado se administra en software y puede cambiar sin reprogramar el chip.
+- Estado activo/inactivo controlado por la plataforma; inactivo → respuesta adecuada al usuario.
+- Cada acceso por NFC debe poder registrarse (trazabilidad y estadísticas).
+
+## Contenido
+
+- Interno (creado en la plataforma).
+- Externo (resumen contextual + enlace a fuente oficial, p. ej. FESC).
+- Combinado (propio + referencias externas).
+
+## Actores
+
+- Visitante público: consulta y descubrimiento.
+- Editor: creación y gestión de contenido.
+- Administrador: plataforma, NFC, permisos y visión general/estadísticas.
+
+## Principio del producto
+
+Convertir puntos físicos del campus en puertas digitales a información relevante de la comunidad FESC, administrables y medibles.
