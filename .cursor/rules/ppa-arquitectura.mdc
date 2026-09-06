@@ -1,0 +1,34 @@
+---
+description: Arquitectura Laravel, BD, Eloquent, validación y seguridad
+alwaysApply: true
+---
+
+# Arquitectura Laravel
+
+Separar: rutas, controladores, modelos, migraciones, seeders, Form Requests, services, policies, vistas, componentes Blade, JS y estáticos.
+
+- Controladores delgados; lógica compleja → Service.
+- Sin lógica de negocio en Blade ni en rutas.
+- Nombres claros alineados al dominio: `ContentController`, `NfcPointService`, `ContentRequest`. Evitar `DataController`, `MainController`, etc.
+- Antes de crear o modificar: revisar código existente; no duplicar estructuras.
+- Respetar el dominio: NFC = punto físico administrable; contenido asociable y cambiable; consulta pública sin login obligatorio.
+
+## Base de datos
+
+- Solo cambios estructurales vía migraciones (nunca manual como flujo principal).
+- Nombres descriptivos, FKs, índices justificados, integridad referencial, normalización razonable.
+- Antes de una tabla nueva: confirmar que la información requiere entidad independiente.
+
+## Eloquent
+
+- Relaciones correctas (`hasMany`, `belongsTo`, `belongsToMany`, etc.).
+- Evitar N+1; usar eager loading.
+- Lógica de negocio compleja fuera del modelo (en Service).
+
+## Validación y seguridad
+
+- Validar toda entrada de usuario; preferir Form Requests si es compleja/reutilizable.
+- Auth Laravel, Policies/Gates, CSRF, mass assignment, Eloquent/Query Builder.
+- Secretos solo en `.env`; nunca en el repo. Mantener `.env.example` al día.
+- Mensajes al usuario en español; no exponer detalle técnico sensible.
+- Diferenciar errores de validación, autorización, 404 e internos.
