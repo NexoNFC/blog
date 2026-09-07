@@ -18,6 +18,7 @@
         @if ($name) name="{{ $name }}" id="{{ $name }}" @endif
         rows="{{ $rows }}"
         @if ($required) required @endif
-        {{ $attributes->except('class')->merge(['class' => 'block w-full rounded border border-muted bg-surface px-3 py-2.5 text-sm text-text shadow-sm transition placeholder:text-secondary-light focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20']) }}
+        @if ($name && $errors->has($name)) aria-invalid="true" @endif
+        {{ $attributes->except('class')->class(['form-control']) }}
     >{{ $slot }}</textarea>
 </div>

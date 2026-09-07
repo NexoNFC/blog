@@ -19,7 +19,7 @@ class DemoCatalog
                 'status' => 'publicado',
                 'published_at' => '2026-03-01',
                 'external_url' => null,
-                'image' => 'images/landing/news-students-study.png',
+                'image' => 'images/campus/estudiantes-fuente.jpg',
             ],
             [
                 'slug' => 'evento-lectura-cultura',
@@ -32,7 +32,7 @@ class DemoCatalog
                 'event_starts_at' => '2026-03-20 14:00',
                 'event_ends_at' => '2026-03-20 17:00',
                 'external_url' => null,
-                'image' => 'images/landing/news-event-hall.png',
+                'image' => 'images/campus/estudiantes-cancha.jpg',
             ],
             [
                 'slug' => 'comunicado-calendario',
@@ -43,7 +43,7 @@ class DemoCatalog
                 'status' => 'publicado',
                 'published_at' => '2026-03-05',
                 'external_url' => null,
-                'image' => 'images/landing/news-campus-walk.png',
+                'image' => 'images/campus/estudiantes-fachada.jpg',
             ],
             [
                 'slug' => 'evento-oficial-fesc',
@@ -54,7 +54,7 @@ class DemoCatalog
                 'status' => 'publicado',
                 'published_at' => '2026-03-08',
                 'external_url' => 'https://fesc.edu.co/portal/',
-                'image' => 'images/landing/campus-abstract.png',
+                'image' => 'images/campus/edificio-avenida-5.jpg',
             ],
             [
                 'slug' => 'borrador-semana-universitaria',
@@ -193,8 +193,6 @@ class DemoCatalog
     }
 
     /**
-     * Ubicaciones conocidas para la landing (sin inventar espacios).
-     *
      * @return list<array<string, mixed>>
      */
     public static function campusLocations(): array
@@ -205,6 +203,7 @@ class DemoCatalog
                 'detail' => '3 pisos · puntos NFC por nivel',
                 'icon' => 'building',
                 'badge' => 'Bloque',
+                'image' => 'images/campus/edificio-01.jpg',
                 'href' => route('nfc.show', 'bloque-a-piso-1'),
             ],
             [
@@ -212,6 +211,7 @@ class DemoCatalog
                 'detail' => '2 pisos · puntos NFC por nivel',
                 'icon' => 'building',
                 'badge' => 'Bloque',
+                'image' => 'images/campus/edificio-03.jpg',
                 'href' => route('nfc.show', 'bloque-b-piso-2'),
             ],
             [
@@ -219,6 +219,7 @@ class DemoCatalog
                 'detail' => '4 pisos · puntos NFC por nivel',
                 'icon' => 'building',
                 'badge' => 'Bloque',
+                'image' => 'images/campus/edificio-05.jpg',
                 'href' => route('nfc.show', 'bloque-c-piso-4'),
             ],
             [
@@ -226,6 +227,7 @@ class DemoCatalog
                 'detail' => 'Acceso al campus',
                 'icon' => 'door',
                 'badge' => 'Acceso',
+                'image' => 'images/campus/fachada.jpg',
                 'href' => route('nfc.show', 'entrada-avenida-4'),
             ],
             [
@@ -233,6 +235,7 @@ class DemoCatalog
                 'detail' => 'Acceso al campus',
                 'icon' => 'door',
                 'badge' => 'Acceso',
+                'image' => 'images/campus/edificio-avenida-5.jpg',
                 'href' => route('nfc.show', 'entrada-avenida-5'),
             ],
             [
@@ -240,6 +243,7 @@ class DemoCatalog
                 'detail' => 'Espacio de eventos y encuentros',
                 'icon' => 'stage',
                 'badge' => 'Espacio',
+                'image' => 'images/campus/edificio-06.jpg',
                 'href' => route('nfc.show', 'auditorio-avenida-5'),
             ],
             [
@@ -247,6 +251,7 @@ class DemoCatalog
                 'detail' => 'Servicios e información del lugar',
                 'icon' => 'book',
                 'badge' => 'Espacio',
+                'image' => 'images/campus/fuente.jpg',
                 'href' => route('nfc.show', 'biblioteca'),
             ],
         ];

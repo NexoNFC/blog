@@ -1,7 +1,7 @@
 @php
     $partners = [
         ['src' => 'images/brand/comfanorte.png', 'alt' => 'Comfanorte', 'href' => 'https://www.comfanorte.com.co/'],
-        ['src' => 'images/brand/sies+.png', 'alt' => 'SIES+', 'href' => 'https://siesmas.co/'],
+        ['src' => 'images/brand/sies-plus.png', 'alt' => 'SIES+', 'href' => 'https://siesmas.co/'],
         ['src' => 'images/brand/icetex.png', 'alt' => 'ICETEX', 'href' => 'https://www.icetex.gov.co/'],
         ['src' => 'images/brand/icfes.png', 'alt' => 'ICFES', 'href' => 'https://www.icfes.gov.co/'],
         ['src' => 'images/brand/sena.png', 'alt' => 'SENA', 'href' => 'https://www.sena.edu.co/'],
@@ -11,7 +11,7 @@
 @endphp
 
 <footer class="mt-auto">
-    <div class="border-t border-muted bg-white">
+    <div class="border-t border-white/40 bg-white/70 backdrop-blur-md">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-4 sm:px-6">
             @foreach ($partners as $partner)
                 @if ($partner['href'])

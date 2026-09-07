@@ -9,7 +9,7 @@
         <h1 class="mt-4 text-3xl font-bold sm:text-4xl">{{ $content['title'] }}</h1>
         <p class="mt-4 text-lg text-secondary-light">{{ $content['summary'] }}</p>
 
-        <div class="mt-8 aspect-[16/9] overflow-hidden rounded bg-muted">
+        <div class="mt-8 aspect-[16/9] overflow-hidden rounded-2xl border border-white/50 bg-white/40 backdrop-blur-md">
             @if (! empty($content['image']))
                 <img
                     src="{{ asset($content['image']) }}"

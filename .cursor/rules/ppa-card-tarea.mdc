@@ -1,0 +1,35 @@
+---
+description: Generar card Markdown de la tarea al pedir "card de la tarea"
+alwaysApply: true
+---
+
+# Card de la tarea
+
+Cuando el usuario diga **«card de la tarea»** (o equivalente), responder **solo** con un bloque Markdown listo para copiar, sin prosa extra salvo que pida aclaración.
+
+## Fuentes
+
+- Rama: `git branch --show-current` (si está en `main`/`develop`, usar la rama de la tarea activa del contexto o la última `feature|fix|docs|chore/TASK-*`).
+- Nombre, objetivo y descripción: commits, diff y contexto de la conversación/tarea.
+
+## Formato exacto
+
+```markdown
+## Card de tarea
+
+| Campo | Valor |
+| --- | --- |
+| **Rama** | `tipo/TASK-XXX-nombre-descriptivo` |
+| **Nombre** | Título corto de la tarea |
+| **Objetivo** | Una frase clara del para qué |
+
+### Descripción
+
+Párrafo de **70 a 80 palabras** (contar aprox.): qué se hace, por qué, alcance y resultado esperado. Español, tono de tarjeta de proyecto (no commit). Sin mencionar herramientas de asistencia.
+```
+
+## Reglas
+
+- Respetar convención de ramas del proyecto (`feature/TASK-XXX-...`, etc.).
+- Descripción: 70–80 palabras; ni telegráfica ni relleno.
+- Si falta TASK-XXX o el alcance no está claro: preguntar una sola vez lo mínimo y luego emitir la card.

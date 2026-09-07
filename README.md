@@ -32,14 +32,28 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Configurar la base de datos en `.env` y luego:
+Configurar la base de datos y las credenciales iniciales (`ADMIN_*`, `EDITOR_*`) en `.env` y luego:
 
 ```bash
-php artisan migrate
+php artisan migrate --seed
 npm install
 npm run build
 php artisan serve
 ```
+
+## Acceso administrativo
+
+- Login: `/login`
+- Panel: `/admin` (requiere autenticación y rol `admin` o `editor`)
+- Autorización con Spatie Permission (roles + permisos granulares)
+- El público (lector) consulta el sitio sin iniciar sesión
+
+Usuarios de prueba (después de `migrate --seed`; contraseñas definidas en `.env`):
+
+| Rol | Correo por defecto |
+| --- | --- |
+| Administrador | `admin@fesc.edu.co` |
+| Editor | `editor@fesc.edu.co` |
 
 ## Documentación
 
@@ -49,19 +63,20 @@ php artisan serve
 - [Sistema de diseño](docs/sistema-de-diseno.md): tokens, tipografía y componentes.
 - [Referencias de diseño](docs/referencias-diseno.md): análisis del portal FESC y patrones de producto.
 
-## Maquetación actual (demo)
-
-Rutas de vista estática (sin persistencia ni autenticación):
+## Rutas principales
 
 | Ruta | Descripción |
 |------|-------------|
 | `/` | Home pública |
 | `/contenidos/{slug}` | Detalle de contenido |
 | `/nfc/{code}` | Experiencia por punto NFC |
-| `/admin` | Dashboard (maqueta) |
-| `/admin/contenidos` | Listado de contenidos |
-| `/admin/contenidos/crear` | Formulario de noticia |
-| `/admin/nfc` | Listado de puntos NFC |
+| `/login` | Acceso administrativo |
+| `/admin` | Dashboard (protegido) |
+| `/admin/news` | Noticias (según permisos) |
+| `/admin/categories` | Categorías (según permisos) |
+| `/admin/nfc` | Puntos NFC (según permisos) |
+| `/admin/statistics` | Estadísticas (según permisos) |
+| `/admin/users` | Usuarios (solo admin) |
 
 ## Estructura general
 
@@ -76,7 +91,7 @@ docs/           # Documentación del proyecto
 
 ## Estado actual
 
-Maquetación Blade inicial con datos de ejemplo. Persistencia, autenticación y CRUD real se incorporarán por tareas posteriores.
+Autenticación (Breeze) y autorización (Spatie) integradas. Las vistas de contenido/NFC siguen usando datos de ejemplo; el CRUD persistente se incorporará en tareas posteriores.
 
 ## Comandos importantes
 

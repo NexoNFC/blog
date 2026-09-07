@@ -44,8 +44,8 @@
         <div class="reveal reveal-delay-2 order-1 lg:order-2">
             <div class="relative mx-auto max-w-md">
                 <img
-                    src="{{ asset('images/landing/nfc-phone-tap.png') }}"
-                    alt="Interacción entre un teléfono y un punto NFC"
+                    src="{{ asset('images/campus/estudiantes-nfc.jpg') }}"
+                    alt="Estudiante con el teléfono en el acceso del campus FESC"
                     class="w-full rounded-2xl border border-white/10 object-cover shadow-2xl"
                     loading="lazy"
                 >
