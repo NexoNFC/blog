@@ -1,68 +1,67 @@
-<section class="relative overflow-hidden bg-secondary text-white">
-    <div class="absolute inset-0">
+<section class="relative -mt-20 overflow-hidden pt-20 text-white">
+    <div class="absolute inset-0" aria-hidden="true">
         <img
-            src="{{ asset('images/landing/hero-nfc-campus.png') }}"
-            alt="Estudiante acercando el teléfono a un punto NFC en un pasillo universitario"
-            class="h-full w-full object-cover opacity-45"
-            width="1600"
-            height="900"
+            src="{{ asset('images/campus/aereo.jpg') }}"
+            alt=""
+            class="h-full w-full object-cover opacity-35"
+            width="1920"
+            height="1080"
             fetchpriority="high"
         >
-        <div class="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/85 to-secondary/40"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(200,16,46,0.35),transparent_45%)]"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-text/90 via-primary-dark/70 to-text/85"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-text/55 via-text/20 to-transparent"></div>
     </div>
 
-    <div class="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:items-center lg:py-24">
-        <div class="reveal lg:col-span-7">
-            <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/85 backdrop-blur">
+    <div class="relative mx-auto grid max-w-screen-xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-24">
+        <div class="reveal">
+            <p class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-white/85 uppercase backdrop-blur-md">
                 Comunidad FESC · Campus + NFC
             </p>
 
-            <h1 class="mt-5 max-w-3xl font-serif text-4xl font-bold leading-[1.1] text-white sm:text-5xl lg:text-6xl">
-                Descubre FESC donde estás
+            <h1 class="mt-6 max-w-xl font-serif text-4xl font-bold leading-[1.12] text-white sm:text-5xl lg:text-6xl">
+                Descubre FESC
+                <span class="block">donde estás</span>
             </h1>
 
-            <p class="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+            <p class="mt-5 max-w-lg font-sans text-base leading-relaxed text-white/75 sm:text-lg">
                 Noticias, eventos y mensajes de la comunidad. En el campus, acerca tu teléfono a un punto NFC y abre la información de ese lugar.
             </p>
 
-            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                <x-ui.button href="#noticias" class="w-full sm:w-auto">Explorar noticias</x-ui.button>
-                <x-ui.button href="#como-funciona" variant="secondary" class="w-full !border-white/35 !bg-white/5 !text-white hover:!bg-white/15 sm:w-auto">
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <x-ui.button href="#noticias" class="w-full !rounded-lg !font-bold sm:w-auto">
+                    Explorar noticias
+                </x-ui.button>
+                <x-ui.button href="#como-funciona" variant="glass" class="w-full !rounded-lg sm:w-auto">
                     Descubrir cómo funciona
                 </x-ui.button>
             </div>
 
-            <dl class="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-white/15 pt-6 text-center sm:text-left">
+            <dl class="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-white/10 pt-6">
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-white/60">Bloques</dt>
-                    <dd class="mt-1 font-serif text-2xl font-bold">A · B · C</dd>
+                    <dt class="text-xs font-medium tracking-wide text-white/55 uppercase">Bloques</dt>
+                    <dd class="mt-1 font-serif text-2xl font-bold text-white">A · B · C</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-white/60">Accesos</dt>
-                    <dd class="mt-1 font-serif text-2xl font-bold">Av. 4/5</dd>
+                    <dt class="text-xs font-medium tracking-wide text-white/55 uppercase">Accesos</dt>
+                    <dd class="mt-1 font-serif text-2xl font-bold text-white">Av. 4/5</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-white/60">Canal</dt>
-                    <dd class="mt-1 font-serif text-2xl font-bold">NFC</dd>
+                    <dt class="text-xs font-medium tracking-wide text-white/55 uppercase">Canal</dt>
+                    <dd class="mt-1 font-serif text-2xl font-bold text-white">NFC</dd>
                 </div>
             </dl>
         </div>
 
-        <div class="reveal reveal-delay-2 relative lg:col-span-5">
-            <div class="relative mx-auto max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-white/10 p-3 shadow-2xl backdrop-blur-sm">
+        <div class="reveal reveal-delay-2">
+            <div class="rounded-2xl border border-white/20 bg-white/10 p-3 shadow-2xl backdrop-blur-lg">
                 <img
-                    src="{{ asset('images/landing/nfc-phone-tap.png') }}"
-                    alt="Teléfono cerca de un punto NFC"
-                    class="aspect-square w-full rounded-xl object-cover"
-                    width="800"
-                    height="800"
-                    loading="lazy"
+                    src="{{ asset('images/campus/estudiantes-fachada.jpg') }}"
+                    alt="Estudiantes frente a la sede FESC en Cúcuta"
+                    class="aspect-[4/3] w-full rounded-xl object-cover"
+                    width="1536"
+                    height="1024"
+                    loading="eager"
                 >
-                <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-                    <span class="nfc-pulse absolute h-24 w-24 rounded-full border border-primary/70"></span>
-                    <span class="nfc-pulse nfc-pulse-delay absolute h-36 w-36 rounded-full border border-white/40"></span>
-                </div>
             </div>
             <p class="mt-4 text-center text-sm text-white/70">Campus físico → NFC → tu teléfono → información</p>
         </div>

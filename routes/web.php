@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ContentController as AdminContentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NfcPointController as AdminNfcPointController;
+use App\Http\Controllers\Admin\StatisticsController as AdminStatisticsController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NfcPointController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -14,9 +18,62 @@ Route::get('/contenidos/{slug}', [ContentController::class, 'show'])->name('cont
 
 Route::get('/nfc/{code}', [NfcPointController::class, 'show'])->name('nfc.show');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'active', 'role:admin|editor'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
-    Route::get('/contenidos', [AdminContentController::class, 'index'])->name('contents.index');
-    Route::get('/contenidos/crear', [AdminContentController::class, 'create'])->name('contents.create');
-    Route::get('/nfc', [AdminNfcPointController::class, 'index'])->name('nfc.index');
+
+    Route::middleware('permission:news.view')->group(function () {
+        Route::get('/news', [AdminContentController::class, 'index'])->name('news.index');
+        Route::get('/contenidos', [AdminContentController::class, 'index']);
+    });
+
+    Route::middleware('permission:news.create')->group(function () {
+        Route::get('/news/create', [AdminContentController::class, 'create'])->name('news.create');
+        Route::get('/contenidos/crear', [AdminContentController::class, 'create']);
+    });
+
+    Route::delete('/news/{news}', [AdminContentController::class, 'destroy'])
+        ->middleware('permission:news.delete')
+        ->name('news.destroy');
+
+    Route::get('/categories', [AdminCategoryController::class, 'index'])
+        ->middleware('permission:categories.view')
+        ->name('categories.index');
+
+    Route::post('/categories', [AdminCategoryController::class, 'store'])
+        ->middleware('permission:categories.create')
+        ->name('categories.store');
+
+    Route::get('/nfc', [AdminNfcPointController::class, 'index'])
+        ->middleware('permission:nfc.view')
+        ->name('nfc.index');
+
+    Route::get('/statistics', [AdminStatisticsController::class, 'index'])
+        ->middleware('role_or_permission:statistics.view|statistics.view-content|statistics.view-scans')
+        ->name('statistics.index');
+
+    Route::middleware('permission:users.view')->group(function () {
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    });
+
+    Route::middleware('permission:users.create')->group(function () {
+        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+    });
+
+    Route::middleware('permission:users.update')->group(function () {
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::patch('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+    });
+
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])
+        ->middleware('permission:users.delete')
+        ->name('users.destroy');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';

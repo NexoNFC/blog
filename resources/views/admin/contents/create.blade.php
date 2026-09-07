@@ -5,7 +5,7 @@
 @section('subtitle', 'Formulario de maqueta — no guarda datos')
 
 @section('actions')
-    <x-ui.button href="{{ route('admin.contents.index') }}" variant="secondary">Volver al listado</x-ui.button>
+    <x-ui.button href="{{ route('admin.news.index') }}" variant="secondary">Volver al listado</x-ui.button>
 @endsection
 
 @section('content')
@@ -13,7 +13,8 @@
         Este formulario es solo visual. Al enviar no se persiste información.
     </x-ui.alert>
 
-    <form action="#" method="get" class="mx-auto max-w-3xl space-y-6 rounded border border-muted bg-surface p-5 sm:p-6" onsubmit="return false;">
+    <form action="#" method="get" class="mx-auto max-w-3xl space-y-6" onsubmit="return false;">
+        <x-ui.card class="space-y-6">
         <x-ui.input label="Título" name="title" required placeholder="Ej. Convocatoria de bienestar universitario" />
 
         <x-ui.textarea label="Resumen" name="summary" required rows="3" placeholder="Texto breve para listados y experiencia NFC" />
@@ -23,7 +24,7 @@
         <div class="grid gap-4 sm:grid-cols-2">
             <div class="space-y-1.5">
                 <label for="type" class="block text-sm font-medium text-secondary">Tipo <span class="text-primary">*</span></label>
-                <select id="type" name="type" class="block w-full rounded border border-muted bg-surface px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <select id="type" name="type" class="form-control">
                     <option value="noticia">Noticia</option>
                     <option value="comunicado">Comunicado</option>
                     <option value="evento">Evento</option>
@@ -34,7 +35,7 @@
 
             <div class="space-y-1.5">
                 <label for="status" class="block text-sm font-medium text-secondary">Estado <span class="text-primary">*</span></label>
-                <select id="status" name="status" class="block w-full rounded border border-muted bg-surface px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <select id="status" name="status" class="form-control">
                     <option value="borrador">Borrador</option>
                     <option value="publicado">Publicado</option>
                 </select>
@@ -55,9 +56,10 @@
 
         <x-ui.input label="Categoría o etiquetas" name="tags" placeholder="Ej. bienestar, académico" />
 
-        <div class="flex flex-wrap gap-3 border-t border-muted pt-5">
+        <div class="flex flex-wrap gap-3 border-t border-white/40 pt-5">
             <x-ui.button type="submit">Guardar (demo)</x-ui.button>
-            <x-ui.button href="{{ route('admin.contents.index') }}" variant="secondary">Cancelar</x-ui.button>
+            <x-ui.button href="{{ route('admin.news.index') }}" variant="secondary">Cancelar</x-ui.button>
         </div>
+        </x-ui.card>
     </form>
 @endsection

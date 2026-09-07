@@ -1,4 +1,4 @@
-<section class="border-y border-muted bg-primary-soft/40 py-12 sm:py-14">
+<section class="border-y border-white/40 bg-primary-soft/50 py-12 backdrop-blur-md sm:py-14">
     <div class="reveal mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:items-center">
         <div class="max-w-2xl">
             <h2 class="font-serif text-2xl font-bold text-secondary sm:text-3xl">La información oficial sigue en FESC</h2>

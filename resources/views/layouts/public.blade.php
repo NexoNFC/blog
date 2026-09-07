@@ -7,13 +7,14 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex min-h-screen flex-col">
+<body class="app-canvas flex min-h-screen flex-col">
     <x-navigation.navbar />
 
-    <main class="flex-1">
+    <main class="flex-1 pt-20">
         @yield('content')
     </main>
 
     <x-navigation.site-footer />
+    <x-ui.alert-host />
 </body>
 </html>

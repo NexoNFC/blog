@@ -1,8 +1,9 @@
 @import 'tailwindcss';
-
+@plugin 'flowbite/plugin';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
+@source '../../node_modules/flowbite';
 
 @theme {
     --font-sans: var(--font-source-sans-3), 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
@@ -11,12 +12,15 @@
     --color-primary: #c8102e;
     --color-primary-dark: #9e0c24;
     --color-primary-soft: #f8e8eb;
+    --color-accent: #c8102e;
     --color-secondary: #434345;
     --color-secondary-light: #6b6b6e;
     --color-muted: #e8e8e9;
-    --color-background: #f7f7f8;
+    --color-background: #eef0f3;
+    --color-background-alt: #e4e6ea;
     --color-surface: #ffffff;
     --color-text: #1a1a1b;
+    --color-text-muted: #6b6b6e;
     --color-success: #047857;
     --color-success-soft: #ecfdf5;
     --color-warning: #b45309;
@@ -26,7 +30,11 @@
     --color-info: #1e3a5f;
     --color-info-soft: #eff6ff;
 
-    /* Alias de compatibilidad con la maqueta inicial */
+    --radius-glass: 1rem;
+    --blur-glass: 18px;
+    --shadow-glass: 0 10px 40px rgb(26 26 27 / 0.08);
+    --shadow-glass-lg: 0 18px 50px rgb(26 26 27 / 0.12);
+
     --color-brand-red: var(--color-primary);
     --color-brand-red-dark: var(--color-primary-dark);
     --color-brand-red-soft: var(--color-primary-soft);
@@ -37,8 +45,28 @@
 }
 
 @layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
     html {
         scroll-behavior: smooth;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    *::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+
+    body,
+    * {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
     body {
@@ -56,9 +84,119 @@
     }
 }
 
+@layer components {
+    .app-canvas {
+        background-color: var(--color-background);
+        background-image:
+            radial-gradient(ellipse 80% 50% at 0% -10%, rgb(200 16 46 / 0.08), transparent 50%),
+            radial-gradient(ellipse 60% 40% at 100% 0%, rgb(30 58 95 / 0.08), transparent 45%),
+            radial-gradient(ellipse 50% 30% at 50% 100%, rgb(200 16 46 / 0.04), transparent 50%);
+    }
+
+    .app-canvas-dark {
+        background-color: var(--color-secondary);
+        background-image:
+            radial-gradient(ellipse at top left, rgb(200 16 46 / 0.42), transparent 55%),
+            radial-gradient(ellipse at bottom right, rgb(255 255 255 / 0.1), transparent 45%),
+            radial-gradient(ellipse at 80% 20%, rgb(30 58 95 / 0.35), transparent 40%);
+    }
+
+    .glass-panel {
+        border: 1px solid rgb(255 255 255 / 0.55);
+        background-color: rgb(255 255 255 / 0.78);
+        box-shadow: var(--shadow-glass);
+        backdrop-filter: blur(12px);
+    }
+
+    .glass-nav {
+        border-bottom: 1px solid rgb(255 255 255 / 0.45);
+        background-color: rgb(255 255 255 / 0.72);
+        backdrop-filter: blur(14px);
+    }
+
+    .glass-dark {
+        border: 1px solid rgb(255 255 255 / 0.12);
+        background-color: rgb(26 26 27 / 0.28);
+        box-shadow: var(--shadow-glass);
+        backdrop-filter: blur(16px);
+    }
+
+    .form-control {
+        @apply block w-full rounded-xl border border-white/60 bg-white/60 px-3 py-2.5 text-sm text-text shadow-sm backdrop-blur-md transition placeholder:text-secondary-light hover:border-secondary-light/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-muted/70 disabled:opacity-60;
+    }
+
+    .form-control[aria-invalid='true'] {
+        @apply border-danger/55 focus:border-danger focus:ring-danger/15;
+    }
+
+    .auth-card .form-control {
+        @apply rounded-xl border-muted bg-[#ececee] shadow-none backdrop-blur-none hover:border-secondary-light/40 focus:border-primary focus:ring-4 focus:ring-primary/20;
+    }
+
+    .auth-card input[type='checkbox'] {
+        @apply rounded border-muted bg-[#ececee] shadow-none backdrop-blur-none;
+    }
+
+    .toast-viewport {
+        pointer-events: none;
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        left: auto;
+        z-index: 80;
+        display: flex;
+        width: min(24rem, calc(100vw - 2.5rem));
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .glass-panel {
+        background-color: rgb(255 255 255 / 0.64);
+        backdrop-filter: blur(var(--blur-glass));
+    }
+
+    .glass-nav {
+        backdrop-filter: blur(20px);
+    }
+
+    .glass-dark {
+        backdrop-filter: blur(22px);
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .glass-panel,
+    .glass-nav {
+        background-color: var(--color-surface);
+        backdrop-filter: none;
+    }
+
+    .glass-dark {
+        background-color: rgb(26 26 27 / 0.92);
+        backdrop-filter: none;
+    }
+
+    .form-control {
+        background-color: var(--color-surface);
+        backdrop-filter: none;
+    }
+}
+
 @layer utilities {
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
     .reveal {
-        animation: reveal-up 0.7s ease both;
+        animation: reveal-up 0.55s ease both;
         animation-delay: var(--reveal-delay, 0ms);
     }
 
@@ -82,7 +220,7 @@
 @keyframes reveal-up {
     from {
         opacity: 0;
-        transform: translateY(14px);
+        transform: translateY(10px);
     }
 
     to {

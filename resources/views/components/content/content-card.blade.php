@@ -9,7 +9,7 @@
 
 <article {{ $attributes->merge(['class' => $featured
     ? 'flex flex-col'
-    : 'flex flex-col rounded border border-muted bg-surface p-4 sm:p-5'
+    : 'flex flex-col glass-panel rounded-2xl p-4 sm:p-5'
 ]) }}>
     @if ($featured)
         <div class="aspect-[16/9] rounded bg-muted">

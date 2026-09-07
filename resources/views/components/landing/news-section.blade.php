@@ -4,7 +4,7 @@
     'images' => [],
 ])
 
-<section id="noticias" class="bg-surface py-16 sm:py-20">
+<section id="noticias" class="py-16 sm:py-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <x-ui.section-heading
@@ -19,19 +19,19 @@
         </div>
 
         @if ($featured || count($items))
-            <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="mt-12 grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @if ($featured)
                     <x-news.card
                         :content="$featured"
                         :featured="true"
-                        :image="$images[$featured['slug']] ?? asset('images/landing/news-students-study.png')"
+                        :image="$images[$featured['slug']] ?? null"
                     />
                 @endif
 
                 @foreach ($items as $item)
                     <x-news.card
                         :content="$item"
-                        :image="$images[$item['slug']] ?? asset('images/landing/news-campus-walk.png')"
+                        :image="$images[$item['slug']] ?? null"
                     />
                 @endforeach
             </div>
