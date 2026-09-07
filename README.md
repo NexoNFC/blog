@@ -19,7 +19,7 @@ Convertir puntos físicos de la institución en puertas digitales a información
 
 ## Requisitos
 
-- PHP 8.2 o superior
+- PHP 8.4 o superior
 - Composer
 - Node.js y npm
 - MySQL o MariaDB
@@ -45,6 +45,23 @@ php artisan serve
 
 - [Modelo de negocio](docs/modelo-de-negocio.md): propósito, NFC, actores, entidades y reglas de dominio.
 - [Convenciones de desarrollo](docs/convenciones-de-desarrollo.md): stack, arquitectura, Git, frontend y calidad.
+- [Contextualizador institucional y físico](docs/contexto-institucional-y-fisico.md): identidad oficial FESC y sede Cúcuta / NFC.
+- [Sistema de diseño](docs/sistema-de-diseno.md): tokens, tipografía y componentes.
+- [Referencias de diseño](docs/referencias-diseno.md): análisis del portal FESC y patrones de producto.
+
+## Maquetación actual (demo)
+
+Rutas de vista estática (sin persistencia ni autenticación):
+
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Home pública |
+| `/contenidos/{slug}` | Detalle de contenido |
+| `/nfc/{code}` | Experiencia por punto NFC |
+| `/admin` | Dashboard (maqueta) |
+| `/admin/contenidos` | Listado de contenidos |
+| `/admin/contenidos/crear` | Formulario de noticia |
+| `/admin/nfc` | Listado de puntos NFC |
 
 ## Estructura general
 
@@ -59,7 +76,7 @@ docs/           # Documentación del proyecto
 
 ## Estado actual
 
-Proyecto base Laravel en configuración inicial. El modelo de negocio está documentado; las funcionalidades se incorporarán de forma incremental por tareas, ramas y pull requests.
+Maquetación Blade inicial con datos de ejemplo. Persistencia, autenticación y CRUD real se incorporarán por tareas posteriores.
 
 ## Comandos importantes
 
