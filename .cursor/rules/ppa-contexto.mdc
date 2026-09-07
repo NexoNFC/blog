@@ -1,0 +1,32 @@
+---
+description: Contexto PPA, stack, identidad del repo y principios de desarrollo
+alwaysApply: true
+---
+
+# Contexto del proyecto
+
+Plataforma informativa FESC (PPA, Ingeniería de Software) con acceso web y puntos NFC en el campus. Tratarlo como software real: buenas prácticas, trazabilidad, separación de responsabilidades, documentación y desarrollo incremental.
+
+El dominio de negocio (NFC, contenidos, roles, estadísticas) está en la regla `ppa-negocio` y en `docs/modelo-de-negocio.md`.
+
+## Stack permitido
+
+Laravel, PHP, Blade, HTML, CSS, JavaScript, Tailwind CSS, MySQL/MariaDB, Git/GitHub.
+
+## Stack prohibido (salvo decisión técnica explícita)
+
+React, Vue, Angular, Inertia, Livewire.
+
+## Principios
+
+- Código correcto > mantenible > simple > sofisticado innecesario.
+- No sobreingeniería: microservicios, CQRS, Event Sourcing, hexagonal completa, capas artificiales.
+- No implementar “porque funciona”: entender el problema, el impacto, los archivos afectados y no romper lo existente.
+- No implementar funcionalidades no definidas; desarrollo incremental por tarea.
+- Nombres de código en inglés; documentación funcional/académica en español.
+- Antes de cambios arquitectónicos importantes: explicar problema, propuesta, alternativas, impacto y archivos afectados.
+- Dependencias solo si hay necesidad real; preferir soluciones nativas de Laravel.
+
+## Identidad del repositorio
+
+El repo debe parecer desarrollado por el equipo. No dejar rastros visibles de herramientas de asistencia en README, commits, ramas, issues, PRs, docs, comentarios, nombres, mensajes de error ni configuración.

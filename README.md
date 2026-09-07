@@ -43,6 +43,8 @@ php artisan serve
 
 ## Documentación
 
+- [Modelo de negocio](docs/modelo-de-negocio.md): propósito, NFC, actores, entidades y reglas de dominio.
+- [Convenciones de desarrollo](docs/convenciones-de-desarrollo.md): stack, arquitectura, Git, frontend y calidad.
 - [Contextualizador institucional y físico](docs/contexto-institucional-y-fisico.md): identidad oficial FESC y sede Cúcuta / NFC.
 - [Sistema de diseño](docs/sistema-de-diseno.md): tokens, tipografía y componentes.
 - [Referencias de diseño](docs/referencias-diseno.md): análisis del portal FESC y patrones de producto.
@@ -64,7 +66,7 @@ Rutas de vista estática (sin persistencia ni autenticación):
 ## Estructura general
 
 ```
-app/            # Lógica de aplicación
+app/            # Lógica de aplicación (modelos, controladores, services, etc.)
 database/       # Migraciones y seeders
 resources/      # Vistas Blade, CSS y JavaScript
 routes/         # Definición de rutas
