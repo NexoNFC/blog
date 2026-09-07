@@ -19,7 +19,7 @@ Convertir puntos físicos de la institución en puertas digitales a información
 
 ## Requisitos
 
-- PHP 8.2 o superior
+- PHP 8.4 o superior
 - Composer
 - Node.js y npm
 - MySQL o MariaDB

@@ -3,6 +3,8 @@ name: Tests
 on:
   push:
     branches:
+      - main
+      - develop
       - master
       - '*.x'
   pull_request:
@@ -19,7 +21,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4, 8.5]
+        php: [8.4, 8.5]
 
     name: PHP ${{ matrix.php }}
 
