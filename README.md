@@ -41,6 +41,16 @@ npm run build
 php artisan serve
 ```
 
+## Despliegue en Vercel
+
+La aplicación corre en un contenedor FrankenPHP. Hace falta una base de datos MySQL/MariaDB externa (SQLite no persiste en Vercel).
+
+1. Crear el proyecto en Vercel e importar el repositorio.
+2. Definir variables de entorno de producción: `APP_KEY`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`, y las credenciales `DB_*`.
+3. Tras el primer deploy, ejecutar migraciones contra esa base: `php artisan migrate --force --seed` (desde un entorno con esas variables, no al arrancar el contenedor).
+
+Archivos de despliegue: `vercel.json`, `Dockerfile.vercel`, `Caddyfile`.
+
 ## Acceso administrativo
 
 - Login: `/admin/login` (`/login` redirige ahí)
