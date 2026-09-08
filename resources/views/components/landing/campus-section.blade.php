@@ -2,12 +2,8 @@
     'locations' => [],
 ])
 
-<section id="campus" class="relative overflow-hidden py-16 sm:py-20">
-    <div class="pointer-events-none absolute inset-y-0 right-0 hidden w-1/3 opacity-30 lg:block" aria-hidden="true">
-        <img src="{{ asset('images/campus/fachada-desenfoque.jpg') }}" alt="" class="h-full w-full object-cover">
-    </div>
-
-    <div class="relative mx-auto max-w-7xl px-4 sm:px-6">
+<section id="campus" class="relative py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
         <x-ui.section-heading
             class="reveal"
             eyebrow="Campus"

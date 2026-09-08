@@ -11,7 +11,7 @@
 @endphp
 
 <footer class="mt-auto">
-    <div class="border-t border-white/40 bg-white/70 backdrop-blur-md">
+    <div class="border-t border-white/40 bg-white/35 backdrop-blur-md">
         <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-4 sm:px-6">
             @foreach ($partners as $partner)
                 @if ($partner['href'])
@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="bg-[#666666] text-white">
+    <div class="footer-glass text-white">
         <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:items-start lg:gap-8 lg:py-12">
             <div class="flex justify-center lg:col-span-3">
                 <img

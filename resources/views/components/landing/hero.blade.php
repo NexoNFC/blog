@@ -1,70 +1,30 @@
-<section class="relative -mt-20 overflow-hidden pt-20 text-white">
-    <div class="absolute inset-0" aria-hidden="true">
-        <img
-            src="{{ asset('images/campus/aereo.jpg') }}"
-            alt=""
-            class="h-full w-full object-cover opacity-35"
-            width="1920"
-            height="1080"
-            fetchpriority="high"
-        >
-        <div class="absolute inset-0 bg-gradient-to-br from-text/90 via-primary-dark/70 to-text/85"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-text/55 via-text/20 to-transparent"></div>
-    </div>
-
-    <div class="relative mx-auto grid max-w-screen-xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-24">
-        <div class="reveal">
-            <p class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-white/85 uppercase backdrop-blur-md">
+<section class="hero-section px-4 pb-12 pt-4 sm:px-6 sm:pb-16 sm:pt-6">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
+        <div class="reveal text-center lg:text-left">
+            <p class="glass-chip mx-auto px-3 py-1 text-xs font-semibold tracking-[0.16em] text-secondary uppercase lg:mx-0">
                 Comunidad FESC · Campus + NFC
             </p>
 
-            <h1 class="mt-6 max-w-xl font-serif text-4xl font-bold leading-[1.12] text-white sm:text-5xl lg:text-6xl">
+            <h1 class="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-secondary sm:text-5xl lg:text-6xl">
                 Descubre FESC
-                <span class="block">donde estás</span>
+                <span class="gradient-text block">donde estás</span>
             </h1>
 
-            <p class="mt-5 max-w-lg font-sans text-base leading-relaxed text-white/75 sm:text-lg">
+            <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-secondary lg:mx-0 sm:text-lg">
                 Noticias, eventos y mensajes de la comunidad. En el campus, acerca tu teléfono a un punto NFC y abre la información de ese lugar.
             </p>
 
-            <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <x-ui.button href="#noticias" class="w-full !rounded-lg !font-bold sm:w-auto">
+            <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+                <x-ui.button href="#noticias" class="w-full !rounded-2xl !px-6 !shadow-[0_12px_28px_rgb(200_16_46_/_0.22)] sm:w-auto">
                     Explorar noticias
                 </x-ui.button>
-                <x-ui.button href="#como-funciona" variant="glass" class="w-full !rounded-lg sm:w-auto">
+                <x-ui.button href="#como-funciona" variant="secondary" class="w-full !rounded-2xl !border-primary/15 !bg-white/80 !text-secondary sm:w-auto">
                     Descubrir cómo funciona
                 </x-ui.button>
             </div>
 
-            <dl class="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-white/10 pt-6">
-                <div>
-                    <dt class="text-xs font-medium tracking-wide text-white/55 uppercase">Bloques</dt>
-                    <dd class="mt-1 font-serif text-2xl font-bold text-white">A · B · C</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium tracking-wide text-white/55 uppercase">Accesos</dt>
-                    <dd class="mt-1 font-serif text-2xl font-bold text-white">Av. 4/5</dd>
-                </div>
-                <div>
-                    <dt class="text-xs font-medium tracking-wide text-white/55 uppercase">Canal</dt>
-                    <dd class="mt-1 font-serif text-2xl font-bold text-white">NFC</dd>
-                </div>
-            </dl>
-        </div>
-
-        <div class="reveal reveal-delay-2">
-            <div class="rounded-2xl border border-white/20 bg-white/10 p-3 shadow-2xl backdrop-blur-lg">
-                <img
-                    src="{{ asset('images/campus/estudiantes-fachada.jpg') }}"
-                    alt="Estudiantes frente a la sede FESC en Cúcuta"
-                    class="aspect-[4/3] w-full rounded-xl object-cover"
-                    width="1536"
-                    height="1024"
-                    loading="eager"
-                >
-            </div>
             <x-landing.journey
-                class="mt-4"
+                class="mt-8 justify-center lg:justify-start"
                 :steps="[
                     ['icon' => 'bookmark', 'label' => 'Campus'],
                     ['icon' => 'atom', 'label' => 'NFC'],
@@ -72,6 +32,24 @@
                     ['icon' => 'book', 'label' => 'Información'],
                 ]"
             />
+        </div>
+
+        <div class="reveal reveal-delay-2 relative">
+            <span class="absolute -inset-5 rounded-[2.25rem] bg-primary/20 blur-2xl" aria-hidden="true"></span>
+            <figure class="hero-photo relative">
+                <img
+                    src="{{ asset('images/campus/estudiantes-fachada.jpg') }}"
+                    alt="Estudiantes frente a la sede FESC en Cúcuta"
+                    width="960"
+                    height="720"
+                    fetchpriority="high"
+                >
+                <figcaption class="absolute inset-x-4 bottom-4 z-10">
+                    <span class="glass-chip px-3 py-1.5 text-xs font-semibold text-secondary">
+                        Sede Cúcuta · puntos NFC en campus
+                    </span>
+                </figcaption>
+            </figure>
         </div>
     </div>
 </section>
