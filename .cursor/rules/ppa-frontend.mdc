@@ -1,24 +1,34 @@
 ---
-description: Blade, Tailwind, UI, responsive y componentes del blog
+description: Blade, Tailwind, Glassmorphism, Flowbite e identidad visual FESC
 globs: resources/**/*.{blade.php,css,js}
 alwaysApply: false
 ---
 
-# Frontend (Blade + Tailwind)
+# Frontend
 
-- Vistas limpias: layouts, componentes, partials, slots.
-- Sin lógica de negocio en Blade; no duplicar HTML.
-- Componentes reutilizables cuando se repitan: `button`, `card`, `input`, `alert`, `badge`.
-- Tailwind organizado; evitar estilos repetitivos o innecesarios.
-- JS solo cuando aporte interacción real (no para lo resoluble con HTML/Blade).
+Identidad: **FESC + NFC + Glassmorphism + Flowbite**. Un solo producto, no plantilla Laravel ni copia del portal FESC.
 
-## UI
+## Orden de decisión
 
-- Sin emojis como elementos principales; preferir iconos consistentes.
-- Jerarquía, espaciado, tipografía y estados (`hover`, `focus`, `disabled`) coherentes.
-- Mensajes de error y éxito claros, en español.
-- Interfaz coherente como producto, no como piezas sueltas.
+1. ¿Hay patrón Flowbite reutilizable?
+2. ¿Ya existe un componente Blade?
+3. Adaptar a Glassmorphism y tokens FESC.
+4. No inventar estilos por pantalla.
 
-## Responsive
+## Tokens
 
-Adaptar a escritorio, tablet y móvil: tablas, formularios, navegación, tarjetas y publicaciones.
+Usar clases del tema (`primary`, `secondary`, `surface`, `background`, `success`, `warning`, `danger`, `info`) y superficies `glass-panel`, `glass-nav`, `glass-dark`, `form-control`, `app-canvas`.
+
+Glassmorphism estratégico: profundidad y jerarquía, no paneles transparentes en todo. Contraste suficiente; si baja, subir opacidad. En móvil, blur más ligero.
+
+## Componentes
+
+Reutilizar `x-ui.button`, `x-ui.alert` / `x-alert`, `x-ui.badge`, `x-ui.card`, `x-ui.table`, `x-ui.empty-state`, `x-ui.loading`, `x-form.input`, `x-form.password`, `x-form.select`. Iconos con `x-icon`, nunca emojis.
+
+## Formularios
+
+Errores y avisos transitorios (validación, flash, login) van al toast global `x-ui.alert-host` (esquina superior derecha, cierre automático). No incrustarlos en formularios ni tarjetas. El campo inválido usa borde/aria-invalid. Reservar `x-ui.alert` en página solo para contexto persistente (p. ej. NFC inactivo, último administrador).
+
+## Interacción
+
+Hover, focus y disabled visibles. Animaciones cortas (fade/scale). Alpine para lo ya existente; Flowbite como base visual.

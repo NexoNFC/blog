@@ -9,21 +9,34 @@
 
 <{{ $tag }}
     @if ($href) href="{{ $href }}" @endif
-    {{ $attributes->merge(['class' => 'group reveal flex h-full flex-col rounded-2xl border border-muted bg-surface p-5 transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg']) }}
+    {{ $attributes->merge(['class' => 'group reveal flex h-full flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/65 shadow-[0_10px_40px_rgb(26_26_27_/_0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_18px_50px_rgb(26_26_27_/_0.12)]']) }}
 >
-    <div class="flex items-start justify-between gap-3">
-        <x-ui.icon :name="$location['icon'] ?? 'building'" />
-        @if (! empty($location['badge']))
-            <x-ui.badge tone="accent">{{ $location['badge'] }}</x-ui.badge>
+    @if (! empty($location['image']))
+        <div class="overflow-hidden">
+            <img
+                src="{{ asset($location['image']) }}"
+                alt=""
+                class="h-36 w-full object-cover transition duration-300 group-hover:scale-105"
+                loading="lazy"
+            >
+        </div>
+    @endif
+
+    <div class="flex flex-1 flex-col p-5">
+        <div class="flex items-start justify-between gap-3">
+            <x-ui.icon :name="$location['icon'] ?? 'building'" />
+            @if (! empty($location['badge']))
+                <x-ui.badge tone="accent">{{ $location['badge'] }}</x-ui.badge>
+            @endif
+        </div>
+
+        <h3 class="mt-5 font-serif text-xl font-semibold text-secondary group-hover:text-primary">
+            {{ $location['name'] }}
+        </h3>
+        <p class="mt-2 text-sm text-secondary-light">{{ $location['detail'] }}</p>
+
+        @if ($href)
+            <span class="mt-auto pt-5 text-sm font-semibold text-primary">Explorar este punto</span>
         @endif
     </div>
-
-    <h3 class="mt-5 font-serif text-xl font-semibold text-secondary group-hover:text-primary">
-        {{ $location['name'] }}
-    </h3>
-    <p class="mt-2 text-sm text-secondary-light">{{ $location['detail'] }}</p>
-
-    @if ($href)
-        <span class="mt-auto pt-5 text-sm font-semibold text-primary">Explorar este punto</span>
-    @endif
 </{{ $tag }}>

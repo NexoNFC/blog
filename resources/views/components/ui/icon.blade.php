@@ -15,7 +15,7 @@
     ];
 @endphp
 
-<span {{ $attributes->merge(['class' => 'inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary']) }}>
+<span {{ $attributes->merge(['class' => 'inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/50 text-primary shadow-sm backdrop-blur-md']) }}>
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor" class="h-6 w-6" aria-hidden="true">
         {!! $icons[$name] ?? $icons['spark'] !!}
     </svg>
