@@ -1,5 +1,4 @@
 @php
-    $selectedRole = old('role', $user->roles->first()?->name ?? '');
     $selectedActive = old('is_active', $user->is_active ? '1' : '0');
     $lockPrivileges = $isLastActiveAdministrator ?? false;
 @endphp
@@ -34,12 +33,11 @@
 </div>
 
 <div>
-    <x-form.label for="role" required>Rol</x-form.label>
-    <x-form.select id="role" name="role" required @disabled($lockPrivileges)>
-        <option value="" disabled @selected($selectedRole === '')>Selecciona un rol</option>
-        <option value="admin" @selected($selectedRole === 'admin')>Administrador</option>
-        <option value="editor" @selected($selectedRole === 'editor')>Editor</option>
-    </x-form.select>
+    <input type="hidden" name="role" value="admin">
+    <p class="text-sm text-secondary">
+        <span class="font-medium">Rol:</span> Administrador
+    </p>
+    <p class="mt-1 text-xs text-secondary-light">El panel solo admite el rol de administrador.</p>
 </div>
 
 <div>

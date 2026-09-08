@@ -21,6 +21,6 @@
         </section>
     @else
         <x-nfc.point-header :point="$point" />
-        <x-nfc.point-content-section :contents="$contents" />
+        <x-nfc.point-content-section :items="$contents" :more-news="$moreNews" />
     @endif
 @endsection

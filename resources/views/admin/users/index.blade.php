@@ -2,7 +2,7 @@
 
 @section('title', 'Usuarios')
 @section('heading', 'Usuarios')
-@section('subtitle', 'Cuentas de administradores y editores')
+@section('subtitle', 'Cuentas de administradores')
 
 @section('actions')
     @can('users.create')
@@ -27,7 +27,6 @@
                     $role = $user->roles->first()?->name;
                     $roleLabel = match ($role) {
                         'admin' => 'Administrador',
-                        'editor' => 'Editor',
                         default => '—',
                     };
                     $isLastActiveAdministrator = $user->isAdministrator() && $user->is_active && $activeAdministratorCount <= 1;

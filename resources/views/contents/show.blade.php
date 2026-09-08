@@ -13,7 +13,7 @@
             @if (! empty($content['image']))
                 <img
                     src="{{ asset($content['image']) }}"
-                    alt=""
+                    alt="{{ $content['title'] }}"
                     class="h-full w-full object-cover"
                     loading="lazy"
                 >

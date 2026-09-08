@@ -2,12 +2,11 @@
 
 @section('title', 'Dashboard')
 @section('heading', 'Dashboard')
-@section('subtitle', 'Resumen operativo de la maqueta')
+@section('subtitle', 'Resumen operativo de noticias y puntos NFC')
 
 @section('content')
     <x-ui.alert type="info" class="mb-6">
-        Panel administrativo protegido. Los datos de resumen siguen siendo de demostración hasta el CRUD real.
-        Esta plataforma complementa el
+        Panel administrativo protegido. Esta plataforma complementa el
         <a href="https://www.fesc.edu.co/portal/" target="_blank" rel="noopener noreferrer" class="font-semibold underline underline-offset-2">sitio oficial FESC</a>.
     </x-ui.alert>
 
@@ -49,7 +48,7 @@
                     <li class="flex items-start justify-between gap-3 py-3">
                         <div class="min-w-0">
                             <p class="font-medium text-secondary">{{ $point['name'] }}</p>
-                            <p class="text-xs text-secondary-light">{{ $point['identifier'] }} · {{ $point['scans_demo'] }} escaneos (demo)</p>
+                            <p class="text-xs text-secondary-light">{{ $point['identifier'] }} · {{ $point['scans_count'] }} escaneos</p>
                         </div>
                         <x-nfc.point-status :status="$point['status']" />
                     </li>

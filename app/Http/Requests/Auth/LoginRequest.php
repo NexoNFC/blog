@@ -67,7 +67,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        if (! $user->hasAnyRole(['admin', 'editor'])) {
+        if (! $user->hasRole('admin')) {
             Auth::logout();
 
             throw ValidationException::withMessages([

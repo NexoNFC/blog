@@ -32,7 +32,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Configurar la base de datos y las credenciales iniciales (`ADMIN_*`, `EDITOR_*`) en `.env` y luego:
+Configurar la base de datos y las credenciales iniciales (`ADMIN_*`) en `.env` y luego:
 
 ```bash
 php artisan migrate --seed
@@ -43,17 +43,18 @@ php artisan serve
 
 ## Acceso administrativo
 
-- Login: `/login`
-- Panel: `/admin` (requiere autenticación y rol `admin` o `editor`)
-- Autorización con Spatie Permission (roles + permisos granulares)
-- El público (lector) consulta el sitio sin iniciar sesión
+- Login: `/admin/login` (`/login` redirige ahí)
+- Panel: `/admin` (requiere autenticación y rol `admin`)
+- Autorización con Spatie Permission (un solo rol: administrador)
+- El público consulta el sitio sin iniciar sesión
 
-Usuarios de prueba (después de `migrate --seed`; contraseñas definidas en `.env`):
+Usuarios de prueba (después de `migrate --seed`; contraseñas definidas en `.env`, por defecto `password`):
 
-| Rol | Correo por defecto |
+| Nombre | Correo por defecto |
 | --- | --- |
-| Administrador | `admin@fesc.edu.co` |
-| Editor | `editor@fesc.edu.co` |
+| Administrador FESC | `admin@fesc.edu.co` |
+| Erick | `est_es.perez@fesc.edu.co` |
+| Santiago | `est_s_rueda@fesc.edu.co` |
 
 ## Documentación
 

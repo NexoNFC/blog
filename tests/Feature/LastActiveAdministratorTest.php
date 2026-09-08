@@ -70,7 +70,7 @@ class LastActiveAdministratorTest extends TestCase
                 'is_active' => '1',
             ])
             ->assertRedirect(route('admin.users.edit', $admin))
-            ->assertSessionHas('alert.type', 'danger');
+            ->assertSessionHasErrors('role');
 
         $this->assertTrue($admin->fresh()->hasRole('admin'));
         $this->assertSame(1, app(AdministratorIntegrityService::class)->activeAdministratorCount());
@@ -108,7 +108,7 @@ class LastActiveAdministratorTest extends TestCase
                 'role' => 'editor',
                 'is_active' => '1',
             ])
-            ->assertSessionHas('alert.type', 'danger');
+            ->assertSessionHasErrors('role');
 
         $this->assertTrue($active->fresh()->hasRole('admin'));
         $this->assertTrue($inactive->fresh()->exists);

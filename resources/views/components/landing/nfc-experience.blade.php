@@ -11,21 +11,21 @@
 
             <ul class="mt-8 space-y-4">
                 <li class="flex gap-3">
-                    <x-ui.icon name="door" class="!bg-white/10 !text-white" />
+                    <x-ui.icon name="arrow-right-to-bracket" class="!bg-white/10 !text-white" />
                     <div>
                         <p class="font-semibold">Lugar físico</p>
                         <p class="text-sm text-white/70">Biblioteca, entradas, bloques y auditorio.</p>
                     </div>
                 </li>
                 <li class="flex gap-3">
-                    <x-ui.icon name="nfc" class="!bg-white/10 !text-white" />
+                    <x-ui.icon name="atom" class="!bg-white/10 !text-white" />
                     <div>
                         <p class="font-semibold">Punto NFC estable</p>
                         <p class="text-sm text-white/70">Una URL permanente, contenido administrable.</p>
                     </div>
                 </li>
                 <li class="flex gap-3">
-                    <x-ui.icon name="spark" class="!bg-white/10 !text-white" />
+                    <x-ui.icon name="book" class="!bg-white/10 !text-white" />
                     <div>
                         <p class="font-semibold">Descubrimiento</p>
                         <p class="text-sm text-white/70">Noticias, eventos y enlaces oficiales de FESC.</p>
@@ -55,7 +55,14 @@
                     <span class="nfc-pulse nfc-pulse-delay-2 absolute h-60 w-60 rounded-full border border-white/25"></span>
                 </div>
             </div>
-            <p class="mt-4 text-center text-sm text-white/65">Teléfono → punto NFC → contenido</p>
+            <x-landing.journey
+                class="mt-4"
+                :steps="[
+                    ['icon' => 'blender-phone', 'label' => 'Teléfono'],
+                    ['icon' => 'atom', 'label' => 'Punto NFC'],
+                    ['icon' => 'book', 'label' => 'Contenido'],
+                ]"
+            />
         </div>
     </div>
 </section>
