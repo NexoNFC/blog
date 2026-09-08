@@ -9,6 +9,10 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
             fonts: [
+                bunny('Inter', {
+                    weights: [400, 500, 600, 700],
+                    optimizedFallbacks: false,
+                }),
                 bunny('Source Sans 3', {
                     weights: [400, 500, 600, 700],
                     optimizedFallbacks: false,

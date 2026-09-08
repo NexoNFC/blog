@@ -5,6 +5,7 @@
 @section('content')
     @if ($point['status'] !== 'activo')
         <section class="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+            <div class="glass-card px-6 py-8 sm:px-10">
             <x-ui.alert type="warning">
                 Este punto NFC no está disponible en este momento. El chip físico puede permanecer instalado; el acceso se controla desde la plataforma.
             </x-ui.alert>
@@ -17,6 +18,7 @@
 
             <div class="mt-8">
                 <x-ui.button href="{{ route('home') }}" variant="secondary">Ir al inicio</x-ui.button>
+            </div>
             </div>
         </section>
     @else
