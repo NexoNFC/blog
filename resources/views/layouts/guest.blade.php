@@ -17,7 +17,7 @@
                     Administración
                 </p>
                 <p class="mt-3 max-w-sm text-sm leading-relaxed text-white/75 sm:text-base">
-                    Acceso restringido para administradores y editores de la plataforma informativa FESC.
+                    Acceso restringido para administradores de la plataforma informativa FESC.
                 </p>
             </div>
 

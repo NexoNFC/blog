@@ -10,26 +10,78 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::query()->updateOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@fesc.edu.co')],
-            [
-                'name' => env('ADMIN_NAME', 'Administrador FESC'),
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
-                'is_active' => true,
-                'email_verified_at' => now(),
-            ],
-        );
-        $admin->syncRoles(['admin']);
+        $password = (string) env('ADMIN_PASSWORD', 'password');
 
-        $editor = User::query()->updateOrCreate(
-            ['email' => env('EDITOR_EMAIL', 'editor@fesc.edu.co')],
+        $this->upsertAdministrator(
+            email: (string) env('ADMIN_EMAIL', 'admin@fesc.edu.co'),
+            name: (string) env('ADMIN_NAME', 'Administrador FESC'),
+            password: $password,
+        );
+
+        $erickEmail = (string) env('ADMIN_ERICK_EMAIL', 'est_es.perez@fesc.edu.co');
+        $santiagoEmail = (string) env('ADMIN_SANTIAGO_EMAIL', 'est_s_rueda@fesc.edu.co');
+
+        $this->migrateEmail('erick@fesc.edu.co', $erickEmail);
+        $this->migrateEmail('santiago@fesc.edu.co', $santiagoEmail);
+
+        $this->upsertAdministrator(
+            email: $erickEmail,
+            name: (string) env('ADMIN_ERICK_NAME', 'Erick'),
+            password: (string) env('ADMIN_ERICK_PASSWORD', $password),
+        );
+
+        $this->upsertAdministrator(
+            email: $santiagoEmail,
+            name: (string) env('ADMIN_SANTIAGO_NAME', 'Santiago'),
+            password: (string) env('ADMIN_SANTIAGO_PASSWORD', $password),
+        );
+
+        $legacyEditor = User::query()->where('email', env('EDITOR_EMAIL', 'editor@fesc.edu.co'))->first();
+
+        if ($legacyEditor !== null) {
+            $legacyEditor->syncRoles([]);
+            $legacyEditor->is_active = false;
+            $legacyEditor->save();
+        }
+    }
+
+    private function migrateEmail(string $from, string $to): void
+    {
+        if ($from === $to) {
+            return;
+        }
+
+        $previous = User::query()->where('email', $from)->first();
+        $target = User::query()->where('email', $to)->first();
+
+        if ($previous === null) {
+            return;
+        }
+
+        if ($target === null) {
+            $previous->email = $to;
+            $previous->save();
+
+            return;
+        }
+
+        $previous->syncRoles([]);
+        $previous->is_active = false;
+        $previous->save();
+    }
+
+    private function upsertAdministrator(string $email, string $name, string $password): void
+    {
+        $user = User::query()->updateOrCreate(
+            ['email' => $email],
             [
-                'name' => env('EDITOR_NAME', 'Editor FESC'),
-                'password' => Hash::make(env('EDITOR_PASSWORD', 'password')),
+                'name' => $name,
+                'password' => Hash::make($password),
                 'is_active' => true,
                 'email_verified_at' => now(),
             ],
         );
-        $editor->syncRoles(['editor']);
+
+        $user->syncRoles(['admin']);
     }
 }

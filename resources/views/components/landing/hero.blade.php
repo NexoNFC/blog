@@ -63,7 +63,15 @@
                     loading="eager"
                 >
             </div>
-            <p class="mt-4 text-center text-sm text-white/70">Campus físico → NFC → tu teléfono → información</p>
+            <x-landing.journey
+                class="mt-4"
+                :steps="[
+                    ['icon' => 'bookmark', 'label' => 'Campus'],
+                    ['icon' => 'atom', 'label' => 'NFC'],
+                    ['icon' => 'blender-phone', 'label' => 'Tu teléfono'],
+                    ['icon' => 'book', 'label' => 'Información'],
+                ]"
+            />
         </div>
     </div>
 </section>

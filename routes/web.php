@@ -18,7 +18,7 @@ Route::get('/contenidos/{slug}', [ContentController::class, 'show'])->name('cont
 
 Route::get('/nfc/{code}', [NfcPointController::class, 'show'])->name('nfc.show');
 
-Route::middleware(['auth', 'active', 'role:admin|editor'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
 
     Route::middleware('permission:news.view')->group(function () {
@@ -30,6 +30,18 @@ Route::middleware(['auth', 'active', 'role:admin|editor'])->prefix('admin')->nam
         Route::get('/news/create', [AdminContentController::class, 'create'])->name('news.create');
         Route::get('/contenidos/crear', [AdminContentController::class, 'create']);
     });
+
+    Route::get('/news/{news}/edit', [AdminContentController::class, 'edit'])
+        ->middleware('permission:news.update')
+        ->name('news.edit');
+
+    Route::patch('/news/{news}', [AdminContentController::class, 'update'])
+        ->middleware('permission:news.update')
+        ->name('news.update');
+
+    Route::post('/news/{news}/publish', [AdminContentController::class, 'publish'])
+        ->middleware('permission:news.publish')
+        ->name('news.publish');
 
     Route::delete('/news/{news}', [AdminContentController::class, 'destroy'])
         ->middleware('permission:news.delete')
@@ -46,6 +58,10 @@ Route::middleware(['auth', 'active', 'role:admin|editor'])->prefix('admin')->nam
     Route::get('/nfc', [AdminNfcPointController::class, 'index'])
         ->middleware('permission:nfc.view')
         ->name('nfc.index');
+
+    Route::patch('/nfc/{nfcPoint}', [AdminNfcPointController::class, 'update'])
+        ->middleware('permission:nfc.manage-content')
+        ->name('nfc.update');
 
     Route::get('/statistics', [AdminStatisticsController::class, 'index'])
         ->middleware('role_or_permission:statistics.view|statistics.view-content|statistics.view-scans')

@@ -15,7 +15,7 @@
         <div class="overflow-hidden">
             <img
                 src="{{ asset($location['image']) }}"
-                alt=""
+                alt="{{ $location['name'] }}"
                 class="h-36 w-full object-cover transition duration-300 group-hover:scale-105"
                 loading="lazy"
             >
@@ -24,7 +24,7 @@
 
     <div class="flex flex-1 flex-col p-5">
         <div class="flex items-start justify-between gap-3">
-            <x-ui.icon :name="$location['icon'] ?? 'building'" />
+            <x-ui.icon :name="$location['icon'] ?? 'bookmark'" />
             @if (! empty($location['badge']))
                 <x-ui.badge tone="accent">{{ $location['badge'] }}</x-ui.badge>
             @endif

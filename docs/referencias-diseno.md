@@ -11,9 +11,9 @@ Patrones observados en sitios de educación superior (portales de noticias, facu
 - Flujo **listado → detalle**, con tipología visible (noticia, evento, comunicado).
 - Portada con **un destacado** y un listado secundario; poca ornamentación.
 - Jerarquía tipográfica clara; tono sobrio y mobile-first.
-- Gobernanza editorial: roles diferenciados, plantillas que mantienen la marca, publicación controlada.
+- Comunicación institucional controlada en origen (portal y redes oficiales), no redacción paralela en un CMS propio.
 
-Aplicación al producto: la web pública debe sentirse institucional y legible; el NFC añade descubrimiento por lugar, no un feed tipo red social.
+Aplicación al producto: la web pública debe sentirse institucional y legible; el NFC añade descubrimiento por lugar, no un feed tipo red social. El catálogo se alimenta de FESC e Instagram, no de un editor interno.
 
 ## 2. Identidad FESC
 
@@ -36,7 +36,7 @@ Cuentas de referencia:
 
 Estilo de comunicación en redes: fotografía institucional, eventos, logros estudiantiles y llamados a acción cortos.
 
-Uso en el producto: tono de copy y tipo de piezas (evento, logro, convocatoria). **No** copiar el layout de un feed social en la web.
+Uso en el producto: Instagram es **fuente de ingesta** (texto e imágenes; videos como miniatura + enlace a la publicación). El tono de las piezas puede inspirar la redacción IA, pero la web **no** copia el layout de un feed social.
 
 ## 4. Gestión de NFC (industria y campus)
 
@@ -53,26 +53,23 @@ En FESC, la ubicación se ancla al contexto físico documentado. Ver [contexto-i
 
 Experiencia al escanear: **landing de descubrimiento** del punto (varios contenidos), no un redirect fijo a una sola noticia. El usuario debe reconocer el lugar físico de origen.
 
-## 5. Panel editorial — lo necesario para crear noticias
+## 5. Panel de administración — asociación NFC y catálogo ingerido
 
-Campos mínimos del formulario (maqueta):
+El administrador no crea noticias. El panel debe permitir:
 
-- Título
-- Resumen
-- Cuerpo
-- Tipo (noticia, comunicado, evento, institucional)
-- Imagen destacada
-- Estado (borrador / publicado)
-- Fecha de publicación (y fechas de evento si aplica)
-- Enlace externo (contenido externo o combinado)
-- Categoría o etiquetas (UI simple)
+- Ver el **catálogo ingerido** (fuente FESC o Instagram, fecha de extracción, enlace al origen, texto IA, imágenes).
+- Distinguir publicaciones de **video** de Instagram (miniatura + «Ver en Instagram», sin reproductor embebido).
+- **Asociar** uno o varios contenidos del catálogo a un punto NFC, y cambiar esa asociación sin reprogramar el chip.
+- Activar o desactivar puntos NFC.
+- Consultar **estadísticas** de uso (escaneos por punto, frecuencia, contenido mostrado si se define).
 
-Fuera de esta etapa de maquetación: validación real, autenticación, políticas, asociación persistente a puntos NFC y estadísticas.
+Campos que ya no aplican como flujo principal: formulario de título, cuerpo, tipo y publicación redactados a mano.
+
+Fuera de la implementación actual: extractor cada 24 h, API de IA, persistencia del catálogo y asociación real punto ↔ contenido.
 
 ## 6. Decisiones de maquetación inicial
 
 - Marca visual: sistema de diseño en [sistema-de-diseno.md](sistema-de-diseno.md) (gris/rojo FESC adaptado).
-- Vistas estáticas con datos de ejemplo y componentes Blade por dominio (`ui`, `navigation`, `content`, `nfc`, `admin`).
-- Módulos visibles: home pública, detalle de contenido, experiencia NFC, dashboard admin, listado/formulario de contenidos, listado de puntos NFC.
-- El panel `/admin` es temporalmente público solo para revisar la maqueta; la autenticación llega en una tarea posterior.
+- Vistas con datos de ejemplo y componentes Blade por dominio (`ui`, `navigation`, `content`, `nfc`, `admin`).
+- Módulos visibles hoy: home pública, detalle de contenido, experiencia NFC, dashboard admin, listados de contenidos y puntos NFC (aún con maqueta editorial; el producto objetivo es catálogo ingerido + asociación).
 - Enlace explícito al [sitio oficial FESC](https://www.fesc.edu.co/portal/) para no confundir esta capa con el portal institucional.

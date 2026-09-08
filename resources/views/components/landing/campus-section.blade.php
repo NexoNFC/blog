@@ -16,9 +16,13 @@
         />
 
         <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            @foreach ($locations as $location)
+            @forelse ($locations as $location)
                 <x-nfc.point-card :location="$location" />
-            @endforeach
+            @empty
+                <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4">
+                    <x-ui.empty-state title="Aún no hay puntos NFC" description="Cuando se registren puntos del campus aparecerán aquí." />
+                </div>
+            @endforelse
         </div>
     </div>
 </section>

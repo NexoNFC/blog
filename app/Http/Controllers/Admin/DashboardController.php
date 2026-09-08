@@ -2,24 +2,34 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ContentStatus;
+use App\Enums\NfcPointStatus;
 use App\Http\Controllers\Controller;
-use App\Support\DemoCatalog;
+use App\Models\News;
+use App\Models\NfcPoint;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     public function __invoke(): View
     {
-        $contents = DemoCatalog::contents();
-        $points = DemoCatalog::nfcPoints();
+        $contents = News::query()
+            ->with('category')
+            ->latest()
+            ->get();
+
+        $points = NfcPoint::query()
+            ->withCount('scans')
+            ->orderBy('identifier')
+            ->get();
 
         return view('admin.dashboard', [
-            'contentCount' => count($contents),
-            'publishedCount' => count(array_filter($contents, fn (array $item): bool => $item['status'] === 'publicado')),
-            'nfcCount' => count($points),
-            'activeNfcCount' => count(array_filter($points, fn (array $item): bool => $item['status'] === 'activo')),
-            'recentContents' => array_slice($contents, 0, 3),
-            'nfcPoints' => array_slice($points, 0, 4),
+            'contentCount' => $contents->count(),
+            'publishedCount' => $contents->where('status', ContentStatus::Published)->count(),
+            'nfcCount' => $points->count(),
+            'activeNfcCount' => $points->where('status', NfcPointStatus::Active)->count(),
+            'recentContents' => $contents->take(3)->map(fn (News $news): array => $news->toPublicArray())->all(),
+            'nfcPoints' => $points->take(4)->map(fn (NfcPoint $point): array => $point->toPublicArray())->all(),
         ]);
     }
 }

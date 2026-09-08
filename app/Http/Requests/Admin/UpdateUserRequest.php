@@ -34,7 +34,7 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique(User::class)->ignore($user->id),
             ],
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'role' => ['required', Rule::in(['admin', 'editor'])],
+            'role' => ['required', Rule::in(['admin'])],
             'is_active' => ['required', 'boolean'],
         ];
     }
