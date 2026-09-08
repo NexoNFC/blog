@@ -7,9 +7,11 @@ alwaysApply: true
 
 Plataforma web de difusión y consulta de información para la comunidad de la Fundación de Estudios Superiores Comfanorte (FESC). Producto del PPA de Ingeniería de Software.
 
-No es “un blog al que se le agregaron NFC”. El NFC es parte central de la propuesta de valor:
+No es “un blog al que se le agregaron NFC” ni un CMS donde se redactan noticias. El NFC es parte central de la propuesta de valor:
 
 espacio físico → NFC → plataforma → experiencia de información → estadísticas
+
+El contenido se extrae del sitio FESC y de Instagram, se redacta con IA a partir de ese extracto y el administrador lo asocia a puntos NFC.
 
 ## Acceso
 
@@ -19,22 +21,24 @@ espacio físico → NFC → plataforma → experiencia de información → estad
 ## Puntos NFC
 
 - El chip guarda una URL permanente de un **punto** (`/nfc/{codigo}`), no de una noticia fija.
-- El contenido asociado se administra en software y puede cambiar sin reprogramar el chip.
+- El contenido asociado se elige en software (catálogo ingerido) y puede cambiar sin reprogramar el chip.
 - Estado activo/inactivo controlado por la plataforma; inactivo → respuesta adecuada al usuario.
 - Cada acceso por NFC debe poder registrarse (trazabilidad y estadísticas).
 
 ## Contenido
 
-- Interno (creado en la plataforma).
-- Externo (resumen contextual + enlace a fuente oficial, p. ej. FESC).
-- Combinado (propio + referencias externas).
+- No se crea ni se edita redacción propia en la plataforma.
+- Fuentes: sitio FESC e Instagram institucional.
+- Extracción periódica (cada 24 h) → redacción con IA → catálogo.
+- Siempre hay enlace a la fuente original.
+- Videos de Instagram: no iframe; miniatura (si existe) + enlace a la publicación.
 
 ## Actores
 
 - Visitante público: consulta y descubrimiento.
-- Editor: creación y gestión de contenido.
-- Administrador: plataforma, NFC, permisos y visión general/estadísticas.
+- Administrador: asocia puntos NFC al catálogo ingerido, gestiona el estado de los puntos y consulta estadísticas.
+- No existe el rol editor.
 
 ## Principio del producto
 
-Convertir puntos físicos del campus en puertas digitales a información relevante de la comunidad FESC, administrables y medibles.
+Convertir puntos físicos del campus en puertas digitales a información relevante de la comunidad FESC, extraída de fuentes oficiales, administrable por asociación NFC y medible.

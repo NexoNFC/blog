@@ -49,11 +49,4 @@ class UserFactory extends Factory
             $user->assignRole('admin');
         });
     }
-
-    public function editor(): static
-    {
-        return $this->afterCreating(function (User $user): void {
-            $user->assignRole('editor');
-        });
-    }
 }

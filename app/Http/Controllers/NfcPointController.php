@@ -2,24 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\DemoCatalog;
+use App\Enums\ContentStatus;
+use App\Models\News;
+use App\Models\NfcPoint;
+use App\Services\VisitRecorder;
 use Illuminate\View\View;
 
 class NfcPointController extends Controller
 {
+    public function __construct(private VisitRecorder $visits) {}
+
     public function show(string $code): View
     {
-        $point = DemoCatalog::nfcByCode($code);
+        $point = NfcPoint::query()
+            ->with(['news.category'])
+            ->where('code', $code)
+            ->firstOrFail();
 
-        if ($point === null) {
-            abort(404);
+        if ($point->isActive()) {
+            $this->visits->recordNfcScan($point);
         }
 
-        $contents = DemoCatalog::contentsBySlugs($point['content_slugs']);
+        $news = $point->news;
+        $contents = ($news !== null && $news->status === ContentStatus::Published)
+            ? [$news->toPublicArray()]
+            : [];
+
+        $moreNews = News::query()
+            ->published()
+            ->with('category')
+            ->when($news !== null, fn ($query) => $query->whereKeyNot($news->id))
+            ->latest('published_at')
+            ->limit(3)
+            ->get()
+            ->map(fn (News $item): array => $item->toPublicArray())
+            ->all();
 
         return view('nfc.show', [
-            'point' => $point,
+            'point' => $point->toPublicArray(),
             'contents' => $contents,
+            'moreNews' => $moreNews,
         ]);
     }
 }

@@ -55,19 +55,6 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('admin.dashboard', absolute: false));
     }
 
-    public function test_editor_can_authenticate(): void
-    {
-        $user = User::factory()->editor()->create();
-
-        $response = $this->post('/admin/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('admin.dashboard', absolute: false));
-    }
-
     public function test_users_without_staff_role_cannot_authenticate(): void
     {
         $user = User::factory()->create();
@@ -91,7 +78,7 @@ class AuthenticationTest extends TestCase
 
         $this->get('/admin/login')
             ->assertSeeInOrder([
-                'Ingresa con tu cuenta de administrador o editor.',
+                'Ingresa con tu cuenta de administrador.',
                 'Correo electrónico',
                 'toast-viewport',
                 'data-alert-host',

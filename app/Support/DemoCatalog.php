@@ -5,6 +5,8 @@ namespace App\Support;
 class DemoCatalog
 {
     /**
+     * Contenido de demostración usado por el seeder hasta que exista extracción automática.
+     *
      * @return list<array<string, mixed>>
      */
     public static function contents(): array
@@ -53,7 +55,7 @@ class DemoCatalog
                 'type' => 'externo',
                 'status' => 'publicado',
                 'published_at' => '2026-03-08',
-                'external_url' => 'https://fesc.edu.co/portal/',
+                'external_url' => 'https://www.fesc.edu.co/portal/',
                 'image' => 'images/campus/edificio-avenida-5.jpg',
             ],
             [
@@ -71,25 +73,68 @@ class DemoCatalog
     }
 
     /**
-     * @return array<string, mixed>|null
-     */
-    public static function contentBySlug(string $slug): ?array
-    {
-        foreach (self::contents() as $content) {
-            if ($content['slug'] === $slug) {
-                return $content;
-            }
-        }
-
-        return null;
-    }
-
-    /**
+     * Puntos NFC validados del campus. Un punto, una noticia activa.
+     *
      * @return list<array<string, mixed>>
      */
     public static function nfcPoints(): array
     {
         return [
+            [
+                'code' => 'bloque-a',
+                'identifier' => 'NFC-001',
+                'name' => 'Bloque A',
+                'location' => 'Bloque A',
+                'description' => 'Información institucional asociada al Bloque A.',
+                'status' => 'activo',
+                'kind' => 'bloque',
+                'image' => 'images/campus/edificio-01.jpg',
+                'content_slugs' => ['comunicado-calendario'],
+            ],
+            [
+                'code' => 'bloque-b',
+                'identifier' => 'NFC-002',
+                'name' => 'Bloque B',
+                'location' => 'Bloque B',
+                'description' => 'Información institucional asociada al Bloque B.',
+                'status' => 'activo',
+                'kind' => 'bloque',
+                'image' => 'images/campus/edificio-03.jpg',
+                'content_slugs' => ['comunicado-calendario'],
+            ],
+            [
+                'code' => 'bloque-c',
+                'identifier' => 'NFC-003',
+                'name' => 'Bloque C',
+                'location' => 'Bloque C',
+                'description' => 'Información institucional asociada al Bloque C.',
+                'status' => 'activo',
+                'kind' => 'bloque',
+                'image' => 'images/campus/edificio-05.jpg',
+                'content_slugs' => ['evento-oficial-fesc'],
+            ],
+            [
+                'code' => 'biblioteca',
+                'identifier' => 'NFC-004',
+                'name' => 'Biblioteca Moisés San Juan López',
+                'location' => 'Biblioteca Moisés San Juan López',
+                'description' => 'Servicios, noticias y eventos relacionados con la biblioteca.',
+                'status' => 'activo',
+                'kind' => 'espacio',
+                'image' => 'images/campus/fuente.jpg',
+                'content_slugs' => ['servicios-biblioteca'],
+            ],
+            [
+                'code' => 'auditorio-avenida-5',
+                'identifier' => 'NFC-005',
+                'name' => 'Auditorio Avenida 5',
+                'location' => 'Auditorio Avenida 5',
+                'description' => 'Información de actividades y eventos del auditorio.',
+                'status' => 'activo',
+                'kind' => 'espacio',
+                'image' => 'images/campus/edificio-06.jpg',
+                'content_slugs' => ['evento-lectura-cultura'],
+            ],
             [
                 'code' => 'entrada-avenida-4',
                 'identifier' => 'NFC-006',
@@ -97,8 +142,9 @@ class DemoCatalog
                 'location' => 'Acceso Avenida 4',
                 'description' => 'Bienvenida e información general al ingresar por Avenida 4.',
                 'status' => 'activo',
-                'content_slugs' => ['comunicado-calendario', 'evento-oficial-fesc'],
-                'scans_demo' => 64,
+                'kind' => 'acceso',
+                'image' => 'images/campus/fachada.jpg',
+                'content_slugs' => ['comunicado-calendario'],
             ],
             [
                 'code' => 'entrada-avenida-5',
@@ -107,152 +153,9 @@ class DemoCatalog
                 'location' => 'Acceso Avenida 5',
                 'description' => 'Orientación e información institucional al ingresar por Avenida 5.',
                 'status' => 'activo',
-                'content_slugs' => ['comunicado-calendario', 'evento-oficial-fesc'],
-                'scans_demo' => 91,
-            ],
-            [
-                'code' => 'bloque-a-piso-1',
-                'identifier' => 'NFC-001',
-                'name' => 'Bloque A · Piso 1',
-                'location' => 'Bloque A, piso 1',
-                'description' => 'Contenido asociado al primer piso del Bloque A.',
-                'status' => 'activo',
-                'content_slugs' => ['comunicado-calendario', 'evento-lectura-cultura'],
-                'scans_demo' => 42,
-            ],
-            [
-                'code' => 'bloque-a-piso-3',
-                'identifier' => 'NFC-002',
-                'name' => 'Bloque A · Piso 3',
-                'location' => 'Bloque A, piso 3',
-                'description' => 'Contenido asociado al tercer piso del Bloque A.',
-                'status' => 'activo',
-                'content_slugs' => ['evento-lectura-cultura'],
-                'scans_demo' => 28,
-            ],
-            [
-                'code' => 'bloque-b-piso-2',
-                'identifier' => 'NFC-003',
-                'name' => 'Bloque B · Piso 2',
-                'location' => 'Bloque B, piso 2',
-                'description' => 'Contenido asociado al segundo piso del Bloque B.',
-                'status' => 'activo',
-                'content_slugs' => ['comunicado-calendario'],
-                'scans_demo' => 35,
-            ],
-            [
-                'code' => 'bloque-c-piso-4',
-                'identifier' => 'NFC-004',
-                'name' => 'Bloque C · Piso 4',
-                'location' => 'Bloque C, piso 4',
-                'description' => 'Contenido asociado al cuarto piso del Bloque C.',
-                'status' => 'activo',
-                'content_slugs' => ['evento-oficial-fesc'],
-                'scans_demo' => 19,
-            ],
-            [
-                'code' => 'biblioteca',
-                'identifier' => 'NFC-005',
-                'name' => 'Biblioteca Moisés San Juan López',
-                'location' => 'Biblioteca Moisés San Juan López',
-                'description' => 'Servicios, noticias y eventos relacionados con la biblioteca.',
-                'status' => 'activo',
-                'content_slugs' => [
-                    'servicios-biblioteca',
-                    'evento-lectura-cultura',
-                    'comunicado-calendario',
-                    'evento-oficial-fesc',
-                ],
-                'scans_demo' => 128,
-            ],
-            [
-                'code' => 'auditorio-avenida-5',
-                'identifier' => 'NFC-008',
-                'name' => 'Auditorio Avenida 5',
-                'location' => 'Auditorio Avenida 5',
-                'description' => 'Información de actividades y eventos del auditorio.',
-                'status' => 'activo',
-                'content_slugs' => ['evento-lectura-cultura', 'evento-oficial-fesc'],
-                'scans_demo' => 47,
-            ],
-        ];
-    }
-
-    /**
-     * @return array<string, mixed>|null
-     */
-    public static function nfcByCode(string $code): ?array
-    {
-        foreach (self::nfcPoints() as $point) {
-            if ($point['code'] === $code) {
-                return $point;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    public static function campusLocations(): array
-    {
-        return [
-            [
-                'name' => 'Bloque A',
-                'detail' => '3 pisos · puntos NFC por nivel',
-                'icon' => 'building',
-                'badge' => 'Bloque',
-                'image' => 'images/campus/edificio-01.jpg',
-                'href' => route('nfc.show', 'bloque-a-piso-1'),
-            ],
-            [
-                'name' => 'Bloque B',
-                'detail' => '2 pisos · puntos NFC por nivel',
-                'icon' => 'building',
-                'badge' => 'Bloque',
-                'image' => 'images/campus/edificio-03.jpg',
-                'href' => route('nfc.show', 'bloque-b-piso-2'),
-            ],
-            [
-                'name' => 'Bloque C',
-                'detail' => '4 pisos · puntos NFC por nivel',
-                'icon' => 'building',
-                'badge' => 'Bloque',
-                'image' => 'images/campus/edificio-05.jpg',
-                'href' => route('nfc.show', 'bloque-c-piso-4'),
-            ],
-            [
-                'name' => 'Entrada Avenida 4',
-                'detail' => 'Acceso al campus',
-                'icon' => 'door',
-                'badge' => 'Acceso',
-                'image' => 'images/campus/fachada.jpg',
-                'href' => route('nfc.show', 'entrada-avenida-4'),
-            ],
-            [
-                'name' => 'Entrada Avenida 5',
-                'detail' => 'Acceso al campus',
-                'icon' => 'door',
-                'badge' => 'Acceso',
+                'kind' => 'acceso',
                 'image' => 'images/campus/edificio-avenida-5.jpg',
-                'href' => route('nfc.show', 'entrada-avenida-5'),
-            ],
-            [
-                'name' => 'Auditorio Avenida 5',
-                'detail' => 'Espacio de eventos y encuentros',
-                'icon' => 'stage',
-                'badge' => 'Espacio',
-                'image' => 'images/campus/edificio-06.jpg',
-                'href' => route('nfc.show', 'auditorio-avenida-5'),
-            ],
-            [
-                'name' => 'Biblioteca Moisés San Juan López',
-                'detail' => 'Servicios e información del lugar',
-                'icon' => 'book',
-                'badge' => 'Espacio',
-                'image' => 'images/campus/fuente.jpg',
-                'href' => route('nfc.show', 'biblioteca'),
+                'content_slugs' => ['evento-oficial-fesc'],
             ],
         ];
     }
@@ -264,55 +167,25 @@ class DemoCatalog
     {
         return [
             [
-                'icon' => 'nfc',
+                'icon' => 'atom',
                 'title' => 'Encuentra un punto NFC',
                 'description' => 'Están en entradas, bloques, biblioteca y auditorio.',
             ],
             [
-                'icon' => 'phone',
+                'icon' => 'blender-phone',
                 'title' => 'Acerca tu teléfono',
                 'description' => 'Sin apps extra: el chip abre una URL del punto.',
             ],
             [
-                'icon' => 'spark',
+                'icon' => 'book',
                 'title' => 'Descubre el contenido',
                 'description' => 'Noticias, eventos y mensajes de ese lugar.',
             ],
             [
-                'icon' => 'compass',
+                'icon' => 'arrow-up-right-from-square',
                 'title' => 'Explora más información',
                 'description' => 'Sigue navegando o visita el sitio oficial FESC.',
             ],
         ];
-    }
-
-    /**
-     * @param  list<string>  $slugs
-     * @return list<array<string, mixed>>
-     */
-    public static function contentsBySlugs(array $slugs): array
-    {
-        $items = [];
-
-        foreach ($slugs as $slug) {
-            $content = self::contentBySlug($slug);
-
-            if ($content !== null) {
-                $items[] = $content;
-            }
-        }
-
-        return $items;
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    public static function publishedContents(): array
-    {
-        return array_values(array_filter(
-            self::contents(),
-            fn (array $content): bool => $content['status'] === 'publicado'
-        ));
     }
 }

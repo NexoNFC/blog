@@ -33,9 +33,4 @@ class User extends Authenticatable
     {
         return $this->hasRole('admin');
     }
-
-    public function isEditor(): bool
-    {
-        return $this->hasRole('editor');
-    }
 }

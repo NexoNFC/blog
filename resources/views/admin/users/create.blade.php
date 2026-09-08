@@ -34,12 +34,11 @@
         </div>
 
         <div>
-            <x-form.label for="role" required>Rol</x-form.label>
-            <x-form.select id="role" name="role" required>
-                <option value="" disabled @selected(blank(old('role')))>Selecciona un rol</option>
-                <option value="admin" @selected(old('role') === 'admin')>Administrador</option>
-                <option value="editor" @selected(old('role') === 'editor')>Editor</option>
-            </x-form.select>
+            <input type="hidden" name="role" value="admin">
+            <p class="text-sm text-secondary">
+                <span class="font-medium">Rol:</span> Administrador
+            </p>
+            <p class="mt-1 text-xs text-secondary-light">El panel solo admite el rol de administrador.</p>
         </div>
 
         <div>

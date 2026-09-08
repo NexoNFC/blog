@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\DemoCatalog;
+use App\Models\News;
+use App\Services\VisitRecorder;
 use Illuminate\View\View;
 
 class ContentController extends Controller
 {
+    public function __construct(private VisitRecorder $visits) {}
+
     public function show(string $slug): View
     {
-        $content = DemoCatalog::contentBySlug($slug);
+        $news = News::query()
+            ->published()
+            ->with('category')
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        if ($content === null || $content['status'] !== 'publicado') {
-            abort(404);
-        }
+        $this->visits->recordNewsView($news);
 
         return view('contents.show', [
-            'content' => $content,
+            'content' => $news->toPublicArray(),
         ]);
     }
 }

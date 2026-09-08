@@ -30,7 +30,7 @@
                         <span class="block">administrativo</span>
                     </p>
                     <p class="mt-4 max-w-md font-sans text-sm leading-relaxed text-white/70 sm:text-base">
-                        Plataforma informativa FESC. Ingreso restringido para administradores y editores.
+                        Plataforma informativa FESC. Ingreso restringido para administradores.
                         La consulta pública no requiere cuenta.
                     </p>
                 </div>

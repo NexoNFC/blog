@@ -1,7 +1,7 @@
 <div class="auth-card rounded-[1.75rem] bg-[#f4f4f5] p-7 sm:rounded-[2rem] sm:p-10">
     <div class="mb-7">
         <h1 class="font-serif text-3xl font-bold text-secondary">Iniciar sesión</h1>
-        <p class="mt-1.5 text-sm text-secondary-light">Ingresa con tu cuenta de administrador o editor.</p>
+        <p class="mt-1.5 text-sm text-secondary-light">Ingresa con tu cuenta de administrador.</p>
     </div>
 
     <form

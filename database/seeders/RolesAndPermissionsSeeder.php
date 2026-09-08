@@ -52,15 +52,17 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin = Role::findOrCreate('admin', 'web');
         $admin->syncPermissions(self::PERMISSIONS);
 
-        $editor = Role::findOrCreate('editor', 'web');
-        $editor->syncPermissions([
-            'news.view',
-            'news.create',
-            'news.update',
-            'news.publish',
-            'categories.view',
-            'nfc.view',
-            'statistics.view-content',
-        ]);
+        $editor = Role::query()
+            ->where('name', 'editor')
+            ->where('guard_name', 'web')
+            ->first();
+
+        if ($editor !== null) {
+            $editor->users()->detach();
+            $editor->syncPermissions([]);
+            $editor->delete();
+        }
+
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

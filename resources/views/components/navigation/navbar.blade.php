@@ -9,9 +9,10 @@
     aria-label="Principal"
 >
     <div class="relative mx-auto flex max-w-screen-xl flex-wrap items-center justify-between px-4 py-3.5 md:px-6">
-        <a href="{{ $home }}" class="flex items-baseline space-x-2.5 rtl:space-x-reverse">
-            <span class="self-center font-serif text-2xl font-bold tracking-tight whitespace-nowrap text-secondary">FESC</span>
-            <span class="hidden font-sans text-sm font-normal text-[#9a9a9d] sm:inline">Información en campus</span>
+        <a href="{{ $home }}" class="flex items-center gap-3">
+            <span class="font-serif text-2xl leading-none font-bold tracking-tight whitespace-nowrap text-secondary">FESC</span>
+            <span class="hidden h-4 w-px shrink-0 bg-secondary/25 sm:block" aria-hidden="true"></span>
+            <span class="hidden font-sans text-sm leading-none font-medium tracking-wide whitespace-nowrap text-secondary-light sm:inline">Información en campus</span>
         </a>
 
         <div class="flex items-center space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
