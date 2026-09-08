@@ -11,14 +11,14 @@
 
 <article {{ $attributes->merge([
     'class' => $featured
-        ? 'group reveal flex w-full flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/65 shadow-[0_10px_40px_rgb(26_26_27_/_0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_50px_rgb(26_26_27_/_0.12)] sm:col-span-2 lg:col-span-2'
-        : 'group reveal flex w-full flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/65 shadow-[0_10px_40px_rgb(26_26_27_/_0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_50px_rgb(26_26_27_/_0.12)]',
+        ? 'group glass-card glass-hover reveal flex w-full flex-col overflow-hidden sm:col-span-2 lg:col-span-2'
+        : 'group glass-card glass-hover reveal flex w-full flex-col overflow-hidden',
 ]) }}>
     <a href="{{ route('contents.show', $content['slug']) }}" class="relative block overflow-hidden">
         <img
             src="{{ $imageSrc }}"
             alt=""
-            class="{{ $featured ? 'h-44' : 'h-36' }} w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            class="{{ $featured ? 'h-52' : 'h-40' }} w-full object-cover transition duration-500 group-hover:scale-[1.03]"
             loading="lazy"
         >
         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-secondary/70 to-transparent p-4">
@@ -26,8 +26,8 @@
         </div>
     </a>
 
-    <div class="flex flex-col p-5">
-        <h3 @class(['font-serif font-semibold text-secondary', 'text-2xl sm:text-3xl' => $featured, 'text-xl' => ! $featured])>
+    <div class="flex flex-col p-6">
+        <h3 @class(['font-semibold text-secondary', 'text-2xl sm:text-3xl' => $featured, 'text-xl' => ! $featured])>
             <a href="{{ route('contents.show', $content['slug']) }}" class="transition hover:text-primary">
                 {{ $content['title'] }}
             </a>
@@ -36,8 +36,8 @@
             {{ $content['summary'] }}
         </p>
 
-        <div class="mt-4 flex flex-wrap items-center gap-2">
-            <x-ui.button href="{{ route('contents.show', $content['slug']) }}" variant="secondary">
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+            <x-ui.button href="{{ route('contents.show', $content['slug']) }}" variant="secondary" class="!rounded-2xl">
                 Leer noticia
             </x-ui.button>
             @if ($isExternal && ! empty($content['external_url']))

@@ -9,7 +9,7 @@
 
 <{{ $tag }}
     @if ($href) href="{{ $href }}" @endif
-    {{ $attributes->merge(['class' => 'group reveal flex h-full flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/65 shadow-[0_10px_40px_rgb(26_26_27_/_0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_18px_50px_rgb(26_26_27_/_0.12)]']) }}
+    {{ $attributes->merge(['class' => 'group glass-card glass-hover reveal flex h-full flex-col overflow-hidden']) }}
 >
     @if (! empty($location['image']))
         <div class="overflow-hidden">
@@ -30,7 +30,7 @@
             @endif
         </div>
 
-        <h3 class="mt-5 font-serif text-xl font-semibold text-secondary group-hover:text-primary">
+        <h3 class="mt-5 text-xl font-semibold text-secondary group-hover:text-primary">
             {{ $location['name'] }}
         </h3>
         <p class="mt-2 text-sm text-secondary-light">{{ $location['detail'] }}</p>

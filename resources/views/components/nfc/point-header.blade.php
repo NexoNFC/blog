@@ -2,8 +2,8 @@
     'point',
 ])
 
-<section {{ $attributes->merge(['class' => 'border-b border-white/40 bg-white/40 backdrop-blur-md']) }}>
-    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+<section {{ $attributes->merge(['class' => 'px-4 pt-8 sm:px-6']) }}>
+    <div class="glass-card mx-auto max-w-6xl px-6 py-8 sm:px-10 sm:py-10">
         <div class="flex flex-wrap items-center gap-2">
             <p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Punto NFC</p>
             <x-nfc.point-status :status="$point['status']" />

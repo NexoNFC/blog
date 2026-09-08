@@ -1,8 +1,8 @@
-<section id="nfc" class="bg-secondary py-16 text-white sm:py-20">
+<section id="nfc" class="footer-glass py-16 text-white sm:py-20">
     <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16">
         <div class="reveal order-2 lg:order-1">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Experiencia NFC</p>
-            <h2 class="mt-3 font-serif text-3xl font-bold text-white sm:text-4xl">
+            <h2 class="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
                 Acerca tu teléfono y descubre qué hay aquí
             </h2>
             <p class="mt-4 max-w-xl text-base leading-relaxed text-white/80">
@@ -56,7 +56,8 @@
                 </div>
             </div>
             <x-landing.journey
-                class="mt-4"
+                class="mt-4 justify-center"
+                :on-dark="true"
                 :steps="[
                     ['icon' => 'blender-phone', 'label' => 'Teléfono'],
                     ['icon' => 'atom', 'label' => 'Punto NFC'],

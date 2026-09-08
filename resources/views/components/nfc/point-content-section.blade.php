@@ -4,7 +4,8 @@
 ])
 
 <section class="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-    <h2 class="text-xl font-semibold sm:text-2xl">Información de este punto</h2>
+    <div class="glass-card px-6 py-8 sm:px-10">
+        <h2 class="text-xl font-semibold tracking-tight sm:text-2xl">Información de este punto</h2>
     <p class="mt-1 text-sm text-secondary-light">
         El contenido puede cambiar sin reprogramar el chip físico.
     </p>
@@ -17,7 +18,7 @@
             <p class="mt-3 text-base text-secondary-light sm:text-lg">{{ $content['summary'] }}</p>
 
             @if (! empty($content['image']))
-                <div class="mt-6 overflow-hidden rounded-2xl border border-white/50 bg-white/40 backdrop-blur-md">
+                <div class="mt-6 overflow-hidden rounded-[20px] border border-white/50 bg-white/40">
                     <img
                         src="{{ asset($content['image']) }}"
                         alt="{{ $content['title'] }}"
@@ -68,4 +69,5 @@
             </ul>
         </nav>
     @endif
+    </div>
 </section>
