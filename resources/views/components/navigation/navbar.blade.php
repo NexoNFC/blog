@@ -36,7 +36,7 @@
                     aria-expanded="false"
                 >
                     <span class="sr-only">Abrir menú principal</span>
-                    <x-icon name="bars" outline class="h-6 w-6" />
+                    <x-icon name="menu-burger" class="h-6 w-6" />
                 </button>
             </div>
 

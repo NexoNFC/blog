@@ -1,11 +1,7 @@
 <section class="hero-section px-4 pb-12 pt-4 sm:px-6 sm:pb-16 sm:pt-6">
     <div class="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
         <div class="reveal text-center lg:text-left">
-            <p class="glass-chip mx-auto px-3 py-1 text-xs font-semibold tracking-[0.16em] text-secondary uppercase lg:mx-0">
-                Comunidad FESC · Campus + NFC
-            </p>
-
-            <h1 class="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-secondary sm:text-5xl lg:text-6xl">
+            <h1 class="text-4xl font-bold leading-[1.08] tracking-tight text-secondary sm:text-5xl lg:text-6xl">
                 Descubre FESC
                 <span class="gradient-text block">donde estás</span>
             </h1>
@@ -22,16 +18,6 @@
                     Descubrir cómo funciona
                 </x-ui.button>
             </div>
-
-            <x-landing.journey
-                class="mt-8 justify-center lg:justify-start"
-                :steps="[
-                    ['icon' => 'bookmark', 'label' => 'Campus'],
-                    ['icon' => 'atom', 'label' => 'NFC'],
-                    ['icon' => 'blender-phone', 'label' => 'Tu teléfono'],
-                    ['icon' => 'book', 'label' => 'Información'],
-                ]"
-            />
         </div>
 
         <div class="reveal reveal-delay-2 relative">

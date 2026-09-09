@@ -1,5 +1,5 @@
 @php
-    $navBase = 'nav-link block rounded-xl px-3 py-2.5 text-sm font-semibold whitespace-nowrap transition';
+    $navBase = 'nav-link inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold whitespace-nowrap transition';
     $navOn = $navBase.' active bg-primary-soft';
     $navOff = $navBase.' hover:bg-primary-soft';
 @endphp
@@ -22,49 +22,73 @@
         <a href="{{ route('admin.dashboard') }}" @class([
             $navOn => request()->routeIs('admin.dashboard'),
             $navOff => ! request()->routeIs('admin.dashboard'),
-        ])>Dashboard</a>
+        ])>
+            <x-icon name="home" class="h-4 w-4 shrink-0" />
+            Dashboard
+        </a>
 
         @can('news.view')
             <a href="{{ route('admin.news.index') }}" @class([
                 $navOn => request()->routeIs('admin.news.*'),
                 $navOff => ! request()->routeIs('admin.news.*'),
-            ])>Noticias</a>
+            ])>
+                <x-icon name="browsers" class="h-4 w-4 shrink-0" />
+                Noticias
+            </a>
         @endcan
 
         @can('categories.view')
             <a href="{{ route('admin.categories.index') }}" @class([
                 $navOn => request()->routeIs('admin.categories.*'),
                 $navOff => ! request()->routeIs('admin.categories.*'),
-            ])>Categorías</a>
+            ])>
+                <x-icon name="apps-add" class="h-4 w-4 shrink-0" />
+                Categorías
+            </a>
         @endcan
 
         @can('nfc.view')
             <a href="{{ route('admin.nfc.index') }}" @class([
                 $navOn => request()->routeIs('admin.nfc.*'),
                 $navOff => ! request()->routeIs('admin.nfc.*'),
-            ])>Puntos NFC</a>
+            ])>
+                <x-icon name="degrees-360" class="h-4 w-4 shrink-0" />
+                Puntos NFC
+            </a>
         @endcan
 
         @can('statistics.view')
             <a href="{{ route('admin.statistics.index') }}" @class([
                 $navOn => request()->routeIs('admin.statistics.*'),
                 $navOff => ! request()->routeIs('admin.statistics.*'),
-            ])>Estadísticas</a>
+            ])>
+                <x-icon name="search" class="h-4 w-4 shrink-0" />
+                Estadísticas
+            </a>
         @elsecan('statistics.view-content')
             <a href="{{ route('admin.statistics.index') }}" @class([
                 $navOn => request()->routeIs('admin.statistics.*'),
                 $navOff => ! request()->routeIs('admin.statistics.*'),
-            ])>Estadísticas</a>
+            ])>
+                <x-icon name="search" class="h-4 w-4 shrink-0" />
+                Estadísticas
+            </a>
         @endcan
 
         @can('users.view')
             <a href="{{ route('admin.users.index') }}" @class([
                 $navOn => request()->routeIs('admin.users.*'),
                 $navOff => ! request()->routeIs('admin.users.*'),
-            ])>Usuarios</a>
+            ])>
+                <x-icon name="users-alt" class="h-4 w-4 shrink-0" />
+                Usuarios
+            </a>
         @endcan
 
-        <a href="{{ route('home') }}" class="{{ $navOff }} max-lg:hidden">Sitio público</a>
+        <a href="{{ route('home') }}" class="{{ $navOff }} max-lg:hidden">
+            <x-icon name="window-alt" class="h-4 w-4 shrink-0" />
+            Sitio público
+        </a>
     </nav>
 
     <div class="hidden border-t border-primary/10 px-4 py-4 lg:block">
