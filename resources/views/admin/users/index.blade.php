@@ -12,16 +12,16 @@
 
 @section('content')
     <x-ui.table>
-        <thead class="border-b border-white/40 bg-white/30 text-xs uppercase tracking-wide text-secondary-light">
+        <thead>
             <tr>
-                <th class="px-4 py-3 font-semibold">Nombre</th>
-                <th class="px-4 py-3 font-semibold">Correo</th>
-                <th class="px-4 py-3 font-semibold">Rol</th>
-                <th class="px-4 py-3 font-semibold">Estado</th>
-                <th class="px-4 py-3 font-semibold"><span class="sr-only">Acciones</span></th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Rol</th>
+                <th scope="col">Estado</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-white/40">
+        <tbody>
             @forelse ($users as $user)
                 @php
                     $role = $user->roles->first()?->name;
@@ -31,16 +31,16 @@
                     };
                     $isLastActiveAdministrator = $user->isAdministrator() && $user->is_active && $activeAdministratorCount <= 1;
                 @endphp
-                <tr class="transition hover:bg-white/35">
-                    <td class="px-4 py-3 font-medium text-secondary">{{ $user->name }}</td>
-                    <td class="px-4 py-3 text-secondary-light">{{ $user->email }}</td>
-                    <td class="px-4 py-3">{{ $roleLabel }}</td>
-                    <td class="px-4 py-3">
+                <tr>
+                    <th scope="row" class="whitespace-nowrap">{{ $user->name }}</th>
+                    <td class="text-secondary-light">{{ $user->email }}</td>
+                    <td>{{ $roleLabel }}</td>
+                    <td>
                         <x-ui.badge :tone="$user->is_active ? 'success' : 'warning'">
                             {{ $user->is_active ? 'Activo' : 'Inactivo' }}
                         </x-ui.badge>
                     </td>
-                    <td class="px-4 py-3">
+                    <td>
                         <div class="flex flex-wrap items-center justify-end gap-2">
                             @can('update', $user)
                                 <x-ui.button href="{{ route('admin.users.edit', $user) }}" variant="secondary" size="sm">
@@ -70,7 +70,9 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-4 py-8 text-center text-secondary-light">No hay usuarios registrados.</td>
+                    <td colspan="5">
+                        <x-ui.empty-state embedded title="Sin usuarios" description="No hay usuarios registrados." />
+                    </td>
                 </tr>
             @endforelse
         </tbody>

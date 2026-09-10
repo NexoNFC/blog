@@ -7,10 +7,11 @@
 
 @php
     $classes = match ($variant) {
-        'secondary' => 'border border-white/60 bg-white/55 text-secondary backdrop-blur-md hover:border-secondary/30 hover:bg-white/80',
+        'secondary' => 'border border-secondary/15 bg-white text-secondary shadow-sm hover:border-secondary/25 hover:bg-secondary/5',
         'glass' => 'border border-white/30 bg-white/5 text-white backdrop-blur-md hover:bg-white/10',
         'ghost' => 'text-secondary hover:bg-white/50',
-        'danger' => 'bg-danger text-white shadow-sm hover:bg-danger/90',
+        'success' => 'bg-success text-white shadow-sm hover:bg-success/90 focus-visible:outline-success',
+        'danger' => 'bg-danger text-white shadow-sm hover:bg-danger/90 focus-visible:outline-danger',
         default => 'bg-primary text-white shadow-sm hover:bg-primary-dark',
     };
 
