@@ -121,7 +121,7 @@ class CatalogDomainTest extends TestCase
 
         $this->actingAs($admin)
             ->post(route('admin.news.publish', $news))
-            ->assertRedirect(route('admin.news.edit', $news));
+            ->assertRedirect(route('admin.news.index'));
 
         $this->assertSame(ContentStatus::Published, $news->fresh()->status);
         $this->get(route('contents.show', $news->slug))->assertOk();
@@ -254,11 +254,16 @@ class CatalogDomainTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.statistics.index'))
             ->assertOk()
+            ->assertSee('Visitas a noticias')
+            ->assertSee('Escaneos NFC')
+            ->assertSee('Actividad últimos 14 días')
+            ->assertSee('Escaneos por punto NFC')
             ->assertSee('3')
             ->assertSee('2')
             ->assertSee('Noticia con visitas reales')
             ->assertSee('3 visitas')
             ->assertSee('Biblioteca Moisés San Juan López')
-            ->assertSee('2 escaneos');
+            ->assertSee('2 escaneos')
+            ->assertSee('stats-trend-chart', false);
     }
 }

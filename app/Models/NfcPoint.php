@@ -90,9 +90,9 @@ class NfcPoint extends Model
             'name' => $this->name,
             'detail' => $this->location,
             'icon' => match ($this->kind) {
-                'acceso' => 'arrow-right-to-bracket',
-                'espacio' => $this->code === 'biblioteca' ? 'book' : 'bullhorn',
-                default => 'bookmark',
+                'acceso' => 'home',
+                'espacio' => $this->code === 'biblioteca' ? 'address-card' : 'users-alt',
+                default => 'degrees-360',
             },
             'badge' => match ($this->kind) {
                 'acceso' => 'Acceso',

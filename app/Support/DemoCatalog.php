@@ -167,22 +167,22 @@ class DemoCatalog
     {
         return [
             [
-                'icon' => 'atom',
+                'icon' => 'search',
                 'title' => 'Encuentra un punto NFC',
                 'description' => 'Están en entradas, bloques, biblioteca y auditorio.',
             ],
             [
-                'icon' => 'blender-phone',
+                'icon' => 'smartphone-rotate',
                 'title' => 'Acerca tu teléfono',
                 'description' => 'Sin apps extra: el chip abre una URL del punto.',
             ],
             [
-                'icon' => 'book',
+                'icon' => 'browsers',
                 'title' => 'Descubre el contenido',
                 'description' => 'Noticias, eventos y mensajes de ese lugar.',
             ],
             [
-                'icon' => 'arrow-up-right-from-square',
+                'icon' => 'window-alt',
                 'title' => 'Explora más información',
                 'description' => 'Sigue navegando o visita el sitio oficial FESC.',
             ],

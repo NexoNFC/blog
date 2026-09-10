@@ -8,18 +8,31 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="site-body admin-shell min-h-screen">
+<body class="site-body admin-shell min-h-screen" x-data="adminShell">
     <div class="ambient-bg" aria-hidden="true">
         <div class="ambient-blob ambient-blob--1"></div>
         <div class="ambient-blob ambient-blob--2"></div>
         <div class="ambient-blob ambient-blob--3"></div>
     </div>
 
-    <div class="site-content flex min-h-screen flex-col gap-3 p-3 lg:flex-row lg:p-4">
+    <div class="site-content relative min-h-screen">
+        <x-navigation.admin-topbar />
         <x-navigation.admin-sidebar />
 
-        <div class="flex min-w-0 flex-1 flex-col gap-3">
-            <header class="nav-glass sticky top-3 z-20 px-4 py-4 sm:px-6 lg:top-4">
+        <div
+            class="fixed inset-0 z-30 bg-secondary/40 backdrop-blur-[2px] sm:hidden"
+            x-show="open"
+            x-transition.opacity
+            x-cloak
+            @click="closeMobile()"
+            aria-hidden="true"
+        ></div>
+
+        <div
+            class="min-h-screen p-4 pt-[4.75rem] transition-[margin] duration-300 sm:p-6 sm:pt-[5rem]"
+            :class="open ? 'sm:ml-64' : 'sm:ml-0'"
+        >
+            <header class="nav-glass mb-4 px-4 py-4 sm:px-6">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <h1 class="text-xl font-semibold text-secondary sm:text-2xl">@yield('heading', 'Administración')</h1>
@@ -33,11 +46,13 @@
                 </div>
             </header>
 
-            <main class="flex-1 px-1 py-2 sm:px-2">
+            <main>
                 @yield('content')
             </main>
         </div>
     </div>
+
     <x-ui.alert-host />
+    @stack('scripts')
 </body>
 </html>

@@ -72,7 +72,7 @@ class AdminUserSeeder extends Seeder
 
     private function upsertAdministrator(string $email, string $name, string $password): void
     {
-        $user = User::query()->updateOrCreate(
+        $user = User::query()->firstOrCreate(
             ['email' => $email],
             [
                 'name' => $name,
@@ -81,6 +81,14 @@ class AdminUserSeeder extends Seeder
                 'email_verified_at' => now(),
             ],
         );
+
+        if (! $user->wasRecentlyCreated) {
+            $user->forceFill([
+                'name' => $name,
+                'is_active' => true,
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ])->save();
+        }
 
         $user->syncRoles(['admin']);
     }

@@ -51,9 +51,19 @@ Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admi
         ->middleware('permission:categories.view')
         ->name('categories.index');
 
-    Route::post('/categories', [AdminCategoryController::class, 'store'])
-        ->middleware('permission:categories.create')
-        ->name('categories.store');
+    Route::middleware('permission:categories.create')->group(function () {
+        Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+        Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+    });
+
+    Route::middleware('permission:categories.update')->group(function () {
+        Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+        Route::patch('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+    });
+
+    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])
+        ->middleware('permission:categories.delete')
+        ->name('categories.destroy');
 
     Route::get('/nfc', [AdminNfcPointController::class, 'index'])
         ->middleware('permission:nfc.view')

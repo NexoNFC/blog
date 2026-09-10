@@ -1,0 +1,72 @@
+FROM node:22-bookworm-slim AS assets
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
+COPY vite.config.js ./
+COPY resources ./resources
+COPY public ./public
+RUN npm run build
+
+FROM dunglas/frankenphp:1-php8.4-bookworm AS base
+
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && install-php-extensions intl zip bcmath pdo_mysql opcache
+
+WORKDIR /app
+
+FROM base AS dependencies
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --optimize-autoloader \
+    --prefer-dist
+
+COPY . .
+COPY --from=assets /app/public/build ./public/build
+RUN rm -rf vendor \
+    && rm -f bootstrap/cache/*.php \
+    && mkdir -p \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/views \
+        bootstrap/cache \
+    && composer install \
+        --no-dev \
+        --no-interaction \
+        --no-progress \
+        --no-scripts \
+        --optimize-autoloader \
+        --prefer-dist \
+    && composer dump-autoload --no-dev --classmap-authoritative --no-scripts \
+    && php artisan package:discover --ansi --no-interaction \
+    && chmod +x docker/entrypoint.sh
+
+FROM base AS runtime
+
+COPY --from=dependencies --chown=www-data:www-data /app /app
+COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
+
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
+    && chown -R www-data:www-data /config/caddy /data/caddy \
+    && mkdir -p /app/database \
+    && chown www-data:www-data /app/database
+
+ENV PORT=80 \
+    APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    QUEUE_CONNECTION=sync \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=/app/database/database.sqlite
+
+USER www-data
+
+ENTRYPOINT ["/app/docker/entrypoint.sh"]

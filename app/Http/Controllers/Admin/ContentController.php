@@ -71,8 +71,8 @@ class ContentController extends Controller
         $this->lifecycle->publish($news);
 
         return redirect()
-            ->route('admin.news.edit', $news)
-            ->with('status', 'La noticia se publicó correctamente.');
+            ->route('admin.news.index')
+            ->with('status', 'La noticia se aprobó y publicó correctamente.');
     }
 
     public function destroy(News $news): RedirectResponse
@@ -83,6 +83,6 @@ class ContentController extends Controller
 
         return redirect()
             ->route('admin.news.index')
-            ->with('status', "La noticia «{$news->title}» se archivó y permanece en el histórico.");
+            ->with('status', "La noticia «{$news->title}» se desaprobó y permanece en el histórico.");
     }
 }

@@ -23,7 +23,7 @@ class CatalogSeeder extends Seeder
             $category = $categories->get($item['type']);
             $status = ContentStatus::from($item['status']);
 
-            News::query()->updateOrCreate(
+            News::query()->firstOrCreate(
                 ['slug' => $item['slug']],
                 [
                     'source_id' => $item['type'] === 'externo' ? $fesc->id : null,
@@ -47,7 +47,7 @@ class CatalogSeeder extends Seeder
             $slug = $point['content_slugs'][0] ?? null;
             $associated = $slug !== null ? $news->get($slug) : null;
 
-            NfcPoint::query()->updateOrCreate(
+            NfcPoint::query()->firstOrCreate(
                 ['code' => $point['code']],
                 [
                     'identifier' => $point['identifier'],

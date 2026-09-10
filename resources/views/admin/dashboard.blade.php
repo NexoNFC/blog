@@ -18,42 +18,71 @@
     </div>
 
     <div class="mt-8 grid gap-6 lg:grid-cols-2">
-        <x-ui.card>
-            <div class="flex items-center justify-between gap-3">
-                <h2 class="text-lg font-semibold">Contenidos recientes</h2>
+        <x-ui.table>
+            <x-slot:header>
+                <h2 class="text-lg font-semibold text-secondary">Contenidos recientes</h2>
                 @can('news.view')
                     <x-ui.button href="{{ route('admin.news.index') }}" variant="ghost" size="sm">Ver todos</x-ui.button>
                 @endcan
-            </div>
-            <ul class="mt-4 divide-y divide-white/40">
-                @foreach ($recentContents as $content)
-                    <li class="flex items-start justify-between gap-3 py-3">
-                        <div class="min-w-0">
-                            <p class="truncate font-medium text-secondary">{{ $content['title'] }}</p>
-                            <p class="text-xs text-secondary-light">{{ $content['type'] }}</p>
-                        </div>
-                        <x-ui.badge :tone="$content['status'] === 'publicado' ? 'success' : 'warning'">{{ $content['status'] }}</x-ui.badge>
-                    </li>
-                @endforeach
-            </ul>
-        </x-ui.card>
+            </x-slot:header>
+            <thead>
+                <tr>
+                    <th scope="col">Título</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($recentContents as $content)
+                    <tr>
+                        <th scope="row">{{ $content['title'] }}</th>
+                        <td class="text-secondary-light">{{ $content['type'] }}</td>
+                        <td>
+                            <x-ui.badge :tone="$content['status'] === 'publicado' ? 'success' : 'warning'">{{ $content['status'] }}</x-ui.badge>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3">
+                            <x-ui.empty-state embedded title="Sin contenidos" description="Cuando haya noticias en el catálogo aparecerán aquí." />
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-ui.table>
 
-        <x-ui.card>
-            <div class="flex items-center justify-between gap-3">
-                <h2 class="text-lg font-semibold">Puntos NFC</h2>
+        <x-ui.table>
+            <x-slot:header>
+                <h2 class="text-lg font-semibold text-secondary">Puntos NFC</h2>
                 <x-ui.button href="{{ route('admin.nfc.index') }}" variant="ghost" size="sm">Gestionar</x-ui.button>
-            </div>
-            <ul class="mt-4 divide-y divide-white/40">
-                @foreach ($nfcPoints as $point)
-                    <li class="flex items-start justify-between gap-3 py-3">
-                        <div class="min-w-0">
-                            <p class="font-medium text-secondary">{{ $point['name'] }}</p>
-                            <p class="text-xs text-secondary-light">{{ $point['identifier'] }} · {{ $point['scans_count'] }} escaneos</p>
-                        </div>
-                        <x-nfc.point-status :status="$point['status']" />
-                    </li>
-                @endforeach
-            </ul>
-        </x-ui.card>
+            </x-slot:header>
+            <thead>
+                <tr>
+                    <th scope="col">Punto</th>
+                    <th scope="col">Identificador</th>
+                    <th scope="col">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($nfcPoints as $point)
+                    <tr>
+                        <th scope="row">
+                            <p>{{ $point['name'] }}</p>
+                            <p class="text-xs font-normal text-secondary-light">{{ $point['scans_count'] }} escaneos</p>
+                        </th>
+                        <td class="whitespace-nowrap text-secondary-light">{{ $point['identifier'] }}</td>
+                        <td>
+                            <x-nfc.point-status :status="$point['status']" />
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3">
+                            <x-ui.empty-state embedded title="Sin puntos NFC" description="Cuando existan puntos en el campus aparecerán aquí." />
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-ui.table>
     </div>
 @endsection

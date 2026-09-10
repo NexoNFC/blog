@@ -58,11 +58,11 @@
         </x-ui.card>
     </form>
 
-    @if ($news->status->value !== 'publicado')
+    @if ($news->status->value === 'borrador')
         @can('news.publish')
             <form method="POST" action="{{ route('admin.news.publish', $news) }}" class="mx-auto mt-4 max-w-3xl">
                 @csrf
-                <x-ui.button type="submit" variant="secondary">Publicar</x-ui.button>
+                <x-ui.button type="submit" variant="success">Aprobar</x-ui.button>
             </form>
         @endcan
     @endif

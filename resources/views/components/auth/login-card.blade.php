@@ -1,13 +1,13 @@
-<div class="auth-card rounded-[1.75rem] bg-[#f4f4f5] p-7 sm:rounded-[2rem] sm:p-10">
-    <div class="mb-7">
-        <h1 class="font-serif text-3xl font-bold text-secondary">Iniciar sesión</h1>
+<div class="auth-card rounded-[1.5rem] p-6 sm:rounded-[2rem] sm:p-9">
+    <div class="mb-6 sm:mb-7">
+        <h1 class="font-serif text-2xl font-bold text-secondary sm:text-3xl">Iniciar sesión</h1>
         <p class="mt-1.5 text-sm text-secondary-light">Ingresa con tu cuenta de administrador.</p>
     </div>
 
     <form
         method="POST"
         action="{{ route('login') }}"
-        class="space-y-5"
+        class="space-y-4 sm:space-y-5"
         novalidate
         x-data="{ submitting: false }"
         @submit="submitting = true"

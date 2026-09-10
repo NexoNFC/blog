@@ -33,6 +33,15 @@ class IconComponentTest extends TestCase
         $this->assertStringContainsString('h-4 w-4 text-primary', $html);
     }
 
+    public function test_catalog_icons_from_downloads_render(): void
+    {
+        $html = Blade::render('<x-icon name="search" /><x-icon name="menu-burger" /><x-icon name="degrees-360" />');
+
+        $this->assertStringContainsString('viewBox="0 0 24 24"', $html);
+        $this->assertStringContainsString('viewBox="0 0 512 512"', $html);
+        $this->assertStringContainsString('fill="currentColor"', $html);
+    }
+
     public function test_unknown_icon_throws(): void
     {
         try {
