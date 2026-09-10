@@ -3,6 +3,58 @@ import 'flowbite';
 
 window.Alpine = Alpine;
 
+Alpine.data('adminShell', () => {
+    const desktopQuery = () => window.matchMedia('(min-width: 640px)');
+
+    const readDesktopPreference = () => window.localStorage.getItem('admin-sidebar-open') !== '0';
+
+    return {
+        open: desktopQuery().matches ? readDesktopPreference() : false,
+        isDesktop: desktopQuery().matches,
+
+        init() {
+            this.syncViewport();
+
+            window.addEventListener('resize', () => {
+                const wasDesktop = this.isDesktop;
+                this.syncViewport();
+
+                if (! wasDesktop && this.isDesktop) {
+                    this.open = readDesktopPreference();
+                }
+
+                if (wasDesktop && ! this.isDesktop) {
+                    this.open = false;
+                }
+            }, { passive: true });
+
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && this.open && ! this.isDesktop) {
+                    this.open = false;
+                }
+            });
+        },
+
+        syncViewport() {
+            this.isDesktop = desktopQuery().matches;
+        },
+
+        toggle() {
+            this.open = ! this.open;
+
+            if (this.isDesktop) {
+                window.localStorage.setItem('admin-sidebar-open', this.open ? '1' : '0');
+            }
+        },
+
+        closeMobile() {
+            if (! this.isDesktop) {
+                this.open = false;
+            }
+        },
+    };
+});
+
 Alpine.start();
 
 const navGlass = document.querySelector('.nav-glass');
