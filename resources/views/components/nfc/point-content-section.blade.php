@@ -20,7 +20,7 @@
             @if (! empty($content['image']))
                 <div class="mt-6 overflow-hidden rounded-[20px] border border-white/50 bg-white/40">
                     <img
-                        src="{{ asset($content['image']) }}"
+                        src="{{ $content['image'] }}"
                         alt="{{ $content['title'] }}"
                         class="aspect-[16/9] h-full w-full object-cover"
                         loading="lazy"

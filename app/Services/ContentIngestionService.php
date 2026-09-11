@@ -20,6 +20,8 @@ class ContentIngestionService
 
     public function ingest(string $trigger = 'manual', ?ContentSourceKey $sourceKey = null): ScrapeRun
     {
+        set_time_limit(180);
+
         $run = $this->scrapeRuns->start($trigger);
 
         try {
