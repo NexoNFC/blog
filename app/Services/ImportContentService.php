@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ContentStatus;
+use App\Models\Category;
 use App\Models\ImportedContent;
 use App\Models\News;
 use App\Models\Source;
@@ -62,20 +63,33 @@ class ImportContentService
         }
 
         $title = $attributes['title'] ?? $imported->title ?? 'Contenido importado';
+        $media = is_array($imported->media) ? $imported->media : [];
+        $featured = $attributes['featured_image_path'] ?? ($media[0]['url'] ?? null);
+        $gallery = $attributes['gallery'] ?? array_values(array_filter(array_map(
+            fn (mixed $item): ?string => is_array($item) ? ($item['url'] ?? null) : null,
+            array_slice($media, 1),
+        )));
 
         return News::query()->create([
             'imported_content_id' => $imported->id,
             'source_id' => $imported->source_id,
-            'category_id' => $attributes['category_id'] ?? null,
+            'category_id' => $attributes['category_id'] ?? $this->categoryIdFromImport($imported),
             'title' => $title,
             'slug' => $attributes['slug'] ?? Str::slug($title).'-'.$imported->id,
             'summary' => $attributes['summary'] ?? Str::limit((string) $imported->raw_text, 220),
             'body' => $attributes['body'] ?? (string) $imported->raw_text,
-            'featured_image_path' => $attributes['featured_image_path'] ?? null,
+            'featured_image_path' => $featured,
+            'gallery' => $gallery,
             'origin_url' => $imported->origin_url,
             'origin_published_at' => $imported->origin_published_at,
             'status' => ContentStatus::Draft,
             'published_at' => null,
+            'processed_payload' => [
+                'presentation' => 'original',
+                'original_title' => $title,
+                'original_summary' => $attributes['summary'] ?? Str::limit((string) $imported->raw_text, 220),
+                'original_body' => (string) $imported->raw_text,
+            ],
         ]);
     }
 
@@ -103,5 +117,18 @@ class ImportContentService
             ->where('source_id', $source->id)
             ->where('external_id', $externalId)
             ->first();
+    }
+
+    private function categoryIdFromImport(ImportedContent $imported): ?int
+    {
+        $slug = $imported->metadata['category_slug'] ?? null;
+
+        if (! is_string($slug) || $slug === '') {
+            return null;
+        }
+
+        $id = Category::query()->where('slug', $slug)->value('id');
+
+        return is_numeric($id) ? (int) $id : null;
     }
 }

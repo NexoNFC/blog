@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
 class FescPortalExtractor implements SourceExtractor
 {
     /**
-     * Meses usados en la columna "Fecha de creación" de /portal/comunicados.
+     * Meses usados en la columna "Fecha de creación" de los listados Joomla.
      *
      * @var array<string, int>
      */
@@ -58,21 +58,19 @@ class FescPortalExtractor implements SourceExtractor
 
     public function extract(Source $source): array
     {
-        $listingUrl = $this->listingUrl($source);
-        $html = $this->fetchHtml($listingUrl, 'No se pudo leer el listado de comunicados del portal FESC.');
-        $items = $this->listingItems($html, $source);
+        $discovered = $this->discoverItems($source);
 
-        if ($items === []) {
+        if ($discovered === []) {
             throw new SourceExtractionException(
-                'El listado de comunicados FESC no tiene la tabla esperada (com-content-category__table). El HTML del portal pudo haber cambiado.',
+                'No se encontraron noticias en el portal FESC (carrusel «Proyectamos Nuestra Institución» o listados de News Bienestar, Comunicados, Novedades SIG y News Extension). El HTML del portal pudo haber cambiado.',
             );
         }
 
-        $limit = max(1, (int) config('ingestion.fesc.item_limit', 8));
+        $limit = max(1, (int) config('ingestion.fesc.item_limit', 12));
         $extracted = [];
 
-        foreach (array_slice($items, 0, $limit) as $item) {
-            $article = $this->extractArticle($item);
+        foreach ($this->selectWithinLimit($discovered, $limit) as $item) {
+            $article = $this->extractArticle($item, $source);
 
             if ($article !== null) {
                 $extracted[] = $article;
@@ -81,7 +79,7 @@ class FescPortalExtractor implements SourceExtractor
 
         if ($extracted === []) {
             throw new SourceExtractionException(
-                'Se encontró el listado de comunicados, pero ninguno pudo extraerse con contenido editorial.',
+                'Se encontraron enlaces de noticias, pero ninguno pudo extraerse con contenido editorial.',
             );
         }
 
@@ -89,10 +87,216 @@ class FescPortalExtractor implements SourceExtractor
     }
 
     /**
-     * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon}>
+     * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>
      */
-    private function listingItems(string $html, Source $source): array
+    private function discoverItems(Source $source): array
     {
+        $byUrl = [];
+
+        foreach ($this->homeCarouselItems($source) as $item) {
+            $byUrl[$item['origin_url']] = $item;
+        }
+
+        foreach ($this->configuredListings() as $listing) {
+            foreach ($this->listingItems($source, $listing) as $item) {
+                $existing = $byUrl[$item['origin_url']] ?? null;
+
+                if ($existing === null || ($existing['origin_published_at'] === null && $item['origin_published_at'] !== null)) {
+                    $byUrl[$item['origin_url']] = $item;
+                }
+            }
+        }
+
+        return array_values($byUrl);
+    }
+
+    /**
+     * Reparte el cupo entre las secciones del portal para no dejar fuera
+     * Comunicados, Novedades SIG o News Extension cuando el carrusel ya llenó el límite.
+     *
+     * @param  list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>  $discovered
+     * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>
+     */
+    private function selectWithinLimit(array $discovered, int $limit): array
+    {
+        if (count($discovered) <= $limit) {
+            return $discovered;
+        }
+
+        $queues = [];
+
+        foreach ($discovered as $item) {
+            $queues[$item['section']][] = $item;
+        }
+
+        foreach ($queues as &$queue) {
+            usort($queue, function (array $left, array $right): int {
+                $leftDate = $left['origin_published_at'];
+                $rightDate = $right['origin_published_at'];
+
+                if ($leftDate !== null && $rightDate !== null) {
+                    return $rightDate <=> $leftDate;
+                }
+
+                if ($leftDate !== null) {
+                    return -1;
+                }
+
+                if ($rightDate !== null) {
+                    return 1;
+                }
+
+                return 0;
+            });
+        }
+        unset($queue);
+
+        $selected = [];
+        $sectionOrder = array_keys($queues);
+
+        while (count($selected) < $limit) {
+            $progress = false;
+
+            foreach ($sectionOrder as $section) {
+                if ($queues[$section] === []) {
+                    continue;
+                }
+
+                $selected[] = array_shift($queues[$section]);
+                $progress = true;
+
+                if (count($selected) >= $limit) {
+                    break;
+                }
+            }
+
+            if (! $progress) {
+                break;
+            }
+        }
+
+        return $selected;
+    }
+
+    /**
+     * @return list<array{path: string, section: string, label: string, category: string}>
+     */
+    private function configuredListings(): array
+    {
+        $listings = config('ingestion.fesc.listings', []);
+
+        if (! is_array($listings) || $listings === []) {
+            return [[
+                'path' => 'comunicados',
+                'section' => 'comunicados',
+                'label' => 'Comunicados',
+                'category' => 'comunicado',
+            ]];
+        }
+
+        $normalized = [];
+
+        foreach ($listings as $listing) {
+            if (! is_array($listing) || ! isset($listing['path'])) {
+                continue;
+            }
+
+            $path = trim((string) $listing['path'], '/');
+
+            $normalized[] = [
+                'path' => $path,
+                'section' => (string) ($listing['section'] ?? $path),
+                'label' => (string) ($listing['label'] ?? $path),
+                'category' => (string) ($listing['category'] ?? 'noticia'),
+            ];
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>
+     */
+    private function homeCarouselItems(Source $source): array
+    {
+        try {
+            $html = $this->fetchHtml(
+                $this->homeUrl($source),
+                'No se pudo leer la portada del portal FESC.',
+            );
+        } catch (SourceExtractionException $exception) {
+            Log::warning('No se pudo extraer el carrusel institucional FESC.', [
+                'reason' => $exception->getMessage(),
+            ]);
+
+            return [];
+        }
+
+        $xpath = $this->xpath($html);
+        $links = $xpath->query('//div[contains(@class,"jtcs_item_wrapper")]//a[contains(@class,"jt-title") or contains(@class,"link-image")]');
+
+        if ($links === false || $links->length === 0) {
+            return [];
+        }
+
+        $items = [];
+
+        foreach ($links as $link) {
+            if (! $link instanceof DOMElement) {
+                continue;
+            }
+
+            $href = trim($link->getAttribute('href'));
+            $title = $this->normalizeText($link->getAttribute('title') ?: $link->textContent);
+            $listing = $this->listingFromUrl($href);
+
+            if ($href === '' || $title === '' || $listing === null || $this->shouldIgnoreUrl($href)) {
+                continue;
+            }
+
+            $originUrl = $this->canonicalUrl($this->absoluteUrl($href, $source));
+
+            if (isset($items[$originUrl])) {
+                continue;
+            }
+
+            $dateNode = $xpath->query('.//ancestor::div[contains(@class,"item") or contains(@class,"slide")][1]//*[contains(@class,"jt-date") or contains(@class,"create")]', $link)?->item(0);
+
+            $items[$originUrl] = [
+                'origin_url' => $originUrl,
+                'title' => $title,
+                'origin_published_at' => $dateNode instanceof DOMNode
+                    ? $this->parseSpanishDate($dateNode->textContent)
+                    : null,
+                'section' => $listing['section'],
+                'label' => $listing['label'],
+                'category' => $listing['category'],
+            ];
+        }
+
+        return array_values($items);
+    }
+
+    /**
+     * @param  array{path: string, section: string, label: string, category: string}  $listing
+     * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>
+     */
+    private function listingItems(Source $source, array $listing): array
+    {
+        try {
+            $html = $this->fetchHtml(
+                $this->listingUrl($source, $listing['path']),
+                "No se pudo leer el listado {$listing['label']} del portal FESC.",
+            );
+        } catch (SourceExtractionException $exception) {
+            Log::warning('No se pudo extraer un listado FESC.', [
+                'listing' => $listing['path'],
+                'reason' => $exception->getMessage(),
+            ]);
+
+            return [];
+        }
+
         $xpath = $this->xpath($html);
         $rows = $xpath->query('//table[contains(concat(" ", normalize-space(@class), " "), " com-content-category__table ")]//tbody/tr');
 
@@ -123,7 +327,7 @@ class FescPortalExtractor implements SourceExtractor
 
             $originUrl = $this->canonicalUrl($this->absoluteUrl($href, $source));
 
-            if (! str_contains($originUrl, '/comunicados/')) {
+            if (! str_contains($originUrl, '/'.$listing['path'].'/')) {
                 continue;
             }
 
@@ -133,6 +337,9 @@ class FescPortalExtractor implements SourceExtractor
                 'origin_published_at' => $dateCell instanceof DOMNode
                     ? $this->parseSpanishDate($dateCell->textContent)
                     : null,
+                'section' => $listing['section'],
+                'label' => $listing['label'],
+                'category' => $listing['category'],
             ];
         }
 
@@ -140,18 +347,18 @@ class FescPortalExtractor implements SourceExtractor
     }
 
     /**
-     * @param  array{origin_url: string, title: string, origin_published_at: ?Carbon}  $item
+     * @param  array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}  $item
      * @return array<string, mixed>|null
      */
-    private function extractArticle(array $item): ?array
+    private function extractArticle(array $item, Source $source): ?array
     {
         try {
             $html = $this->fetchHtml(
                 $item['origin_url'],
-                'No se pudo leer un comunicado del portal FESC.',
+                'No se pudo leer una noticia del portal FESC.',
             );
         } catch (SourceExtractionException $exception) {
-            Log::warning('No se pudo extraer un comunicado FESC.', [
+            Log::warning('No se pudo extraer una noticia FESC.', [
                 'url' => $item['origin_url'],
                 'reason' => $exception->getMessage(),
             ]);
@@ -164,7 +371,7 @@ class FescPortalExtractor implements SourceExtractor
         $body = $xpath->query('//div[contains(@class,"article-details")]//div[@itemprop="articleBody"]')?->item(0);
 
         if (! $body instanceof DOMElement) {
-            Log::warning('El comunicado FESC no tiene cuerpo editorial.', [
+            Log::warning('La noticia FESC no tiene cuerpo editorial.', [
                 'url' => $item['origin_url'],
             ]);
 
@@ -189,9 +396,11 @@ class FescPortalExtractor implements SourceExtractor
             'title' => $title,
             'raw_text' => $rawText,
             'raw_html' => $rawHtml,
-            'media' => $this->articleMedia($xpath),
+            'media' => $this->articleMedia($xpath, $source),
             'metadata' => [
-                'section' => 'comunicados',
+                'section' => $item['section'],
+                'section_label' => $item['label'],
+                'category_slug' => $item['category'],
                 'external_id' => $externalId,
             ],
             'origin_published_at' => $item['origin_published_at'],
@@ -202,34 +411,43 @@ class FescPortalExtractor implements SourceExtractor
     /**
      * @return list<array<string, mixed>>
      */
-    private function articleMedia(DOMXPath $xpath): array
+    private function articleMedia(DOMXPath $xpath, Source $source): array
     {
-        $images = $xpath->query('//div[contains(@class,"article-details")]//div[contains(@class,"fotorama")]//img');
+        $queries = [
+            '//div[contains(@class,"article-details")]//div[contains(@class,"fotorama")]//img',
+            '//div[contains(@class,"article-details")]//div[@itemprop="articleBody"]//img',
+        ];
         $media = [];
+        $seen = [];
 
-        if ($images === false) {
-            return $media;
-        }
+        foreach ($queries as $query) {
+            $images = $xpath->query($query);
 
-        foreach ($images as $image) {
-            if (! $image instanceof DOMElement) {
+            if ($images === false) {
                 continue;
             }
 
-            $src = $this->cleanMediaUrl($image->getAttribute('src'));
+            foreach ($images as $image) {
+                if (! $image instanceof DOMElement) {
+                    continue;
+                }
 
-            if ($src === '' || ! str_contains($src, '/images/comunicados/')) {
-                continue;
-            }
+                $src = $this->cleanMediaUrl($image->getAttribute('src'), $source);
 
-            $media[] = [
-                'kind' => MediaKind::Image->value,
-                'url' => $src,
-                'alt' => $this->normalizeText($image->getAttribute('alt')) ?: null,
-            ];
+                if ($src === '' || isset($seen[$src]) || ! $this->isContentImage($src)) {
+                    continue;
+                }
 
-            if (count($media) >= 5) {
-                break;
+                $seen[$src] = true;
+                $media[] = [
+                    'kind' => MediaKind::Image->value,
+                    'url' => $src,
+                    'alt' => $this->normalizeText($image->getAttribute('alt')) ?: null,
+                ];
+
+                if (count($media) >= 12) {
+                    return $media;
+                }
             }
         }
 
@@ -261,11 +479,28 @@ class FescPortalExtractor implements SourceExtractor
             ->accept('text/html');
     }
 
-    private function listingUrl(Source $source): string
+    private function homeUrl(Source $source): string
     {
-        $path = trim((string) config('ingestion.fesc.listing_path', 'comunicados'), '/');
+        return rtrim($source->base_url, '/').'/';
+    }
 
-        return rtrim($source->base_url, '/').'/'.$path;
+    private function listingUrl(Source $source, string $path): string
+    {
+        return rtrim($source->base_url, '/').'/'.trim($path, '/');
+    }
+
+    /**
+     * @return array{path: string, section: string, label: string, category: string}|null
+     */
+    private function listingFromUrl(string $url): ?array
+    {
+        foreach ($this->configuredListings() as $listing) {
+            if (str_contains($url, '/'.$listing['path'].'/')) {
+                return $listing;
+            }
+        }
+
+        return null;
     }
 
     private function xpath(string $html): DOMXPath
@@ -307,11 +542,11 @@ class FescPortalExtractor implements SourceExtractor
 
     private function externalIdFromUrl(string $url): ?string
     {
-        if (preg_match('#/comunicados/(\d+)(?:-|$)#', $url, $matches) !== 1) {
+        if (preg_match('#/(news-bienestar|comunicados|news-sig|news-extension)/(\d+)(?:-|$)#', $url, $matches) !== 1) {
             return null;
         }
 
-        return $matches[1];
+        return $matches[2];
     }
 
     private function shouldIgnoreUrl(string $href): bool
@@ -323,7 +558,7 @@ class FescPortalExtractor implements SourceExtractor
     {
         $normalized = $this->normalizeText($value);
 
-        if (preg_match('/^(\d{1,2})\s+([A-Za-zÁÉÍÓÚÜáéíóúü]+)\s+(\d{4})$/u', $normalized, $matches) !== 1) {
+        if (preg_match('/(\d{1,2})\s+([A-Za-zÁÉÍÓÚÜáéíóúü]+)\s+(\d{4})/u', $normalized, $matches) !== 1) {
             return null;
         }
 
@@ -356,11 +591,44 @@ class FescPortalExtractor implements SourceExtractor
         return $html;
     }
 
-    private function cleanMediaUrl(string $src): string
+    private function cleanMediaUrl(string $src, Source $source): string
     {
-        $withoutFragment = explode('#', $src, 2)[0];
+        $withoutFragment = trim(explode('#', $src, 2)[0]);
 
-        return trim($withoutFragment);
+        if ($withoutFragment === '') {
+            return '';
+        }
+
+        $absolute = $this->absoluteUrl($withoutFragment, $source);
+        $canonical = $this->canonicalUrl($absolute);
+
+        return preg_replace('#(?<!:)/{2,}#', '/', $canonical) ?? $canonical;
+    }
+
+    private function isContentImage(string $url): bool
+    {
+        if (! str_contains($url, '/images/')) {
+            return false;
+        }
+
+        $ignored = [
+            '/logo',
+            '/footer/',
+            '/red-social/',
+            '/wompi/',
+            '/boletines/',
+            '/inicio/',
+            '/modules/',
+            'facebook.com/tr',
+        ];
+
+        foreach ($ignored as $fragment) {
+            if (str_contains($url, $fragment)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function normalizeText(string $value): string

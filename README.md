@@ -102,7 +102,7 @@ docs/           # Documentación del proyecto
 
 ## Estado actual
 
-Autenticación, autorización y dominio de catálogo/NFC persistente. El público solo ve noticias publicadas. La ingestión del portal FESC deja contenidos en borrador para revisión administrativa. Instagram, el botón «Actualizar ahora» y el scheduler todavía no forman parte de este flujo.
+Autenticación, autorización y dominio de catálogo/NFC persistente. El público solo ve noticias publicadas. Desde `/admin/news` el administrador trae piezas del portal FESC (carrusel «Proyectamos Nuestra Institución», News Bienestar, Comunicados, Novedades SIG y News Extension), las revisa en original o transcritas con IA y decide si las publica. Instagram y el scheduler todavía no forman parte de este flujo.
 
 ## Comandos importantes
 
@@ -115,4 +115,4 @@ npm run dev
 npm run build
 ```
 
-`catalog:ingest` consulta el listado real de comunicados del portal FESC, importa piezas recientes de forma idempotente y crea noticias en estado `borrador`. No publica automáticamente. En pruebas no se llama al portal: se usan fixtures.
+`catalog:ingest` consulta el portal FESC (portada y listados institucionales), importa piezas recientes de forma idempotente y crea noticias en estado `borrador`. No publica automáticamente. En administración, `/admin/news` ofrece la misma acción. En pruebas no se llama al portal: se usan fixtures.

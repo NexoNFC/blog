@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ContentStatus;
+use App\Support\MediaUrl;
 use Database\Factories\NewsFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -128,6 +129,16 @@ class News extends Model
      */
     public function toPublicArray(): array
     {
+        $gallery = collect($this->gallery ?? [])
+            ->map(function (mixed $item): ?string {
+                $path = is_array($item) ? ($item['url'] ?? null) : $item;
+
+                return is_string($path) ? MediaUrl::resolve($path) : null;
+            })
+            ->filter()
+            ->values()
+            ->all();
+
         return [
             'slug' => $this->slug,
             'title' => $this->title,
@@ -139,7 +150,10 @@ class News extends Model
             'event_starts_at' => $this->event_starts_at?->format('Y-m-d H:i'),
             'event_ends_at' => $this->event_ends_at?->format('Y-m-d H:i'),
             'external_url' => $this->origin_url,
-            'image' => $this->featured_image_path,
+            'image' => MediaUrl::resolve($this->featured_image_path),
+            'gallery' => $gallery,
+            'section' => $this->importedContent?->metadata['section_label'] ?? null,
+            'presentation' => $this->processed_payload['presentation'] ?? 'original',
         ];
     }
 }
