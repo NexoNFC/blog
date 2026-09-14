@@ -1,9 +1,8 @@
 name: Deploy Production
 
+# El deploy a producción lo hace la integración Git de Vercel (proyecto "blog").
+# Este workflow es opcional: solo manual, si tienes un VERCEL_TOKEN con acceso al team.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:

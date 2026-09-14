@@ -47,15 +47,11 @@ La aplicación corre en un contenedor FrankenPHP. Hace falta una base de datos M
 
 ### Deploy automático
 
-Cada push a `main` dispara un deploy automático en Vercel (integración Git del proyecto [blog](https://vercel.com/erick-s-projects8/blog)).
+Cada push a `main` dispara un deploy automático en Vercel (integración Git del proyecto [blog](https://vercel.com/erick-s-projects8/blog)). Esa es la vía principal.
 
-Además, el workflow [Deploy Production](.github/workflows/deploy-production.yml) puede desplegar con la CLI. Configura este **secret** en GitHub (`Settings → Secrets and variables → Actions` a nivel org o repo):
+El workflow [Deploy Production](.github/workflows/deploy-production.yml) es **opcional** (solo manual) y requiere el secret `VERCEL_TOKEN` con acceso al team `erick-s-projects8`. Si el token no ve el proyecto `blog`, fallará con “Project not found”; en ese caso regenera el token en [Vercel → Tokens](https://vercel.com/account/tokens) con scope del team.
 
-| Secret | Valor |
-| --- | --- |
-| `VERCEL_TOKEN` | Token de [Vercel → Account Settings → Tokens](https://vercel.com/account/tokens) |
-
-Los IDs de org/proyecto (`blog`) van fijados en el workflow. En Vercel → proyecto **blog**, define las variables de Laravel (`APP_KEY`, `APP_URL`, `DB_*`, etc.).
+En Vercel → proyecto **blog**, define las variables de Laravel (`APP_KEY`, `APP_URL`, `DB_*`, etc.).
 
 ### Variables de entorno en Vercel
 
