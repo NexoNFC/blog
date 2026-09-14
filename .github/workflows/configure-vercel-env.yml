@@ -1,0 +1,105 @@
+name: Configure Vercel Laravel Env
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    name: Set production env vars
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upsert Laravel environment variables and redeploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${VERCEL_TOKEN:-}" ] || [ -z "${VERCEL_ORG_ID:-}" ] || [ -z "${VERCEL_PROJECT_ID:-}" ]; then
+            echo "Faltan secrets VERCEL_TOKEN, VERCEL_ORG_ID o VERCEL_PROJECT_ID."
+            exit 1
+          fi
+
+          python3 <<'PY'
+          import json, os, urllib.request, ssl, secrets, base64
+
+          token = os.environ["VERCEL_TOKEN"]
+          org = os.environ["VERCEL_ORG_ID"]
+          project = os.environ["VERCEL_PROJECT_ID"]
+          base = f"https://api.vercel.com"
+          team_q = f"teamId={org}"
+
+          def req(method, path, body=None):
+              data = None if body is None else json.dumps(body).encode()
+              request = urllib.request.Request(
+                  f"{base}{path}",
+                  data=data,
+                  method=method,
+                  headers={
+                      "Authorization": f"Bearer {token}",
+                      "Content-Type": "application/json",
+                  },
+              )
+              with urllib.request.urlopen(request) as response:
+                  raw = response.read().decode()
+                  return json.loads(raw) if raw else {}
+
+          envs = req("GET", f"/v9/projects/{project}/env?{team_q}").get("envs", [])
+          by_key = {e["key"]: e for e in envs}
+
+          app_key = "base64:" + base64.b64encode(secrets.token_bytes(32)).decode()
+          pairs = [
+              ("APP_KEY", app_key, "encrypted"),
+              ("APP_URL", "https://blog-erick-s-projects8.vercel.app", "plain"),
+              ("APP_ENV", "production", "plain"),
+              ("APP_DEBUG", "false", "plain"),
+              ("APP_NAME", "DescubreFESC", "plain"),
+              ("DB_CONNECTION", "sqlite", "plain"),
+              ("DB_DATABASE", "/app/database/database.sqlite", "plain"),
+              ("LOG_CHANNEL", "stderr", "plain"),
+              ("SESSION_DRIVER", "database", "plain"),
+              ("CACHE_STORE", "database", "plain"),
+              ("QUEUE_CONNECTION", "sync", "plain"),
+          ]
+
+          for key, value, typ in pairs:
+              payload = {
+                  "value": value,
+                  "type": typ,
+                  "target": ["production", "preview", "development"],
+              }
+              existing = by_key.get(key)
+              if existing:
+                  # No rotar APP_KEY si ya existe (evita invalidar sesiones).
+                  if key == "APP_KEY":
+                      print(f"Conservada: {key}")
+                      continue
+                  req("PATCH", f"/v9/projects/{project}/env/{existing['id']}?{team_q}", payload)
+                  print(f"Actualizada: {key}")
+              else:
+                  create = {
+                      "key": key,
+                      **payload,
+                  }
+                  req("POST", f"/v10/projects/{project}/env?{team_q}", create)
+                  print(f"Creada: {key}")
+
+          # Redeploy desde main
+          body = {
+              "name": "blog",
+              "project": project,
+              "target": "production",
+              "gitSource": {
+                  "type": "github",
+                  "org": "NexoNFC",
+                  "repo": "blog",
+                  "ref": "main",
+              },
+          }
+          created = req("POST", f"/v13/deployments?{team_q}&forceNew=1", body)
+          print("Redeploy:", created.get("url") or created.get("id") or created)
+          PY

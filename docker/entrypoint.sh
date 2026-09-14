@@ -3,6 +3,22 @@ set -eu
 
 cd /app
 
+# Laravel no arranca sin APP_KEY. Si Vercel no la definió, generar una para esta instancia.
+if [ -z "${APP_KEY:-}" ]; then
+    echo "Advertencia: APP_KEY no definida en el entorno; generando una temporal." >&2
+    APP_KEY="$(php -r 'echo "base64:" . base64_encode(random_bytes(32));')"
+    export APP_KEY
+fi
+
+# URL pública en Vercel (dominio de producción o preview).
+if [ -z "${APP_URL:-}" ]; then
+    if [ -n "${VERCEL_PROJECT_PRODUCTION_URL:-}" ]; then
+        export APP_URL="https://${VERCEL_PROJECT_PRODUCTION_URL}"
+    elif [ -n "${VERCEL_URL:-}" ]; then
+        export APP_URL="https://${VERCEL_URL}"
+    fi
+fi
+
 if [ "${DB_CONNECTION:-sqlite}" = "sqlite" ]; then
     db_file="${DB_DATABASE:-/app/database/database.sqlite}"
     mkdir -p "$(dirname "$db_file")"
