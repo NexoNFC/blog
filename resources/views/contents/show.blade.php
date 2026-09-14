@@ -30,11 +30,8 @@
             </div>
 
             @if (! empty($content['external_url']))
-                <div class="mt-10 space-y-4">
-                    <x-ui.alert type="info">
-                        Resumen en esta plataforma. El detalle oficial está en el sitio de FESC.
-                    </x-ui.alert>
-                    <x-content.external-source :url="$content['external_url']" label="Consultar información oficial" />
+                <div class="mt-10">
+                    <x-content.external-source :url="$content['external_url']" label="Ver en el sitio oficial de FESC" />
                 </div>
             @endif
 

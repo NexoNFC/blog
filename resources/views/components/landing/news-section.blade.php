@@ -19,7 +19,7 @@
         </div>
 
         @if ($featured || count($items))
-            <div class="mt-12 grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="mt-12 grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger data-reveal-step="70">
                 @if ($featured)
                     <x-news.card
                         :content="$featured"

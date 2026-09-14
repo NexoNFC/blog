@@ -11,7 +11,7 @@
             description="La plataforma se conecta con espacios de la sede Cúcuta. Cada punto NFC identifica un lugar; el contenido puede cambiar sin reprogramar el chip."
         />
 
-        <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-reveal-stagger data-reveal-step="70">
             @forelse ($locations as $location)
                 <x-nfc.point-card :location="$location" />
             @empty

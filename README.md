@@ -46,8 +46,8 @@ php artisan serve
 La aplicación corre en un contenedor FrankenPHP. Hace falta una base de datos MySQL/MariaDB externa (SQLite no persiste en Vercel).
 
 1. Crear el proyecto en Vercel e importar el repositorio.
-2. Definir variables de entorno de producción: `APP_KEY`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`, y las credenciales `DB_*` (MySQL/MariaDB recomendado para persistir datos).
-3. Al arrancar el contenedor se ejecutan `php artisan migrate --force` (solo migraciones pendientes) y `php artisan db:seed --force` (seeders idempotentes: no borran datos ni reinician contraseñas existentes).
+2. Definir variables de entorno de producción: `APP_KEY`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`, credenciales `DB_*` (MySQL/MariaDB) y, para los administradores iniciales, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` (y opcionalmente `ADMIN_ERICK_*` / `ADMIN_SANTIAGO_*`).
+3. Al arrancar el contenedor se ejecutan `php artisan migrate --force` y, de forma explícita, los seeders de roles y usuarios (`RolesAndPermissionsSeeder`, `AdminUserSeeder`). Son idempotentes: crean cuentas faltantes y no reinician contraseñas de usuarios ya existentes. Después se siembran fuentes, categorías y catálogo demo.
 
 Archivos de despliegue: `vercel.json`, `Dockerfile.vercel`, `Caddyfile`, `docker/entrypoint.sh`.
 

@@ -26,15 +26,15 @@
             <x-ui.textarea label="Contenido" name="body" required rows="10">{{ old('body', $news->body) }}</x-ui.textarea>
 
             <div class="space-y-1.5">
-                <label for="category_id" class="block text-sm font-medium text-secondary">Categoría</label>
-                <select id="category_id" name="category_id" class="form-control" @if ($errors->has('category_id')) aria-invalid="true" @endif>
+                <x-form.label for="category_id">Categoría</x-form.label>
+                <x-form.select id="category_id" name="category_id" :selected="old('category_id', $news->category_id)">
                     <option value="">Sin categoría</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}" @selected((string) old('category_id', $news->category_id) === (string) $category->id)>
                             {{ $category->name }}
                         </option>
                     @endforeach
-                </select>
+                </x-form.select>
             </div>
 
             <x-ui.input

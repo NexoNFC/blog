@@ -16,7 +16,7 @@
             <img
                 src="{{ asset($location['image']) }}"
                 alt="{{ $location['name'] }}"
-                class="h-36 w-full object-cover transition duration-300 group-hover:scale-105"
+            class="h-36 w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
                 loading="lazy"
             >
         </div>

@@ -11,9 +11,9 @@
             description="Encuentra un punto en el campus, acerca el teléfono y explora lo que hay disponible en ese lugar."
         />
 
-        <ol class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal-stagger data-reveal-step="80">
             @foreach ($steps as $index => $step)
-                <li class="reveal glass-card glass-hover p-6" style="--reveal-delay: {{ ($index + 1) * 80 }}ms">
+                <li class="reveal glass-card glass-hover p-6">
                     <div class="flex items-center justify-between gap-3">
                         <x-ui.icon :name="$step['icon']" />
                         <span class="text-2xl font-bold tabular-nums text-primary/30">{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</span>
