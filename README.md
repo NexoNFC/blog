@@ -47,17 +47,17 @@ La aplicación corre en un contenedor FrankenPHP. Hace falta una base de datos M
 
 ### Deploy automático
 
-Cada push a `main` dispara el workflow [Deploy Production](.github/workflows/deploy-production.yml) hacia el proyecto Vercel `nexo-nfc`.
+Cada push a `main` dispara un deploy automático en Vercel (integración Git del proyecto [blog](https://vercel.com/erick-s-projects8/blog)).
 
-Configura estos **secrets** en el repositorio de GitHub (`Settings → Secrets and variables → Actions`):
+Además, el workflow [Deploy Production](.github/workflows/deploy-production.yml) puede desplegar con la CLI. Configura estos **secrets** en GitHub (`Settings → Secrets and variables → Actions` a nivel org o repo):
 
 | Secret | Valor |
 | --- | --- |
 | `VERCEL_TOKEN` | Token de [Vercel → Account Settings → Tokens](https://vercel.com/account/tokens) |
 | `VERCEL_ORG_ID` | `team_ED4JT637mALZVOb0g0fDFaMf` |
-| `VERCEL_PROJECT_ID` | `prj_OV2IzObgwiNVyV7q9widk5bsBcp7` |
+| `VERCEL_PROJECT_ID` | `prj_lPZqMR4NWy21nad4q5PzMXUAm5eA` |
 
-Opcional (recomendado): instalar la [app de Vercel en GitHub](https://github.com/apps/vercel) sobre la organización `NexoNFC` y vincular el repo al proyecto; así Vercel también puede crear previews por PR.
+Copia en el proyecto **blog** las mismas variables de entorno que tenías en `nexo-nfc` (si aplica).
 
 ### Variables de entorno en Vercel
 
@@ -66,7 +66,7 @@ Opcional (recomendado): instalar la [app de Vercel en GitHub](https://github.com
 
 Archivos de despliegue: `vercel.json`, `Dockerfile.vercel`, `Caddyfile`, `docker/entrypoint.sh`.
 
-Dominio actual del proyecto: [nexo-nfc-phi.vercel.app](https://nexo-nfc-phi.vercel.app).
+Dominio del proyecto vinculado: [blog-erick-s-projects8.vercel.app](https://blog-erick-s-projects8.vercel.app).
 
 ## Acceso administrativo
 
