@@ -30,7 +30,8 @@ jobs:
           node-version: 22
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        # Fijar versión: vercel@latest a veces publica deps rotas (p. ej. @vercel/cervel 404).
+        run: npm install --global vercel@59.16.0
 
       - name: Pull Vercel project settings
         run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
