@@ -40,7 +40,9 @@ class CatalogDomainTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('Noticia pública de campus');
+            ->assertSee('Noticia pública de campus')
+            ->assertSee('data-nfc-signal', false)
+            ->assertSee('red NFC activa');
 
         $this->get(route('contents.show', $news->slug))
             ->assertOk()
@@ -177,7 +179,11 @@ class CatalogDomainTest extends TestCase
             'news_id' => $news->id,
         ]);
 
-        $this->get(route('nfc.show', $point->code))->assertOk();
+        $this->get(route('nfc.show', $point->code))
+            ->assertOk()
+            ->assertSee('data-nfc-connection', false)
+            ->assertSee('Conexión NFC')
+            ->assertSee('Punto reconocido correctamente');
 
         $this->assertSame(1, NfcScan::query()->where('nfc_point_id', $point->id)->count());
         $this->assertSame(0, NewsView::query()->count());

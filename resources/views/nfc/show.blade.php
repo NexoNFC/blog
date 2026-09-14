@@ -23,7 +23,10 @@
             </div>
         </section>
     @else
-        <section class="mx-auto w-full max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <section class="nfc-point-page mx-auto w-full max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+            <div class="nfc-data-stream" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
             <nav class="reveal mb-6 text-sm text-secondary-light" aria-label="Miga de pan">
                 <a href="{{ route('home') }}" class="font-medium text-primary hover:underline">Inicio</a>
                 <span class="mx-2 text-secondary-light/70">/</span>

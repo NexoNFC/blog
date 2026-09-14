@@ -42,17 +42,18 @@
         </div>
 
         <div class="reveal reveal-delay-2 order-1 lg:order-2">
-            <div class="relative mx-auto max-w-md">
+            <div class="nfc-media relative mx-auto max-w-md">
                 <img
                     src="{{ asset('images/campus/estudiantes-nfc.jpg') }}"
                     alt="Estudiante con el teléfono en el acceso del campus FESC"
                     class="w-full rounded-2xl border border-white/10 object-cover shadow-2xl"
                     loading="lazy"
                 >
-                <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-                    <span class="nfc-pulse absolute h-28 w-28 rounded-full border-2 border-primary/80"></span>
-                    <span class="nfc-pulse nfc-pulse-delay absolute h-44 w-44 rounded-full border border-white/50"></span>
-                    <span class="nfc-pulse nfc-pulse-delay-2 absolute h-60 w-60 rounded-full border border-white/25"></span>
+                <span class="nfc-media__scan" aria-hidden="true"></span>
+                <x-nfc.signal class="!absolute inset-0 z-10 m-auto h-64 w-64 sm:h-72 sm:w-72" on-dark />
+                <div class="nfc-media__telemetry" aria-hidden="true">
+                    <span>13.56 MHz</span>
+                    <span>ENLACE SEGURO</span>
                 </div>
             </div>
             <x-landing.journey

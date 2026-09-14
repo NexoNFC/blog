@@ -13,7 +13,38 @@
         <div class="ambient-blob ambient-blob--1"></div>
         <div class="ambient-blob ambient-blob--2"></div>
         <div class="ambient-blob ambient-blob--3"></div>
+        <div class="tech-backdrop">
+            <span class="tech-backdrop__grid"></span>
+            <span class="tech-backdrop__circuit tech-backdrop__circuit--left"></span>
+            <span class="tech-backdrop__circuit tech-backdrop__circuit--right"></span>
+            <span class="tech-backdrop__halo tech-backdrop__halo--one"></span>
+            <span class="tech-backdrop__halo tech-backdrop__halo--two"></span>
+            <span class="tech-backdrop__packet tech-backdrop__packet--one"></span>
+            <span class="tech-backdrop__packet tech-backdrop__packet--two"></span>
+            <span class="tech-backdrop__packet tech-backdrop__packet--three"></span>
+            <span class="tech-backdrop__depth tech-backdrop__depth--left"></span>
+            <span class="tech-backdrop__depth tech-backdrop__depth--right"></span>
+        </div>
     </div>
+
+    <button type="button" class="fesc-coin-scene" data-fesc-coin aria-label="Hacer girar la moneda FESC">
+        <span class="fesc-coin">
+            <span class="fesc-coin__layer fesc-coin__layer--back"></span>
+            <span class="fesc-coin__layer fesc-coin__layer--back-middle"></span>
+            <span class="fesc-coin__layer fesc-coin__layer--middle"></span>
+            <span class="fesc-coin__layer fesc-coin__layer--front-middle"></span>
+            <span class="fesc-coin__layer fesc-coin__layer--front"></span>
+            <span class="fesc-coin__face fesc-coin__face--front">
+                <strong>FESC</strong>
+                <small>CÚCUTA</small>
+            </span>
+            <span class="fesc-coin__face fesc-coin__face--back">
+                <strong>NFC</strong>
+                <small>CÚCUTA</small>
+            </span>
+            <span class="fesc-coin__rim"></span>
+        </span>
+    </button>
 
     <div class="site-content flex min-h-screen flex-col">
         <x-navigation.navbar />

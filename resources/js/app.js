@@ -289,3 +289,24 @@ if (document.readyState === 'loading') {
 } else {
     initScrollReveal();
 }
+
+const fescCoin = document.querySelector('[data-fesc-coin]');
+
+if (fescCoin instanceof HTMLButtonElement) {
+    let boostTimer;
+
+    fescCoin.addEventListener('click', () => {
+        if (prefersReducedMotion()) {
+            return;
+        }
+
+        window.clearTimeout(boostTimer);
+        fescCoin.classList.remove('is-boosting');
+        void fescCoin.offsetWidth;
+        fescCoin.classList.add('is-boosting');
+
+        boostTimer = window.setTimeout(() => {
+            fescCoin.classList.remove('is-boosting');
+        }, 1800);
+    });
+}
