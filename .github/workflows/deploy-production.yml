@@ -33,12 +33,10 @@ jobs:
         # Fijar versión: vercel@latest a veces publica deps rotas (p. ej. @vercel/cervel 404).
         run: npm install --global vercel@59.16.0
 
-      - name: Pull Vercel project settings
-        run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
-        env:
-          # IDs del proyecto "blog" (NexoNFC/blog). El token sí va en secrets.
-          VERCEL_ORG_ID: team_ED4JT637mALZVOb0g0fDFaMf
-          VERCEL_PROJECT_ID: prj_lPZqMR4NWy21nad4q5PzMXUAm5eA
+      - name: Link Vercel project
+        run: |
+          mkdir -p .vercel
+          printf '%s\n' '{"orgId":"team_ED4JT637mALZVOb0g0fDFaMf","projectId":"prj_lPZqMR4NWy21nad4q5PzMXUAm5eA"}' > .vercel/project.json
 
       - name: Deploy to production
         run: vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
