@@ -2,7 +2,7 @@
 
 Documento conceptual del producto. No define implementación técnica.
 
-**Estado:** el dominio de noticias, NFC, visitas y escaneos ya persiste en base de datos. Solo existe el rol administrador. Aún faltan extracción automática, procesamiento de lenguaje y la acción «Actualizar ahora».
+**Estado:** el dominio de noticias, NFC, visitas y escaneos ya persiste en base de datos. Solo existe el rol administrador. La extracción del portal FESC y la transcripción opcional con IA están disponibles para revisión administrativa; Instagram y la ejecución programada cada 24 h aún no.
 
 ## Propósito
 

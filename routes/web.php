@@ -29,6 +29,7 @@ Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admi
     Route::middleware('permission:news.create')->group(function () {
         Route::get('/news/create', [AdminContentController::class, 'create'])->name('news.create');
         Route::get('/contenidos/crear', [AdminContentController::class, 'create']);
+        Route::post('/news/ingest', [AdminContentController::class, 'ingest'])->name('news.ingest');
     });
 
     Route::get('/news/{news}/edit', [AdminContentController::class, 'edit'])
@@ -38,6 +39,14 @@ Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admi
     Route::patch('/news/{news}', [AdminContentController::class, 'update'])
         ->middleware('permission:news.update')
         ->name('news.update');
+
+    Route::post('/news/{news}/rewrite', [AdminContentController::class, 'rewrite'])
+        ->middleware('permission:news.update')
+        ->name('news.rewrite');
+
+    Route::post('/news/{news}/original', [AdminContentController::class, 'presentOriginal'])
+        ->middleware('permission:news.update')
+        ->name('news.original');
 
     Route::post('/news/{news}/publish', [AdminContentController::class, 'publish'])
         ->middleware('permission:news.publish')

@@ -12,16 +12,29 @@
             </h1>
             <p class="mt-4 text-lg leading-relaxed text-secondary-light">{{ $content['summary'] }}</p>
 
-            <div class="mt-8 overflow-hidden rounded-[20px] border border-white/50 bg-white/40">
-                @if (! empty($content['image']))
+            @if (! empty($content['image']))
+                <div class="mt-8 overflow-hidden rounded-[20px] border border-white/50 bg-white/40">
                     <img
-                        src="{{ asset($content['image']) }}"
+                        src="{{ $content['image'] }}"
                         alt="{{ $content['title'] }}"
                         class="aspect-[16/9] h-full w-full object-cover"
                         loading="lazy"
                     >
-                @endif
-            </div>
+                </div>
+            @endif
+
+            @if (! empty($content['gallery']))
+                <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    @foreach ($content['gallery'] as $image)
+                        <img
+                            src="{{ $image }}"
+                            alt="{{ $content['title'] }}"
+                            class="aspect-[16/9] w-full rounded-xl object-cover"
+                            loading="lazy"
+                        >
+                    @endforeach
+                </div>
+            @endif
 
             <div class="mt-8 space-y-4 text-base leading-relaxed text-secondary">
                 @foreach (preg_split("/\n\n/", $content['body']) as $paragraph)

@@ -6,7 +6,7 @@
 
 @php
     $isExternal = ($content['type'] ?? null) === 'externo' || ! empty($content['external_url']);
-    $imageSrc = $image ?? asset($content['image'] ?? 'images/campus/fachada.jpg');
+    $imageSrc = $image ?? ($content['image'] ?? asset('images/campus/fachada.jpg'));
 @endphp
 
 <article {{ $attributes->merge([

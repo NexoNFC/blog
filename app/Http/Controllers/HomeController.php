@@ -14,7 +14,7 @@ class HomeController extends Controller
     {
         $published = News::query()
             ->published()
-            ->with('category')
+            ->with(['category', 'importedContent'])
             ->latest('published_at')
             ->get()
             ->map(fn (News $news): array => $news->toPublicArray());
@@ -26,7 +26,7 @@ class HomeController extends Controller
         $images = [];
         foreach ($contents as $content) {
             if (! empty($content['image'])) {
-                $images[$content['slug']] = asset($content['image']);
+                $images[$content['slug']] = $content['image'];
             }
         }
 

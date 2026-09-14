@@ -15,7 +15,7 @@ class NfcPointController extends Controller
     public function show(string $code): View
     {
         $point = NfcPoint::query()
-            ->with(['news.category'])
+            ->with(['news.category', 'news.importedContent'])
             ->where('code', $code)
             ->firstOrFail();
 
@@ -30,7 +30,7 @@ class NfcPointController extends Controller
 
         $moreNews = News::query()
             ->published()
-            ->with('category')
+            ->with(['category', 'importedContent'])
             ->when($news !== null, fn ($query) => $query->whereKeyNot($news->id))
             ->latest('published_at')
             ->limit(3)

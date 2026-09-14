@@ -9,7 +9,7 @@
             @if (! empty($content['image']))
                 <div class="relative aspect-[21/9] min-h-[14rem] overflow-hidden bg-secondary/10 sm:min-h-[18rem]">
                     <img
-                        src="{{ asset($content['image']) }}"
+                        src="{{ $content['image'] }}"
                         alt="{{ $content['title'] }}"
                         class="h-full w-full object-cover"
                         loading="eager"

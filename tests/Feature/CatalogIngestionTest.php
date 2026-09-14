@@ -98,9 +98,9 @@ class CatalogIngestionTest extends TestCase
 
     public function test_http_error_on_listing_marks_scrape_run_as_error(): void
     {
-        Http::fake([
-            'https://www.fesc.edu.co/portal/comunicados' => Http::response('error', 500),
-        ]);
+        Http::fake(function () {
+            return Http::response('error', 500);
+        });
         Source::factory()->fesc()->create();
 
         $run = app(ContentIngestionService::class)->ingest('manual', ContentSourceKey::Fesc);
@@ -113,15 +113,15 @@ class CatalogIngestionTest extends TestCase
 
     public function test_missing_listing_markup_marks_scrape_run_as_error(): void
     {
-        Http::fake([
-            'https://www.fesc.edu.co/portal/comunicados' => Http::response('<html><body>Inicio</body></html>', 200),
-        ]);
+        Http::fake(function () {
+            return Http::response('<html><body>Inicio</body></html>', 200);
+        });
         Source::factory()->fesc()->create();
 
         $run = app(ContentIngestionService::class)->ingest('manual', ContentSourceKey::Fesc);
 
         $this->assertSame(ScrapeRunStatus::Error, $run->status);
-        $this->assertStringContainsString('com-content-category__table', (string) $run->error_message);
+        $this->assertStringContainsString('No se encontraron noticias', (string) $run->error_message);
     }
 
     public function test_artisan_command_ingests_fesc_source(): void
@@ -139,20 +139,92 @@ class CatalogIngestionTest extends TestCase
     public function test_visitor_has_no_ingestion_route(): void
     {
         $this->post('/admin/ingestion')->assertNotFound();
+        $this->post(route('admin.news.ingest'))->assertRedirect(route('login'));
         $this->get('/')->assertOk();
     }
 
-    private function fakeFescPortal(): void
+    public function test_fesc_ingestion_reads_home_carousel_and_all_section_listings(): void
+    {
+        $this->fakeFescPortal(withAllSections: true);
+        Source::factory()->fesc()->create();
+
+        $run = app(ContentIngestionService::class)->ingest('manual', ContentSourceKey::Fesc);
+
+        $this->assertSame(ScrapeRunStatus::Completed, $run->status);
+        $this->assertSame(5, $run->contents_found);
+        $this->assertSame(5, News::query()->where('status', ContentStatus::Draft)->count());
+
+        $bienestar = News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/news-bienestar/1413-reunion-estudiantes')->first();
+        $this->assertNotNull($bienestar);
+        $this->assertStringContainsString('estudiantes becarios', (string) $bienestar->body);
+        $this->assertSame('https://www.fesc.edu.co/portal/images/bienestar/noticias/prev-01.jpg', $bienestar->featured_image_path);
+        $this->assertContains('https://www.fesc.edu.co/portal/images/bienestar/noticias/prev-02.jpg', $bienestar->gallery);
+        $this->assertSame('News Bienestar', $bienestar->importedContent?->metadata['section_label'] ?? null);
+        $this->assertSame('original', $bienestar->processed_payload['presentation'] ?? null);
+
+        $this->assertNotNull(News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/comunicados/1411-mundo-fesc-ratifica-su-clasificacion')->first());
+        $this->assertSame('Novedades SIG', News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/news-sig/1409-revision-direccion')->first()?->importedContent?->metadata['section_label'] ?? null);
+        $this->assertSame('News Extension', News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/news-extension/1405-diferenciate')->first()?->importedContent?->metadata['section_label'] ?? null);
+    }
+
+    private function fakeFescPortal(bool $withAllSections = false): void
     {
         $listing = file_get_contents(base_path('tests/Fixtures/fesc/listing.html'));
         $article = file_get_contents(base_path('tests/Fixtures/fesc/article.html'));
         $secondary = file_get_contents(base_path('tests/Fixtures/fesc/article-secondary.html'));
+        $home = file_get_contents(base_path('tests/Fixtures/fesc/home.html'));
+        $bienestarListing = file_get_contents(base_path('tests/Fixtures/fesc/listing-bienestar.html'));
+        $bienestarArticle = file_get_contents(base_path('tests/Fixtures/fesc/article-bienestar.html'));
+        $sigListing = file_get_contents(base_path('tests/Fixtures/fesc/listing-sig.html'));
+        $sigArticle = file_get_contents(base_path('tests/Fixtures/fesc/article-sig.html'));
+        $extensionListing = file_get_contents(base_path('tests/Fixtures/fesc/listing-extension.html'));
+        $extensionArticle = file_get_contents(base_path('tests/Fixtures/fesc/article-extension.html'));
 
-        Http::fake(function ($request) use ($listing, $article, $secondary) {
+        Http::fake(function ($request) use (
+            $listing,
+            $article,
+            $secondary,
+            $home,
+            $bienestarListing,
+            $bienestarArticle,
+            $sigListing,
+            $sigArticle,
+            $extensionListing,
+            $extensionArticle,
+            $withAllSections,
+        ) {
             $url = $request->url();
+
+            if ($withAllSections && rtrim($url, '/') === 'https://www.fesc.edu.co/portal') {
+                return Http::response($home, 200);
+            }
 
             if ($url === 'https://www.fesc.edu.co/portal/comunicados') {
                 return Http::response($listing, 200);
+            }
+
+            if ($withAllSections && $url === 'https://www.fesc.edu.co/portal/news-bienestar') {
+                return Http::response($bienestarListing, 200);
+            }
+
+            if ($withAllSections && $url === 'https://www.fesc.edu.co/portal/news-sig') {
+                return Http::response($sigListing, 200);
+            }
+
+            if ($withAllSections && $url === 'https://www.fesc.edu.co/portal/news-extension') {
+                return Http::response($extensionListing, 200);
+            }
+
+            if (str_contains($url, '1413-reunion-estudiantes')) {
+                return Http::response($bienestarArticle, 200);
+            }
+
+            if (str_contains($url, '1409-revision-direccion')) {
+                return Http::response($sigArticle, 200);
+            }
+
+            if (str_contains($url, '1405-diferenciate')) {
+                return Http::response($extensionArticle, 200);
             }
 
             if (str_contains($url, '1411-mundo-fesc-ratifica-su-clasificacion')) {

@@ -14,7 +14,7 @@ class ContentController extends Controller
     {
         $news = News::query()
             ->published()
-            ->with('category')
+            ->with(['category', 'importedContent'])
             ->where('slug', $slug)
             ->firstOrFail();
 
