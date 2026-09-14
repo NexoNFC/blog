@@ -36,11 +36,12 @@ jobs:
       - name: Pull Vercel project settings
         run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          # IDs del proyecto "blog" (NexoNFC/blog). El token sí va en secrets.
+          VERCEL_ORG_ID: team_ED4JT637mALZVOb0g0fDFaMf
+          VERCEL_PROJECT_ID: prj_lPZqMR4NWy21nad4q5PzMXUAm5eA
 
       - name: Deploy to production
         run: vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: team_ED4JT637mALZVOb0g0fDFaMf
+          VERCEL_PROJECT_ID: prj_lPZqMR4NWy21nad4q5PzMXUAm5eA
