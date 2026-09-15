@@ -11,16 +11,16 @@
     </x-ui.alert>
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <x-admin.stat-card label="Contenidos" :value="$contentCount" />
-        <x-admin.stat-card label="Publicados" :value="$publishedCount" />
-        <x-admin.stat-card label="Puntos NFC" :value="$nfcCount" />
-        <x-admin.stat-card label="NFC activos" :value="$activeNfcCount" />
+        <x-admin.stat-card label="Contenidos" :value="$contentCount" icon="browsers" />
+        <x-admin.stat-card label="Publicados" :value="$publishedCount" icon="badge-check" />
+        <x-admin.stat-card label="Puntos NFC" :value="$nfcCount" icon="nfc" />
+        <x-admin.stat-card label="NFC activos" :value="$activeNfcCount" icon="verified" />
     </div>
 
     <div class="mt-8 grid gap-6 lg:grid-cols-2">
         <x-ui.table>
             <x-slot:header>
-                <h2 class="text-lg font-semibold text-secondary">Contenidos recientes</h2>
+                <h2>Contenidos recientes</h2>
                 @can('news.view')
                     <x-ui.button href="{{ route('admin.news.index') }}" variant="ghost" size="sm">Ver todos</x-ui.button>
                 @endcan
@@ -53,7 +53,7 @@
 
         <x-ui.table>
             <x-slot:header>
-                <h2 class="text-lg font-semibold text-secondary">Puntos NFC</h2>
+                <h2>Puntos NFC</h2>
                 <x-ui.button href="{{ route('admin.nfc.index') }}" variant="ghost" size="sm">Gestionar</x-ui.button>
             </x-slot:header>
             <thead>

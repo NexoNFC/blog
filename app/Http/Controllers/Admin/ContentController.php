@@ -31,9 +31,9 @@ class ContentController extends Controller
         $contents = News::query()
             ->with(['category', 'importedContent'])
             ->latest()
-            ->get()
-            ->map(fn (News $news): array => $news->toPublicArray())
-            ->all();
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn (News $news): array => $news->toPublicArray());
 
         return view('admin.contents.index', [
             'contents' => $contents,

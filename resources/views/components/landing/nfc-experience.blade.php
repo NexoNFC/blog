@@ -42,19 +42,54 @@
         </div>
 
         <div class="reveal reveal-delay-2 order-1 lg:order-2">
-            <div class="relative mx-auto max-w-md">
-                <img
-                    src="{{ asset('images/campus/estudiantes-nfc.jpg') }}"
-                    alt="Estudiante con el teléfono en el acceso del campus FESC"
-                    class="w-full rounded-2xl border border-white/10 object-cover shadow-2xl"
-                    loading="lazy"
-                >
-                <div class="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-                    <span class="nfc-pulse absolute h-28 w-28 rounded-full border-2 border-primary/80"></span>
-                    <span class="nfc-pulse nfc-pulse-delay absolute h-44 w-44 rounded-full border border-white/50"></span>
-                    <span class="nfc-pulse nfc-pulse-delay-2 absolute h-60 w-60 rounded-full border border-white/25"></span>
+            <div class="nfc-stage" aria-hidden="true">
+                <span class="nfc-stage__glow"></span>
+                <span class="nfc-stage__grid"></span>
+
+                <div class="nfc-stage__field">
+                    <span class="nfc-stage__ring nfc-stage__ring--outer"></span>
+                    <span class="nfc-stage__ring nfc-stage__ring--middle"></span>
+                    <span class="nfc-stage__ring nfc-stage__ring--inner"></span>
+                    <span class="nfc-stage__pulse"></span>
+                    <span class="nfc-stage__node nfc-stage__node--a"></span>
+                    <span class="nfc-stage__node nfc-stage__node--b"></span>
+                    <span class="nfc-stage__node nfc-stage__node--c"></span>
+                </div>
+
+                <div class="nfc-stage__chip nfc-stage__chip--coin">
+                    <span class="fesc-coin nfc-stage__coin" aria-hidden="true">
+                        <span class="fesc-coin__layer fesc-coin__layer--back"></span>
+                        <span class="fesc-coin__layer fesc-coin__layer--back-middle"></span>
+                        <span class="fesc-coin__layer fesc-coin__layer--middle"></span>
+                        <span class="fesc-coin__layer fesc-coin__layer--front-middle"></span>
+                        <span class="fesc-coin__layer fesc-coin__layer--front"></span>
+                        <span class="fesc-coin__face fesc-coin__face--front">
+                            <strong>FESC</strong>
+                            <small>CÚCUTA</small>
+                        </span>
+                        <span class="fesc-coin__face fesc-coin__face--back">
+                            <strong>NFC</strong>
+                            <small>CÚCUTA</small>
+                        </span>
+                        <span class="fesc-coin__rim"></span>
+                    </span>
+                </div>
+
+                <div class="nfc-stage__phone">
+                    <span class="nfc-stage__phone-notch"></span>
+                    <span class="nfc-stage__phone-screen">
+                        <span class="nfc-stage__phone-wave"></span>
+                        <span class="nfc-stage__phone-wave"></span>
+                        <span class="nfc-stage__phone-wave"></span>
+                    </span>
+                </div>
+
+                <div class="nfc-stage__labels">
+                    <span>13.56 MHz</span>
+                    <span>ENLACE SEGURO</span>
                 </div>
             </div>
+
             <x-landing.journey
                 class="mt-4 justify-center"
                 :on-dark="true"

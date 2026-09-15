@@ -145,4 +145,6 @@
             @endforelse
         </tbody>
     </x-ui.table>
+
+    <x-ui.pagination :paginator="$contents" />
 @endsection

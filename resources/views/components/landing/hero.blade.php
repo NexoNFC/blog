@@ -26,13 +26,15 @@
                 <img
                     src="{{ asset('images/campus/estudiantes-fachada.jpg') }}"
                     alt="Estudiantes frente a la sede FESC en Cúcuta"
+                    class="hero-photo__image"
                     width="960"
                     height="720"
                     fetchpriority="high"
                 >
                 <figcaption class="absolute inset-x-4 bottom-4 z-10">
                     <span class="glass-chip px-3 py-1.5 text-xs font-semibold text-secondary">
-                        Sede Cúcuta · puntos NFC en campus
+                        <span class="nfc-status-dot" aria-hidden="true"></span>
+                        Sede Cúcuta · red NFC activa
                     </span>
                 </figcaption>
             </figure>

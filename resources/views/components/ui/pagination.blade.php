@@ -2,6 +2,8 @@
     'paginator',
 ])
 
-<div {{ $attributes->merge(['class' => 'mt-6']) }}>
-    {{ $paginator->links() }}
-</div>
+@if ($paginator->hasPages())
+    <div {{ $attributes->merge(['class' => 'admin-pagination mt-6']) }}>
+        {{ $paginator->onEachSide(1)->links('pagination.admin') }}
+    </div>
+@endif

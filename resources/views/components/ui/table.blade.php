@@ -4,8 +4,8 @@
 ])
 
 <div {{ $attributes->merge(['class' => $inset
-    ? 'relative overflow-hidden rounded-xl border border-muted bg-surface/80'
-    : 'glass-panel relative overflow-hidden rounded-2xl shadow-sm'
+    ? 'admin-table-shell admin-table-shell--inset'
+    : 'admin-table-shell glass-panel'
 ]) }}>
     @isset($header)
         <div class="data-table-header">

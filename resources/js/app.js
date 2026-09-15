@@ -207,6 +207,34 @@ Alpine.data('fancySelect', () => ({
 Alpine.start();
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasMotionOverride = () => document.documentElement.classList.contains('motion-override');
+
+document.documentElement.classList.add('motion-override');
+
+const restartSiteAnimations = () => {
+    if (prefersReducedMotion() && ! hasMotionOverride()) {
+        document.documentElement.classList.remove('animations-reset');
+
+        return;
+    }
+
+    document.documentElement.classList.add('animations-reset');
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            document.documentElement.classList.remove('animations-reset');
+        });
+    });
+};
+
+restartSiteAnimations();
+
+window.addEventListener('pageshow', restartSiteAnimations);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        restartSiteAnimations();
+    }
+});
 
 const navGlass = document.querySelector('.nav-glass');
 
@@ -220,7 +248,7 @@ if (navGlass) {
 }
 
 document.addEventListener('pointermove', (event) => {
-    if (prefersReducedMotion()) {
+    if (prefersReducedMotion() && ! hasMotionOverride()) {
         return;
     }
 
@@ -242,7 +270,7 @@ const initScrollReveal = () => {
         return;
     }
 
-    if (prefersReducedMotion() || ! ('IntersectionObserver' in window)) {
+    if ((prefersReducedMotion() && ! hasMotionOverride()) || ! ('IntersectionObserver' in window)) {
         reveals.forEach((element) => element.classList.add('is-revealed'));
 
         return;
@@ -288,4 +316,108 @@ if (document.readyState === 'loading') {
     });
 } else {
     initScrollReveal();
+}
+
+const fescCoin = document.querySelector('[data-fesc-coin]');
+const nfcTracker = document.querySelector('[data-nfc-tracker]');
+
+if (fescCoin instanceof HTMLButtonElement) {
+    let boostTimer;
+
+    fescCoin.addEventListener('click', () => {
+        if (prefersReducedMotion() && ! hasMotionOverride()) {
+            document.documentElement.classList.add('motion-override');
+            initScrollReveal();
+            restartSiteAnimations();
+        }
+
+        window.clearTimeout(boostTimer);
+        fescCoin.classList.remove('is-boosting');
+        void fescCoin.offsetWidth;
+        fescCoin.classList.add('is-boosting');
+
+        boostTimer = window.setTimeout(() => {
+            fescCoin.classList.remove('is-boosting');
+        }, 1800);
+    });
+}
+
+if (nfcTracker instanceof HTMLElement) {
+    // Garantiza anclaje al viewport aunque algún ancestro cree containing block.
+    if (nfcTracker.parentElement !== document.body) {
+        document.body.appendChild(nfcTracker);
+    }
+
+    const pinTrackerToViewport = () => {
+        nfcTracker.style.setProperty('position', 'fixed', 'important');
+        nfcTracker.style.setProperty('top', '5.75rem', 'important');
+        nfcTracker.style.setProperty('right', '1.25rem', 'important');
+        nfcTracker.style.setProperty('bottom', 'auto', 'important');
+        nfcTracker.style.setProperty('left', 'auto', 'important');
+        nfcTracker.style.setProperty('z-index', '60', 'important');
+    };
+
+    pinTrackerToViewport();
+    window.addEventListener('scroll', pinTrackerToViewport, { passive: true });
+    window.addEventListener('resize', pinTrackerToViewport, { passive: true });
+
+    const syncLookAtPointer = (clientX, clientY) => {
+        if (prefersReducedMotion() && ! hasMotionOverride()) {
+            return;
+        }
+
+        const rect = nfcTracker.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const deltaX = clientX - centerX;
+        const deltaY = clientY - centerY;
+        const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
+        const maxTilt = 10;
+        const reach = Math.max(rect.width, 180);
+        const tiltX = Math.max(-1, Math.min(1, deltaY / reach)) * maxTilt;
+        const tiltY = Math.max(-1, Math.min(1, deltaX / reach)) * maxTilt;
+        const yaw = Math.max(-1, Math.min(1, deltaX / reach)) * 14;
+        const pitch = -8 + Math.max(-1, Math.min(1, deltaY / reach)) * 6;
+
+        nfcTracker.style.setProperty('--look-angle', `${angle}deg`);
+        nfcTracker.style.setProperty('--look-rx', `${-tiltX}deg`);
+        nfcTracker.style.setProperty('--look-ry', `${tiltY}deg`);
+        nfcTracker.style.setProperty('--coin-yaw', `${yaw}deg`);
+        nfcTracker.style.setProperty('--coin-pitch', `${pitch}deg`);
+    };
+
+    document.addEventListener('pointermove', (event) => {
+        syncLookAtPointer(event.clientX, event.clientY);
+    }, { passive: true });
+
+    syncLookAtPointer(window.innerWidth * 0.35, window.innerHeight * 0.55);
+
+    const nfcSection = document.querySelector('#nfc');
+
+    if (nfcSection instanceof HTMLElement) {
+        const syncTrackerVisibility = () => {
+            const coinRect = nfcTracker.getBoundingClientRect();
+            const sectionRect = nfcSection.getBoundingClientRect();
+
+            // Solo se oculta si la moneda se solapa con #nfc (no cuando #nfc entra al viewport).
+            const overlaps =
+                coinRect.left < sectionRect.right
+                && coinRect.right > sectionRect.left
+                && coinRect.top < sectionRect.bottom
+                && coinRect.bottom > sectionRect.top;
+
+            nfcTracker.classList.toggle('is-hidden-by-nfc', overlaps);
+            nfcTracker.setAttribute('aria-hidden', overlaps ? 'true' : 'false');
+
+            if (overlaps) {
+                nfcTracker.setAttribute('tabindex', '-1');
+            } else {
+                nfcTracker.removeAttribute('tabindex');
+            }
+        };
+
+        syncTrackerVisibility();
+        window.addEventListener('scroll', syncTrackerVisibility, { passive: true });
+        window.addEventListener('resize', syncTrackerVisibility, { passive: true });
+    }
 }

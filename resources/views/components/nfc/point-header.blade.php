@@ -3,6 +3,17 @@
 ])
 
 <div {{ $attributes->merge(['class' => 'reveal glass-card space-y-6 px-5 py-6 sm:px-6']) }}>
+    <div class="nfc-point-connection -mx-1" data-nfc-connection>
+        <x-nfc.signal class="h-24 w-24 shrink-0" compact />
+        <div class="min-w-0">
+            <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-success">
+                <span class="nfc-status-dot" aria-hidden="true"></span>
+                Conexión NFC
+            </p>
+            <p class="mt-1 text-sm font-medium text-secondary">Punto reconocido correctamente</p>
+        </div>
+    </div>
+
     <div>
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Punto del campus</p>
 

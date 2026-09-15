@@ -8,7 +8,7 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-secondary font-sans antialiased">
+<body class="site-body auth-body antialiased">
     <div class="auth-shell">
         <div class="auth-shell__media" aria-hidden="true">
             <img
@@ -16,19 +16,28 @@
                 alt=""
             >
             <div class="auth-shell__scrim"></div>
+            <div class="auth-shell__atmosphere">
+                <span class="auth-shell__orb auth-shell__orb--one"></span>
+                <span class="auth-shell__orb auth-shell__orb--two"></span>
+                <span class="auth-shell__grid"></span>
+            </div>
         </div>
 
         <div class="auth-shell__content">
             <aside class="auth-shell__brand">
                 <div>
-                    <a href="{{ route('home') }}" class="inline-flex flex-col text-white">
-                        <span class="font-serif text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">FESC</span>
-                        <span class="mt-1 font-sans text-[0.65rem] font-medium tracking-[0.22em] text-white/70 sm:text-[0.7rem]">EDUCACIÓN SUPERIOR</span>
+                    <a href="{{ route('home') }}" class="auth-shell__logo">
+                        <span class="auth-shell__badge">FESC</span>
+                        <span class="auth-shell__logo-text">
+                            <span>Información</span>
+                            <span>en campus</span>
+                        </span>
                     </a>
 
+                    <p class="auth-shell__eyebrow">Administración</p>
                     <p class="auth-shell__title">
                         <span class="block">Acceso</span>
-                        <span class="block">administrativo</span>
+                        <span class="auth-shell__title-accent">administrativo</span>
                     </p>
                     <p class="auth-shell__lead">
                         Plataforma informativa FESC. Ingreso restringido para administradores.
@@ -38,7 +47,7 @@
 
                 <div class="auth-shell__meta auth-shell__meta--desktop">
                     <p>Fundación de Estudios Superiores Comfanorte</p>
-                    <a href="{{ route('home') }}">Volver al sitio</a>
+                    <a href="{{ route('home') }}" class="auth-shell__back">Volver al sitio</a>
                 </div>
             </aside>
 
@@ -49,7 +58,7 @@
 
                 <div class="auth-shell__meta auth-shell__meta--mobile">
                     <p>Fundación de Estudios Superiores Comfanorte</p>
-                    <a href="{{ route('home') }}">Volver al sitio</a>
+                    <a href="{{ route('home') }}" class="auth-shell__back">Volver al sitio</a>
                 </div>
             </main>
         </div>

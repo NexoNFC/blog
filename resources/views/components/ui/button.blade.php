@@ -12,16 +12,16 @@
         'ghost' => 'text-secondary hover:bg-white/50',
         'success' => 'bg-success text-white shadow-sm hover:bg-success/90 focus-visible:outline-success',
         'danger' => 'bg-danger text-white shadow-sm hover:bg-danger/90 focus-visible:outline-danger',
-        default => 'bg-primary text-white shadow-sm hover:bg-primary-dark',
+        default => 'bg-primary text-white shadow-[0_10px_22px_rgb(200_16_46_/_0.22)] hover:bg-primary-dark',
     };
 
     $sizeClasses = match ($size) {
-        'sm' => 'px-3 py-1.5 text-xs',
-        'lg' => 'px-5 py-3 text-base',
-        default => 'px-4 py-2.5 text-sm',
+        'sm' => 'px-3.5 py-2 text-xs',
+        'lg' => 'px-6 py-3 text-base',
+        default => 'px-5 py-2.5 text-sm',
     };
 
-    $base = "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 {$sizeClasses} {$classes}";
+    $base = "inline-flex items-center justify-center gap-2 rounded-2xl font-bold tracking-tight transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 {$sizeClasses} {$classes}";
 @endphp
 
 @if ($href)

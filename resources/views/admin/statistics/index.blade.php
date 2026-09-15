@@ -11,13 +11,14 @@
                 :label="$kpi['label']"
                 :value="$kpi['value']"
                 :hint="$kpi['hint']"
+                icon="adjustments-vertical"
             />
         @endforeach
     </div>
 
     <div class="mt-8 grid gap-6 xl:grid-cols-2">
         <x-ui.card>
-            <h2 class="text-lg font-semibold text-secondary">Actividad últimos 14 días</h2>
+            <h2 class="text-lg font-bold tracking-tight text-secondary">Actividad últimos 14 días</h2>
             <p class="mt-1 text-sm text-secondary-light">Visitas a noticias y escaneos NFC por día</p>
             <div class="mt-4 h-72">
                 <canvas
@@ -31,7 +32,7 @@
         </x-ui.card>
 
         <x-ui.card>
-            <h2 class="text-lg font-semibold text-secondary">Escaneos por punto NFC</h2>
+            <h2 class="text-lg font-bold tracking-tight text-secondary">Escaneos por punto NFC</h2>
             <p class="mt-1 text-sm text-secondary-light">Distribución acumulada por ubicación</p>
             @if (collect($scansByPoint['values'])->sum() === 0)
                 <div class="mt-4">
@@ -54,7 +55,7 @@
         </x-ui.card>
 
         <x-ui.card class="xl:col-span-2">
-            <h2 class="text-lg font-semibold text-secondary">Noticias más visitadas</h2>
+            <h2 class="text-lg font-bold tracking-tight text-secondary">Noticias más visitadas</h2>
             <p class="mt-1 text-sm text-secondary-light">Top de consultas públicas al catálogo</p>
             @if ($mostVisited->isEmpty())
                 <div class="mt-4">
@@ -96,7 +97,7 @@
     <div class="mt-8">
         <x-ui.table>
             <x-slot:header>
-                <h2 class="text-lg font-semibold text-secondary">Detalle por punto NFC</h2>
+                <h2>Detalle por punto NFC</h2>
             </x-slot:header>
             <thead>
                 <tr>
