@@ -207,6 +207,34 @@ Alpine.data('fancySelect', () => ({
 Alpine.start();
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasMotionOverride = () => document.documentElement.classList.contains('motion-override');
+
+document.documentElement.classList.add('motion-override');
+
+const restartSiteAnimations = () => {
+    if (prefersReducedMotion() && ! hasMotionOverride()) {
+        document.documentElement.classList.remove('animations-reset');
+
+        return;
+    }
+
+    document.documentElement.classList.add('animations-reset');
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            document.documentElement.classList.remove('animations-reset');
+        });
+    });
+};
+
+restartSiteAnimations();
+
+window.addEventListener('pageshow', restartSiteAnimations);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        restartSiteAnimations();
+    }
+});
 
 const navGlass = document.querySelector('.nav-glass');
 
@@ -220,7 +248,7 @@ if (navGlass) {
 }
 
 document.addEventListener('pointermove', (event) => {
-    if (prefersReducedMotion()) {
+    if (prefersReducedMotion() && ! hasMotionOverride()) {
         return;
     }
 
@@ -242,7 +270,7 @@ const initScrollReveal = () => {
         return;
     }
 
-    if (prefersReducedMotion() || ! ('IntersectionObserver' in window)) {
+    if ((prefersReducedMotion() && ! hasMotionOverride()) || ! ('IntersectionObserver' in window)) {
         reveals.forEach((element) => element.classList.add('is-revealed'));
 
         return;
@@ -296,8 +324,10 @@ if (fescCoin instanceof HTMLButtonElement) {
     let boostTimer;
 
     fescCoin.addEventListener('click', () => {
-        if (prefersReducedMotion()) {
-            return;
+        if (prefersReducedMotion() && ! hasMotionOverride()) {
+            document.documentElement.classList.add('motion-override');
+            initScrollReveal();
+            restartSiteAnimations();
         }
 
         window.clearTimeout(boostTimer);

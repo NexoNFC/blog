@@ -82,6 +82,10 @@
     :focus-visible {
         @apply outline-2 outline-offset-2 outline-primary;
     }
+
+    html.animations-reset .site-body * {
+        animation-play-state: paused !important;
+    }
 }
 
 @layer components {
@@ -1866,10 +1870,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .motion-ready .reveal,
-    .motion-ready .reveal.is-revealed,
-    .reveal,
-    .reveal.is-revealed {
+    html:not(.motion-override) .motion-ready .reveal,
+    html:not(.motion-override) .motion-ready .reveal.is-revealed,
+    html:not(.motion-override) .reveal,
+    html:not(.motion-override) .reveal.is-revealed {
         opacity: 1 !important;
         transform: none !important;
         filter: none !important;
@@ -1878,63 +1882,63 @@
         will-change: auto !important;
     }
 
-    .nfc-pulse,
-    .nfc-pulse-delay,
-    .nfc-pulse-delay-2,
-    .ambient-blob,
-    .hero-glow,
-    .glass-hover:hover,
-    .glass-hover:active,
-    .glass-chip:hover,
-    .partners-marquee__track {
+    html:not(.motion-override) .nfc-pulse,
+    html:not(.motion-override) .nfc-pulse-delay,
+    html:not(.motion-override) .nfc-pulse-delay-2,
+    html:not(.motion-override) .ambient-blob,
+    html:not(.motion-override) .hero-glow,
+    html:not(.motion-override) .glass-hover:hover,
+    html:not(.motion-override) .glass-hover:active,
+    html:not(.motion-override) .glass-chip:hover,
+    html:not(.motion-override) .partners-marquee__track {
         animation: none !important;
         transform: none !important;
     }
 
-    .nfc-signal__orbit,
-    .nfc-signal__beam,
-    .nfc-signal__node,
-    .nfc-status-dot,
-    .nfc-media__scan,
-    .nfc-card-scan,
-    .nfc-card-link i,
-    .nfc-data-stream span {
+    html:not(.motion-override) .nfc-signal__orbit,
+    html:not(.motion-override) .nfc-signal__beam,
+    html:not(.motion-override) .nfc-signal__node,
+    html:not(.motion-override) .nfc-status-dot,
+    html:not(.motion-override) .nfc-media__scan,
+    html:not(.motion-override) .nfc-card-scan,
+    html:not(.motion-override) .nfc-card-link i,
+    html:not(.motion-override) .nfc-data-stream span {
         animation: none !important;
     }
 
-    .tech-backdrop__grid,
-    .tech-backdrop__halo,
-    .tech-backdrop__packet,
-    .tech-backdrop__depth::before,
-    .fesc-coin-scene,
-    .fesc-coin {
+    html:not(.motion-override) .tech-backdrop__grid,
+    html:not(.motion-override) .tech-backdrop__halo,
+    html:not(.motion-override) .tech-backdrop__packet,
+    html:not(.motion-override) .tech-backdrop__depth::before,
+    html:not(.motion-override) .fesc-coin-scene,
+    html:not(.motion-override) .fesc-coin {
         animation: none !important;
     }
 
-    .tech-backdrop__packet {
+    html:not(.motion-override) .tech-backdrop__packet {
         display: none;
     }
 
-    .nfc-signal__beam,
-    .nfc-media__scan,
-    .nfc-card-scan,
-    .nfc-data-stream {
+    html:not(.motion-override) .nfc-signal__beam,
+    html:not(.motion-override) .nfc-media__scan,
+    html:not(.motion-override) .nfc-card-scan,
+    html:not(.motion-override) .nfc-data-stream {
         display: none;
     }
 
-    .partners-marquee {
+    html:not(.motion-override) .partners-marquee {
         mask-image: none;
         -webkit-mask-image: none;
         padding-inline: 0.75rem;
     }
 
-    .partners-marquee__track {
+    html:not(.motion-override) .partners-marquee__track {
         width: 100%;
         margin: 0 auto;
         justify-content: center;
     }
 
-    .partners-marquee__group {
+    html:not(.motion-override) .partners-marquee__group {
         min-width: 0;
         width: 100%;
         max-width: 52rem;
@@ -1944,16 +1948,17 @@
         row-gap: 1rem;
     }
 
-    .partners-marquee__track > .partners-marquee__group:nth-child(n + 2) {
+    html:not(.motion-override) .partners-marquee__track > .partners-marquee__group:nth-child(n + 2) {
         display: none;
     }
 
-    .partners-marquee__item--up,
-    .partners-marquee__item--down {
+    html:not(.motion-override) .partners-marquee__item--up,
+    html:not(.motion-override) .partners-marquee__item--down {
         transform: none;
     }
 
-    .glass-hover::before {
+    html:not(.motion-override) .glass-hover::before {
         display: none;
     }
+
 }
