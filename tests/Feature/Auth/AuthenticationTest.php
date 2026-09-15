@@ -78,7 +78,7 @@ class AuthenticationTest extends TestCase
 
         $this->get('/admin/login')
             ->assertSeeInOrder([
-                'Ingresa con tu cuenta de administrador.',
+                'Ingresa con tu cuenta de administrador FESC.',
                 'Correo electrónico',
                 'toast-viewport',
                 'data-alert-host',
