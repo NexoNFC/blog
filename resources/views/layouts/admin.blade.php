@@ -29,24 +29,25 @@
         ></div>
 
         <div
-            class="min-h-screen p-4 pt-[4.75rem] transition-[margin] duration-300 sm:p-6 sm:pt-[5rem]"
+            class="admin-main min-h-screen p-4 pt-[4.75rem] transition-[margin] duration-300 sm:p-6 sm:pt-[5rem]"
             :class="open ? 'sm:ml-64' : 'sm:ml-0'"
         >
-            <header class="nav-glass mb-4 px-4 py-4 sm:px-6">
+            <header class="admin-page-header mb-5">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                        <h1 class="text-xl font-semibold text-secondary sm:text-2xl">@yield('heading', 'Administración')</h1>
+                    <div class="min-w-0">
+                        <p class="admin-page-header__eyebrow">Administración FESC</p>
+                        <h1 class="admin-page-header__title">@yield('heading', 'Administración')</h1>
                         @hasSection('subtitle')
-                            <p class="mt-0.5 text-sm text-secondary">@yield('subtitle')</p>
+                            <p class="admin-page-header__subtitle">@yield('subtitle')</p>
                         @endif
                     </div>
                     @hasSection('actions')
-                        <div class="shrink-0">@yield('actions')</div>
+                        <div class="admin-page-header__actions shrink-0">@yield('actions')</div>
                     @endif
                 </div>
             </header>
 
-            <main>
+            <main class="admin-content">
                 @yield('content')
             </main>
         </div>

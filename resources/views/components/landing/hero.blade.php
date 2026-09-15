@@ -37,7 +37,6 @@
                         Sede Cúcuta · red NFC activa
                     </span>
                 </figcaption>
-                <x-nfc.signal class="!absolute right-2 top-2 z-10 h-36 w-36 sm:right-4 sm:top-4 sm:h-44 sm:w-44" compact />
             </figure>
         </div>
     </div>

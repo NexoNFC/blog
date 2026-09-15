@@ -4,12 +4,17 @@
 ])
 
 <div
-    aria-hidden="true"
+    @if ($attributes->get('aria-hidden') !== null)
+        aria-hidden="{{ $attributes->get('aria-hidden') }}"
+    @else
+        aria-hidden="true"
+    @endif
     data-nfc-signal
-    {{ $attributes->class([
+    {{ $attributes->except('aria-hidden')->class([
         'nfc-signal',
         'nfc-signal--dark' => $onDark,
         'nfc-signal--compact' => $compact,
+        'nfc-signal--coin' => ! $slot->isEmpty(),
     ]) }}
 >
     <span class="nfc-signal__grid"></span>
@@ -18,7 +23,11 @@
     <span class="nfc-signal__orbit nfc-signal__orbit--inner"></span>
     <span class="nfc-signal__beam"></span>
     <span class="nfc-signal__core">
-        <strong>NFC</strong>
+        @if ($slot->isEmpty())
+            <strong>NFC</strong>
+        @else
+            {{ $slot }}
+        @endif
     </span>
     <span class="nfc-signal__node nfc-signal__node--one"></span>
     <span class="nfc-signal__node nfc-signal__node--two"></span>

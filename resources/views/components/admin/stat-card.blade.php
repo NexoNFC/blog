@@ -2,12 +2,20 @@
     'label',
     'value',
     'hint' => null,
+    'icon' => null,
 ])
 
-<div {{ $attributes->merge(['class' => 'glass-hover glass-panel rounded-2xl p-4']) }}>
-    <p class="text-xs font-semibold uppercase tracking-wide text-secondary-light">{{ $label }}</p>
-    <p class="mt-2 font-serif text-3xl font-bold text-secondary">{{ $value }}</p>
+<div {{ $attributes->merge(['class' => 'admin-stat-card glass-hover glass-panel']) }}>
+    <div class="flex items-start justify-between gap-3">
+        <p class="admin-stat-card__label">{{ $label }}</p>
+        @if ($icon)
+            <span class="admin-stat-card__icon">
+                <x-icon :name="$icon" class="h-4 w-4" />
+            </span>
+        @endif
+    </div>
+    <p class="admin-stat-card__value">{{ $value }}</p>
     @if ($hint)
-        <p class="mt-1 text-xs text-secondary-light">{{ $hint }}</p>
+        <p class="admin-stat-card__hint">{{ $hint }}</p>
     @endif
 </div>
