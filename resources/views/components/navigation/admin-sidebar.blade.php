@@ -1,7 +1,7 @@
 @php
-    $navBase = 'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-secondary transition';
-    $navOn = $navBase.' bg-primary-soft text-primary';
-    $navOff = $navBase.' hover:bg-primary-soft hover:text-primary';
+    $navBase = 'admin-nav-link group';
+    $navOn = $navBase.' is-active';
+    $navOff = $navBase;
 @endphp
 
 <aside
@@ -10,18 +10,18 @@
     :class="{ '!translate-x-0': open }"
     aria-label="Administración"
 >
-    <div class="flex h-full flex-col overflow-y-auto bg-white/95 px-3 pb-4 pt-[4.75rem] backdrop-blur-xl sm:pt-[5rem]">
-        <a href="{{ route('admin.dashboard') }}" class="mb-5 flex items-center gap-3 rounded-xl px-2.5 py-1.5 sm:hidden">
-            <span class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-primary px-2.5 text-[0.7rem] font-bold tracking-[0.14em] text-white shadow-[0_8px_16px_rgb(200_16_46_/_0.28)]">
-                FESC
-            </span>
+    <div class="flex h-full flex-col overflow-y-auto px-3 pb-4 pt-[4.75rem] sm:pt-[5rem]">
+        <a href="{{ route('admin.dashboard') }}" class="admin-sidebar__brand mb-5 flex items-center gap-3 rounded-2xl px-2.5 py-2 sm:hidden">
+            <span class="admin-brand-badge">FESC</span>
             <span class="min-w-0">
                 <span class="block text-sm font-bold leading-none tracking-tight text-secondary">Panel</span>
-                <span class="mt-1 block text-xs font-medium leading-none text-secondary">administrativo</span>
+                <span class="mt-1 block text-xs font-medium leading-none text-secondary-light">administrativo</span>
             </span>
         </a>
 
-        <ul class="space-y-1 font-medium">
+        <p class="admin-sidebar__section">Menú</p>
+
+        <ul class="space-y-1">
             <li>
                 <a
                     href="{{ route('admin.dashboard') }}"
@@ -31,7 +31,7 @@
                         $navOff => ! request()->routeIs('admin.dashboard'),
                     ])
                 >
-                    <x-icon name="home" class="h-5 w-5 shrink-0" />
+                    <span class="admin-nav-link__icon"><x-icon name="home" class="h-4 w-4" /></span>
                     <span>Dashboard</span>
                 </a>
             </li>
@@ -46,7 +46,7 @@
                             $navOff => ! request()->routeIs('admin.news.*'),
                         ])
                     >
-                        <x-icon name="browsers" class="h-5 w-5 shrink-0" />
+                        <span class="admin-nav-link__icon"><x-icon name="browsers" class="h-4 w-4" /></span>
                         <span>Noticias</span>
                     </a>
                 </li>
@@ -62,7 +62,7 @@
                             $navOff => ! request()->routeIs('admin.categories.*'),
                         ])
                     >
-                        <x-icon name="apps-add" class="h-5 w-5 shrink-0" />
+                        <span class="admin-nav-link__icon"><x-icon name="apps-add" class="h-4 w-4" /></span>
                         <span>Categorías</span>
                     </a>
                 </li>
@@ -78,7 +78,7 @@
                             $navOff => ! request()->routeIs('admin.nfc.*'),
                         ])
                     >
-                        <x-icon name="degrees-360" class="h-5 w-5 shrink-0" />
+                        <span class="admin-nav-link__icon"><x-icon name="nfc" class="h-4 w-4" /></span>
                         <span>Puntos NFC</span>
                     </a>
                 </li>
@@ -94,7 +94,7 @@
                             $navOff => ! request()->routeIs('admin.statistics.*'),
                         ])
                     >
-                        <x-icon name="search" class="h-5 w-5 shrink-0" />
+                        <span class="admin-nav-link__icon"><x-icon name="adjustments-vertical" class="h-4 w-4" /></span>
                         <span>Estadísticas</span>
                     </a>
                 </li>
@@ -108,7 +108,7 @@
                             $navOff => ! request()->routeIs('admin.statistics.*'),
                         ])
                     >
-                        <x-icon name="search" class="h-5 w-5 shrink-0" />
+                        <span class="admin-nav-link__icon"><x-icon name="adjustments-vertical" class="h-4 w-4" /></span>
                         <span>Estadísticas</span>
                     </a>
                 </li>
@@ -124,27 +124,35 @@
                             $navOff => ! request()->routeIs('admin.users.*'),
                         ])
                     >
-                        <x-icon name="users-alt" class="h-5 w-5 shrink-0" />
+                        <span class="admin-nav-link__icon"><x-icon name="users" class="h-4 w-4" /></span>
                         <span>Usuarios</span>
                     </a>
                 </li>
             @endcan
+        </ul>
 
+        <p class="admin-sidebar__section mt-5">Accesos</p>
+        <ul class="space-y-1">
             <li>
                 <a href="{{ route('home') }}" @click="closeMobile()" class="{{ $navOff }}">
-                    <x-icon name="window-alt" class="h-5 w-5 shrink-0" />
+                    <span class="admin-nav-link__icon"><x-icon name="window-alt" class="h-4 w-4" /></span>
                     <span>Sitio público</span>
                 </a>
             </li>
         </ul>
 
-        <div class="mt-auto border-t border-primary/10 px-2 pt-4">
-            <p class="truncate text-sm font-semibold text-secondary">{{ auth()->user()->name }}</p>
-            <p class="truncate text-xs text-secondary-light">{{ auth()->user()->email }}</p>
+        <div class="admin-sidebar__footer mt-auto">
+            <div class="flex items-center gap-3">
+                <span class="admin-avatar">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-bold tracking-tight text-secondary">{{ auth()->user()->name }}</p>
+                    <p class="truncate text-xs text-secondary-light">{{ auth()->user()->email }}</p>
+                </div>
+            </div>
             <form method="POST" action="{{ route('logout') }}" class="mt-3">
                 @csrf
-                <button type="submit" class="inline-flex items-center gap-2 text-xs font-semibold text-primary underline-offset-2 hover:underline">
-                    <x-icon name="arrow-right-from-bracket" class="h-4 w-4" />
+                <button type="submit" class="admin-sidebar__logout">
+                    <x-icon name="logout" class="h-4 w-4" />
                     Cerrar sesión
                 </button>
             </form>

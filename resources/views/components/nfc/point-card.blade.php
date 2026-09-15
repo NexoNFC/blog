@@ -12,13 +12,17 @@
     {{ $attributes->merge(['class' => 'group glass-card glass-hover reveal flex h-full flex-col overflow-hidden']) }}
 >
     @if (! empty($location['image']))
-        <div class="overflow-hidden">
+        <div class="nfc-card-media overflow-hidden">
             <img
                 src="{{ asset($location['image']) }}"
                 alt="{{ $location['name'] }}"
-                class="h-36 w-full object-cover transition duration-300 group-hover:scale-105"
+                class="h-36 w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
                 loading="lazy"
             >
+            <span class="nfc-card-scan" aria-hidden="true"></span>
+            <span class="nfc-card-link" aria-hidden="true">
+                <i></i><i></i><i></i>
+            </span>
         </div>
     @endif
 

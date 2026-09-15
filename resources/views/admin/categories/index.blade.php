@@ -30,31 +30,38 @@
                     <th scope="row">{{ $category->name }}</th>
                     <td class="text-secondary-light">{{ $category->slug }}</td>
                     <td class="whitespace-nowrap text-secondary-light">{{ $category->news_count }}</td>
-                    <td>
-                        <div class="flex flex-wrap items-center justify-end gap-2">
-                            @can('update', $category)
-                                <x-ui.button href="{{ route('admin.categories.edit', $category) }}" variant="secondary" size="sm">
-                                    Editar
-                                </x-ui.button>
-                            @endcan
+                    <td class="text-end">
+                        <div class="inline-grid grid-cols-2 gap-2">
+                            <div class="min-w-[6.5rem]">
+                                @can('update', $category)
+                                    <x-ui.button href="{{ route('admin.categories.edit', $category) }}" variant="secondary" size="sm" class="w-full">
+                                        Editar
+                                    </x-ui.button>
+                                @endcan
+                            </div>
 
-                            @can('delete', $category)
-                                @if ($category->news_count > 0)
-                                    <span class="text-xs text-secondary-light">En uso</span>
-                                @else
-                                    <form
-                                        method="POST"
-                                        action="{{ route('admin.categories.destroy', $category) }}"
-                                        onsubmit="return confirm('¿Eliminar esta categoría? Esta acción no se puede deshacer.')"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-ui.button type="submit" variant="danger" size="sm">
-                                            Eliminar
-                                        </x-ui.button>
-                                    </form>
-                                @endif
-                            @endcan
+                            <div class="flex min-w-[6.5rem] items-center justify-center">
+                                @can('delete', $category)
+                                    @if ($category->news_count > 0)
+                                        <span class="text-xs font-semibold text-secondary-light">
+                                            En uso
+                                        </span>
+                                    @else
+                                        <form
+                                            method="POST"
+                                            action="{{ route('admin.categories.destroy', $category) }}"
+                                            class="w-full"
+                                            onsubmit="return confirm('¿Eliminar esta categoría? Esta acción no se puede deshacer.')"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+                                            <x-ui.button type="submit" variant="danger" size="sm" class="w-full">
+                                                Eliminar
+                                            </x-ui.button>
+                                        </form>
+                                    @endif
+                                @endcan
+                            </div>
                         </div>
                     </td>
                 </tr>

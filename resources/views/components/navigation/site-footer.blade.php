@@ -1,31 +1,57 @@
 @php
     $partners = [
         ['src' => 'images/brand/comfanorte.png', 'alt' => 'Comfanorte', 'href' => 'https://www.comfanorte.com.co/'],
-        ['src' => 'images/brand/sies-plus.png', 'alt' => 'SIES+', 'href' => 'https://siesmas.co/'],
-        ['src' => 'images/brand/icetex.png', 'alt' => 'ICETEX', 'href' => 'https://www.icetex.gov.co/'],
-        ['src' => 'images/brand/icfes.png', 'alt' => 'ICFES', 'href' => 'https://www.icfes.gov.co/'],
         ['src' => 'images/brand/sena.png', 'alt' => 'SENA', 'href' => 'https://www.sena.edu.co/'],
+        ['src' => 'images/brand/sies-plus.png', 'alt' => 'SIES+', 'href' => 'https://siesmas.co/'],
         ['src' => 'images/brand/educajas.png', 'alt' => 'Educajas', 'href' => null],
+        ['src' => 'images/brand/icetex.png', 'alt' => 'ICETEX', 'href' => 'https://www.icetex.gov.co/'],
         ['src' => 'images/brand/men.png', 'alt' => 'Ministerio de Educación Nacional', 'href' => 'https://www.mineducacion.gov.co/'],
+        ['src' => 'images/brand/icfes.png', 'alt' => 'ICFES', 'href' => 'https://www.icfes.gov.co/'],
+        ['src' => 'images/brand/fesc.png', 'alt' => 'FESC', 'href' => 'https://www.fesc.edu.co/'],
     ];
 @endphp
 
 <footer class="mt-auto">
     <div class="border-t border-white/40 bg-white/35 backdrop-blur-md">
-        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-4 sm:px-6">
-            @foreach ($partners as $partner)
-                @if ($partner['href'])
-                    <a href="{{ $partner['href'] }}" target="_blank" rel="noopener noreferrer" class="opacity-90 transition hover:opacity-100">
-                        <img src="{{ asset($partner['src']) }}" alt="{{ $partner['alt'] }}" class="h-10 w-auto object-contain" loading="lazy">
-                    </a>
-                @else
-                    <img src="{{ asset($partner['src']) }}" alt="{{ $partner['alt'] }}" class="h-10 w-auto object-contain opacity-90" loading="lazy">
-                @endif
-            @endforeach
+        <div class="partners-marquee" aria-label="Aliados institucionales">
+            <div class="partners-marquee__track">
+                @foreach ([false, true] as $isClone)
+                    <div class="partners-marquee__group" @if ($isClone) aria-hidden="true" @endif>
+                        @foreach ($partners as $index => $partner)
+                            @php $isUp = $index % 2 === 0; @endphp
+                            @if ($partner['href'])
+                                <a
+                                    href="{{ $partner['href'] }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="partners-marquee__item {{ $isUp ? 'partners-marquee__item--up' : 'partners-marquee__item--down' }}"
+                                    @if ($isClone) tabindex="-1" @endif
+                                >
+                                    <img
+                                        src="{{ asset($partner['src']) }}"
+                                        alt="{{ $isClone ? '' : $partner['alt'] }}"
+                                        class="h-14 w-auto max-w-[11rem] object-contain sm:h-16"
+                                        loading="lazy"
+                                    >
+                                </a>
+                            @else
+                                <span class="partners-marquee__item {{ $isUp ? 'partners-marquee__item--up' : 'partners-marquee__item--down' }}">
+                                    <img
+                                        src="{{ asset($partner['src']) }}"
+                                        alt="{{ $isClone ? '' : $partner['alt'] }}"
+                                        class="h-14 w-auto max-w-[11rem] object-contain sm:h-16"
+                                        loading="lazy"
+                                    >
+                                </span>
+                            @endif
+                        @endforeach
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
 
-    <div class="footer-glass text-white">
+    <div class="footer-glass">
         <div class="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:items-start lg:gap-8 lg:py-12">
             <div class="flex justify-center lg:col-span-3">
                 <img
@@ -40,30 +66,30 @@
 
             <div class="space-y-8 text-center text-sm lg:col-span-3">
                 <div>
-                    <h2 class="text-base font-bold">Sede Cúcuta:</h2>
-                    <p class="mt-2 leading-relaxed text-white">
+                    <h2 class="text-base font-bold text-white">Sede Cúcuta:</h2>
+                    <p class="mt-2 leading-relaxed text-white/90">
                         Av 5 # 15-27, Centro<br>
                         PBX +57 607 5880091 ext 101 102 103<br>
-                        <a href="tel:+573123541578" class="hover:underline">312 354 1578</a>
+                        <a href="tel:+573123541578" class="text-white underline-offset-2 hover:underline">312 354 1578</a>
                         /
-                        <a href="tel:+573133860356" class="hover:underline">313 386 0356</a>
+                        <a href="tel:+573133860356" class="text-white underline-offset-2 hover:underline">313 386 0356</a>
                     </p>
                 </div>
 
                 <div>
-                    <h2 class="text-base font-bold">Sede Ocaña:</h2>
-                    <p class="mt-2 leading-relaxed text-white">
+                    <h2 class="text-base font-bold text-white">Sede Ocaña:</h2>
+                    <p class="mt-2 leading-relaxed text-white/90">
                         Kdx 194-785, Vía Universitaria<br>
                         PBX +57 607 5880091 ext 203<br>
-                        <a href="tel:+573133861614" class="hover:underline">313 386 1614</a>
+                        <a href="tel:+573133861614" class="text-white underline-offset-2 hover:underline">313 386 1614</a>
                     </p>
                 </div>
             </div>
 
             <div class="space-y-4 text-center lg:col-span-6 lg:text-left">
                 <div class="text-center">
-                    <h2 class="text-xl font-bold sm:text-2xl">Fundación de Estudios Superiores Comfanorte</h2>
-                    <p class="mt-2 text-sm">
+                    <h2 class="text-xl font-bold text-white sm:text-2xl">Fundación de Estudios Superiores Comfanorte</h2>
+                    <p class="mt-2 text-sm text-white/90">
                         <a
                             href="https://www.fesc.edu.co/portal/archivos/reglamentos/personeria_juridica.pdf"
                             target="_blank"
@@ -75,11 +101,11 @@
                     </p>
                 </div>
 
-                <p class="text-sm leading-relaxed text-white lg:text-justify">
+                <p class="text-sm leading-relaxed text-white/85 lg:text-justify">
                     Institución de Educación Superior de carácter Tecnológico de derecho privado, de utilidad común y sin ánimo de lucro, redefinida mediante Resolución del MEN 747 del 19 de febrero de 2009, para ofertar programas Técnicos, Tecnológicos, Profesionales y Especializaciones.
                 </p>
 
-                <p class="text-sm leading-relaxed text-white lg:text-justify">
+                <p class="text-sm leading-relaxed text-white/85 lg:text-justify">
                     Su oferta académica se desarrolla en el Departamento Norte de Santander, específicamente en los municipios de San José de Cúcuta y en la Provincia de Ocaña.
                 </p>
             </div>

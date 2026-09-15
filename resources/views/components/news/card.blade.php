@@ -18,7 +18,7 @@
         <img
             src="{{ $imageSrc }}"
             alt=""
-            class="{{ $featured ? 'h-52' : 'h-40' }} w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            class="{{ $featured ? 'h-52' : 'h-40' }} w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
             loading="lazy"
         >
         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-secondary/70 to-transparent p-4">

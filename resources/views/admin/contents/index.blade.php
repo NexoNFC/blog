@@ -79,53 +79,60 @@
                         {{ $content['published_at'] ?? '—' }}
                     </td>
                     <td class="whitespace-nowrap">
-                        <div class="flex flex-nowrap items-center justify-end gap-2">
-                            @can('news.update')
-                                <x-ui.button
-                                    href="{{ route('admin.news.edit', $content['slug']) }}"
-                                    variant="secondary"
-                                    size="sm"
-                                >
-                                    Revisar
-                                </x-ui.button>
-                            @endcan
-
-                            @if ($content['status'] === 'publicado')
-                                <x-ui.button
-                                    href="{{ route('contents.show', $content['slug']) }}"
-                                    variant="secondary"
-                                    size="sm"
-                                >
-                                    Ver
-                                </x-ui.button>
-                            @endif
-
-                            @if ($content['status'] === 'borrador')
-                                @can('news.publish')
-                                    <form method="POST" action="{{ route('admin.news.publish', $content['slug']) }}">
-                                        @csrf
-                                        <x-ui.button type="submit" variant="success" size="sm">
-                                            Publicar
-                                        </x-ui.button>
-                                    </form>
-                                @endcan
-                            @endif
-
-                            @if ($content['status'] !== 'archivado')
-                                @can('news.delete')
-                                    <form
-                                        method="POST"
-                                        action="{{ route('admin.news.destroy', $content['slug']) }}"
-                                        onsubmit="return confirm('¿Desaprobar esta noticia? Se archivará y permanecerá en el histórico.')"
+                        <div class="ml-auto grid w-max grid-cols-3 gap-2">
+                            <div class="min-w-[6.75rem]">
+                                @can('news.update')
+                                    <x-ui.button
+                                        href="{{ route('admin.news.edit', $content['slug']) }}"
+                                        variant="secondary"
+                                        size="sm"
+                                        class="w-full"
                                     >
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-ui.button type="submit" variant="danger" size="sm">
-                                            Desaprobar
-                                        </x-ui.button>
-                                    </form>
+                                        Revisar
+                                    </x-ui.button>
                                 @endcan
-                            @endif
+                            </div>
+
+                            <div class="min-w-[6.75rem]">
+                                @if ($content['status'] === 'publicado')
+                                    <x-ui.button
+                                        href="{{ route('contents.show', $content['slug']) }}"
+                                        variant="secondary"
+                                        size="sm"
+                                        class="w-full"
+                                    >
+                                        Ver
+                                    </x-ui.button>
+                                @elseif ($content['status'] === 'borrador')
+                                    @can('news.publish')
+                                        <form method="POST" action="{{ route('admin.news.publish', $content['slug']) }}" class="w-full">
+                                            @csrf
+                                            <x-ui.button type="submit" variant="success" size="sm" class="w-full">
+                                                Publicar
+                                            </x-ui.button>
+                                        </form>
+                                    @endcan
+                                @endif
+                            </div>
+
+                            <div class="min-w-[6.75rem]">
+                                @if ($content['status'] !== 'archivado')
+                                    @can('news.delete')
+                                        <form
+                                            method="POST"
+                                            action="{{ route('admin.news.destroy', $content['slug']) }}"
+                                            class="w-full"
+                                            onsubmit="return confirm('¿Desaprobar esta noticia? Se archivará y permanecerá en el histórico.')"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+                                            <x-ui.button type="submit" variant="danger" size="sm" class="w-full">
+                                                Desaprobar
+                                            </x-ui.button>
+                                        </form>
+                                    @endcan
+                                @endif
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -138,4 +145,6 @@
             @endforelse
         </tbody>
     </x-ui.table>
+
+    <x-ui.pagination :paginator="$contents" />
 @endsection

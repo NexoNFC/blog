@@ -1,13 +1,12 @@
 @props([
     'content',
     'onDark' => false,
+    'showType' => true,
 ])
 
 <div {{ $attributes->merge(['class' => 'flex flex-wrap items-center gap-2']) }}>
-    <x-ui.badge>{{ $content['type'] }}</x-ui.badge>
-
-    @if (($content['type'] ?? null) === 'externo' || ! empty($content['external_url']))
-        <x-ui.badge tone="warning">Externo</x-ui.badge>
+    @if ($showType && ! empty($content['type']))
+        <x-ui.badge>{{ str_replace('-', ' ', $content['type']) }}</x-ui.badge>
     @endif
 
     @if (! empty($content['published_at']))
