@@ -7,6 +7,7 @@ use App\Enums\ContentSourceKey;
 use App\Enums\MediaKind;
 use App\Exceptions\SourceExtractionException;
 use App\Models\Source;
+use App\Support\FescContentCleaner;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
@@ -50,6 +51,8 @@ class FescPortalExtractor implements SourceExtractor
         'diciembre' => 12,
         'dic' => 12,
     ];
+
+    public function __construct(private FescContentCleaner $cleaner) {}
 
     public function sourceKey(): ContentSourceKey
     {
@@ -381,8 +384,8 @@ class FescPortalExtractor implements SourceExtractor
         $title = $headline instanceof DOMNode
             ? $this->normalizeText($headline->textContent)
             : $item['title'];
-        $rawHtml = $this->sanitizeHtml($this->innerHtml($body));
-        $rawText = $this->normalizeText(html_entity_decode(strip_tags($rawHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $rawHtml = $this->cleaner->cleanHtml($this->innerHtml($body));
+        $rawText = $this->cleaner->htmlToText($rawHtml);
 
         if ($title === '' || $rawText === '') {
             return null;
@@ -574,10 +577,7 @@ class FescPortalExtractor implements SourceExtractor
 
     private function sanitizeHtml(string $html): string
     {
-        $withoutUnsafe = preg_replace('#<(script|iframe|object|embed|form)[^>]*>.*?</\1>#is', '', $html) ?? $html;
-        $withoutHandlers = preg_replace('/\son\w+\s*=\s*("[^"]*"|\'[^\']*\')/i', '', $withoutUnsafe) ?? $withoutUnsafe;
-
-        return trim($withoutHandlers);
+        return $this->cleaner->cleanHtml($html);
     }
 
     private function innerHtml(DOMElement $element): string
@@ -633,6 +633,6 @@ class FescPortalExtractor implements SourceExtractor
 
     private function normalizeText(string $value): string
     {
-        return trim(preg_replace('/\s+/u', ' ', $value) ?? $value);
+        return $this->cleaner->cleanText($value);
     }
 }

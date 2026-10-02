@@ -12,7 +12,7 @@
                     <span class="sr-only" x-text="open ? 'Cerrar menú' : 'Abrir menú'"></span>
                     <svg
                         x-show="!open"
-                        class="h-5 w-5"
+                        class="h-3.5 w-3.5"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -23,7 +23,7 @@
                     <svg
                         x-show="open"
                         x-cloak
-                        class="h-5 w-5"
+                        class="h-3.5 w-3.5"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -50,14 +50,12 @@
                     class="admin-user-trigger"
                     aria-expanded="false"
                 >
-                    <span class="admin-avatar">
-                        {{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
-                    </span>
+                    <x-admin.avatar :user="auth()->user()" size="sm" />
                     <span class="hidden min-w-0 sm:block">
                         <span class="block max-w-[10rem] truncate text-sm font-bold tracking-tight text-secondary">{{ auth()->user()->name }}</span>
                         <span class="block max-w-[10rem] truncate text-xs text-secondary-light">{{ auth()->user()->email }}</span>
                     </span>
-                    <x-icon name="caret-down" class="hidden h-4 w-4 shrink-0 text-secondary-light sm:block" />
+                    <x-icon name="caret-down" class="hidden h-2.5 w-2.5 shrink-0 text-secondary-light sm:block" />
                 </button>
 
                 <div
@@ -75,7 +73,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('profile.edit') }}" class="admin-user-menu__item">
+                            <a href="{{ route('profile.edit') }}" @class(['admin-user-menu__item', 'is-active' => request()->routeIs('profile.*')])>
                                 Perfil
                             </a>
                         </li>
@@ -92,7 +90,7 @@
                                 type="submit"
                                 class="admin-user-menu__item admin-user-menu__item--danger w-full text-left"
                             >
-                                <x-icon name="logout" class="h-4 w-4" />
+                                <x-icon name="logout" class="h-3 w-3" />
                                 Cerrar sesión
                             </button>
                         </form>

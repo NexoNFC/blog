@@ -68,6 +68,51 @@ Alpine.data('adminShell', () => {
     };
 });
 
+Alpine.data('nfcAssociateSearch', () => ({
+    query: '',
+
+    get normalizedQuery() {
+        return this.query.trim().toLowerCase();
+    },
+
+    matches(text) {
+        const query = this.normalizedQuery;
+
+        if (query === '') {
+            return true;
+        }
+
+        return String(text || '').includes(query);
+    },
+
+    get hasResults() {
+        const rows = this.$root.querySelectorAll('[data-nfc-news-row]');
+
+        if (rows.length === 0) {
+            return true;
+        }
+
+        return Array.from(rows).some((row) => this.matches(row.dataset.search || ''));
+    },
+
+    get resultLabel() {
+        const rows = this.$root.querySelectorAll('[data-nfc-news-row]');
+        const total = rows.length;
+
+        if (total === 0) {
+            return '';
+        }
+
+        const visible = Array.from(rows).filter((row) => this.matches(row.dataset.search || '')).length;
+
+        if (this.normalizedQuery === '') {
+            return `${total} noticia${total === 1 ? '' : 's'} publicada${total === 1 ? '' : 's'}`;
+        }
+
+        return `${visible} de ${total} coincidencia${visible === 1 ? '' : 's'}`;
+    },
+}));
+
 Alpine.data('fancySelect', () => ({
     open: false,
     value: '',
@@ -152,6 +197,7 @@ Alpine.data('fancySelect', () => ({
             value: option.value,
             label: option.textContent?.trim() || option.value,
             disabled: option.disabled,
+            href: option.dataset.url || null,
         }));
     },
 
@@ -181,6 +227,13 @@ Alpine.data('fancySelect', () => ({
 
     choose(option) {
         if (option.disabled) {
+            return;
+        }
+
+        if (option.href) {
+            this.close();
+            window.location.assign(option.href);
+
             return;
         }
 
@@ -214,6 +267,376 @@ Alpine.data('fancySelect', () => ({
             maxHeight: `${Math.max(120, maxHeight)}px`,
             zIndex: '80',
         };
+    },
+}));
+
+Alpine.data('fileDropzone', (config = {}) => ({
+    dragging: false,
+    fileName: '',
+    accept: config.accept || 'image/jpeg,image/png,image/webp',
+    maxSizeMb: Number(config.maxSizeMb || 2),
+    previewEvent: config.previewEvent || 'dropzone-preview',
+
+    init() {
+        const input = this.$refs.input;
+
+        if (input instanceof HTMLInputElement && input.files?.[0]) {
+            this.fileName = input.files[0].name;
+        }
+    },
+
+    onDragOver() {
+        this.dragging = true;
+    },
+
+    onDragLeave() {
+        this.dragging = false;
+    },
+
+    onDrop(event) {
+        this.dragging = false;
+        const file = event.dataTransfer?.files?.[0] ?? null;
+        this.applyFile(file);
+    },
+
+    onChange(event) {
+        const file = event.target.files?.[0] ?? null;
+        this.applyFile(file);
+    },
+
+    applyFile(file) {
+        const input = this.$refs.input;
+
+        if (! (input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        if (! file) {
+            this.clear();
+            return;
+        }
+
+        if (! this.isAccepted(file)) {
+            this.clear();
+            this.$dispatch('dropzone-error', {
+                message: 'El archivo debe ser una imagen JPG, PNG o WEBP.',
+            });
+            return;
+        }
+
+        if (file.size > this.maxSizeMb * 1024 * 1024) {
+            this.clear();
+            this.$dispatch('dropzone-error', {
+                message: `La imagen no puede superar ${this.maxSizeMb} MB.`,
+            });
+            return;
+        }
+
+        this.setInputFile(file);
+
+        this.$dispatch(this.previewEvent, {
+            name: file.name,
+            url: URL.createObjectURL(file),
+            size: file.size,
+        });
+    },
+
+    setInputFile(file) {
+        const input = this.$refs.input;
+
+        if (! (input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        input.files = transfer.files;
+        this.fileName = file.name;
+    },
+
+    replaceFile(file) {
+        if (! (file instanceof File)) {
+            return;
+        }
+
+        this.setInputFile(file);
+    },
+
+    isAccepted(file) {
+        const accepted = this.accept
+            .split(',')
+            .map((item) => item.trim().toLowerCase())
+            .filter(Boolean);
+
+        if (accepted.length === 0) {
+            return true;
+        }
+
+        const type = (file.type || '').toLowerCase();
+        const extension = `.${(file.name.split('.').pop() || '').toLowerCase()}`;
+
+        return accepted.some((rule) => {
+            if (rule.endsWith('/*')) {
+                return type.startsWith(rule.slice(0, -1));
+            }
+
+            if (rule.startsWith('.')) {
+                return extension === rule;
+            }
+
+            return type === rule;
+        });
+    },
+
+    clear() {
+        const input = this.$refs.input;
+
+        if (input instanceof HTMLInputElement) {
+            input.value = '';
+        }
+
+        this.fileName = '';
+        this.dragging = false;
+    },
+}));
+
+Alpine.data('avatarEditor', () => ({
+    url: null,
+    name: '',
+    image: null,
+    naturalW: 0,
+    naturalH: 0,
+    viewport: 240,
+    scale: 1,
+    minScale: 1,
+    maxScale: 3,
+    rotation: 0,
+    offsetX: 0,
+    offsetY: 0,
+    dragging: false,
+    lastX: 0,
+    lastY: 0,
+    exporting: false,
+
+    load(detail) {
+        this.url = detail.url;
+        this.name = detail.name || 'avatar.jpg';
+        this.image = null;
+        this.naturalW = 0;
+        this.naturalH = 0;
+        this.scale = 1;
+        this.minScale = 1;
+        this.rotation = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.dragging = false;
+        this.exporting = false;
+    },
+
+    onImageLoad(event) {
+        const img = event.target;
+
+        if (! (img instanceof HTMLImageElement)) {
+            return;
+        }
+
+        this.image = img;
+        this.naturalW = img.naturalWidth;
+        this.naturalH = img.naturalHeight;
+        this.resetTransform();
+    },
+
+    coverScale() {
+        if (! this.naturalW || ! this.naturalH) {
+            return 1;
+        }
+
+        const rotated = this.rotation % 180 === 90;
+        const width = rotated ? this.naturalH : this.naturalW;
+        const height = rotated ? this.naturalW : this.naturalH;
+
+        return Math.max(this.viewport / width, this.viewport / height);
+    },
+
+    displayedSize() {
+        const rotated = this.rotation % 180 === 90;
+        const width = (rotated ? this.naturalH : this.naturalW) * this.scale;
+        const height = (rotated ? this.naturalW : this.naturalH) * this.scale;
+
+        return { width, height };
+    },
+
+    offsetLimits() {
+        if (! this.naturalW || ! this.naturalH) {
+            return { maxX: 0, maxY: 0 };
+        }
+
+        const { width, height } = this.displayedSize();
+        const radius = this.viewport / 2;
+
+        return {
+            maxX: Math.max(0, (width / 2) - radius),
+            maxY: Math.max(0, (height / 2) - radius),
+        };
+    },
+
+    clampOffset() {
+        const { maxX, maxY } = this.offsetLimits();
+
+        this.offsetX = Math.min(maxX, Math.max(-maxX, this.offsetX));
+        this.offsetY = Math.min(maxY, Math.max(-maxY, this.offsetY));
+    },
+
+    refreshScaleBounds() {
+        this.minScale = this.coverScale();
+        this.maxScale = Math.max(this.minScale * 3, this.minScale + 0.5);
+        this.scale = Math.min(this.maxScale, Math.max(this.minScale, this.scale));
+        this.clampOffset();
+    },
+
+    resetTransform() {
+        this.rotation = 0;
+        this.minScale = this.coverScale();
+        this.maxScale = Math.max(this.minScale * 3, this.minScale + 0.5);
+        this.scale = this.minScale;
+        this.offsetX = 0;
+        this.offsetY = 0;
+    },
+
+    imageStyle() {
+        return {
+            width: `${this.naturalW}px`,
+            height: `${this.naturalH}px`,
+            transform: `translate(-50%, -50%) translate(${this.offsetX}px, ${this.offsetY}px) rotate(${this.rotation}deg) scale(${this.scale})`,
+        };
+    },
+
+    setScale(nextScale) {
+        this.scale = Math.min(this.maxScale, Math.max(this.minScale, Number(nextScale)));
+        this.clampOffset();
+    },
+
+    setScaleFromSlider(value) {
+        const ratio = Number(value) / 100;
+        this.setScale(this.minScale + (ratio * (this.maxScale - this.minScale)));
+    },
+
+    zoomIn() {
+        this.setScale(Number((this.scale + 0.1).toFixed(2)));
+    },
+
+    zoomOut() {
+        this.setScale(Number((this.scale - 0.1).toFixed(2)));
+    },
+
+    onWheel(event) {
+        if (event.deltaY < 0) {
+            this.zoomIn();
+        } else {
+            this.zoomOut();
+        }
+    },
+
+    rotateLeft() {
+        this.rotation = (((this.rotation - 90) % 360) + 360) % 360;
+        this.refreshScaleBounds();
+    },
+
+    rotateRight() {
+        this.rotation = (((this.rotation + 90) % 360) + 360) % 360;
+        this.refreshScaleBounds();
+    },
+
+    startDrag(event) {
+        if (event.button !== undefined && event.button !== 0) {
+            return;
+        }
+
+        this.dragging = true;
+        this.lastX = event.clientX;
+        this.lastY = event.clientY;
+        event.currentTarget?.setPointerCapture?.(event.pointerId);
+    },
+
+    onDrag(event) {
+        if (! this.dragging) {
+            return;
+        }
+
+        this.offsetX += event.clientX - this.lastX;
+        this.offsetY += event.clientY - this.lastY;
+        this.lastX = event.clientX;
+        this.lastY = event.clientY;
+        this.clampOffset();
+    },
+
+    endDrag() {
+        this.dragging = false;
+        this.clampOffset();
+    },
+
+    async exportBlob() {
+        if (! this.image || ! this.naturalW || ! this.naturalH) {
+            return null;
+        }
+
+        this.clampOffset();
+
+        const size = 512;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+
+        const ctx = canvas.getContext('2d');
+
+        if (! ctx) {
+            return null;
+        }
+
+        const ratio = size / this.viewport;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+        ctx.translate(size / 2 + this.offsetX * ratio, size / 2 + this.offsetY * ratio);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        ctx.scale(this.scale * ratio, this.scale * ratio);
+        ctx.drawImage(this.image, -this.naturalW / 2, -this.naturalH / 2, this.naturalW, this.naturalH);
+
+        return await new Promise((resolve) => {
+            canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.92);
+        });
+    },
+
+    async confirm() {
+        if (this.exporting) {
+            return;
+        }
+
+        this.exporting = true;
+
+        try {
+            const blob = await this.exportBlob();
+
+            if (! blob) {
+                this.$dispatch('dropzone-error', {
+                    message: 'No fue posible preparar la foto de perfil.',
+                });
+                return;
+            }
+
+            const baseName = (this.name || 'avatar').replace(/\.[^.]+$/, '');
+            const file = new File([blob], `${baseName}.jpg`, { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+
+            this.$dispatch('avatar-preview-confirm', {
+                url,
+                file,
+                name: file.name,
+            });
+            this.$dispatch('close');
+        } finally {
+            this.exporting = false;
+        }
     },
 }));
 

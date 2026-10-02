@@ -7,6 +7,7 @@
 @section('content')
     <x-ui.alert type="info" class="mb-6">
         El código del punto es estable. La noticia asociada se cambia desde la plataforma sin reprogramar el chip.
+        El selector muestra las cinco más recientes; para el resto usa «Buscar en todas las noticias…».
     </x-ui.alert>
 
     <x-ui.table>
@@ -36,11 +37,30 @@
                         <x-nfc.point-status :status="$point['status']" />
                     </td>
                     <td>
-                        <x-nfc.associate-form :point="$point" :published-news="$publishedNews" />
+                        <x-nfc.associate-form :point="$point" />
                     </td>
                     <td class="whitespace-nowrap text-secondary-light">{{ $point['scans_count'] }}</td>
                     <td class="whitespace-nowrap text-right">
-                        <a href="{{ route('nfc.show', $point['code']) }}" class="font-semibold text-primary hover:underline">Probar</a>
+                        <div class="inline-flex w-[9.75rem] flex-col gap-1.5">
+                            @can('nfc.manage-content')
+                                <x-ui.button
+                                    href="{{ route('admin.nfc.associate', $point['code']) }}"
+                                    size="sm"
+                                    variant="secondary"
+                                    class="w-full"
+                                >
+                                    Elegir noticia
+                                </x-ui.button>
+                            @endcan
+                            <x-ui.button
+                                href="{{ route('nfc.show', $point['code']) }}"
+                                size="sm"
+                                variant="secondary"
+                                class="w-full"
+                            >
+                                Probar
+                            </x-ui.button>
+                        </div>
                     </td>
                 </tr>
             @empty

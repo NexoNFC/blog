@@ -38,13 +38,10 @@
                     </p>
                 @endif
 
-                <div class="mt-8 max-w-4xl space-y-4 text-base leading-relaxed text-secondary sm:text-[1.05rem]">
-                    @foreach (preg_split("/\n\n/", (string) $content['body']) as $paragraph)
-                        @if (trim((string) $paragraph) !== '')
-                            <p>{{ $paragraph }}</p>
-                        @endif
-                    @endforeach
-                </div>
+                <x-content.body
+                    :text="$content['body']"
+                    class="mt-8 max-w-4xl space-y-4 text-base leading-relaxed text-secondary sm:text-[1.05rem]"
+                />
 
                 @if (! empty($content['external_url']))
                     <div class="mt-10 border-t border-white/40 pt-6">

@@ -84,6 +84,7 @@
                     :class="{
                         'is-selected': option.value === value,
                         'is-disabled': option.disabled,
+                        'is-action': Boolean(option.href),
                     }"
                     :disabled="option.disabled"
                     @click="choose(option)"

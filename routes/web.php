@@ -78,6 +78,10 @@ Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admi
         ->middleware('permission:nfc.view')
         ->name('nfc.index');
 
+    Route::get('/nfc/{nfcPoint}/associate', [AdminNfcPointController::class, 'associate'])
+        ->middleware('permission:nfc.manage-content')
+        ->name('nfc.associate');
+
     Route::patch('/nfc/{nfcPoint}', [AdminNfcPointController::class, 'update'])
         ->middleware('permission:nfc.manage-content')
         ->name('nfc.update');

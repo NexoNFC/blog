@@ -7,10 +7,13 @@ use App\Models\Category;
 use App\Models\ImportedContent;
 use App\Models\News;
 use App\Models\Source;
+use App\Support\FescContentCleaner;
 use Illuminate\Support\Str;
 
 class ImportContentService
 {
+    public function __construct(private FescContentCleaner $cleaner) {}
+
     /**
      * @param  array{
      *     origin_url: string,
@@ -33,7 +36,12 @@ class ImportContentService
         }
 
         $originUrl = $payload['origin_url'];
-        $rawText = $payload['raw_text'] ?? null;
+        $rawText = isset($payload['raw_text'])
+            ? $this->cleaner->cleanText((string) $payload['raw_text'])
+            : null;
+        $rawHtml = isset($payload['raw_html'])
+            ? $this->cleaner->cleanHtml((string) $payload['raw_html'])
+            : null;
 
         return ImportedContent::query()->create([
             'source_id' => $source->id,
@@ -44,7 +52,7 @@ class ImportContentService
             'content_hash' => $payload['content_hash'] ?? hash('sha256', $originUrl.'|'.(string) $rawText),
             'title' => $payload['title'] ?? null,
             'raw_text' => $rawText,
-            'raw_html' => $payload['raw_html'] ?? null,
+            'raw_html' => $rawHtml,
             'media' => $payload['media'] ?? [],
             'metadata' => $payload['metadata'] ?? [],
             'status' => ContentStatus::Imported,
@@ -69,6 +77,8 @@ class ImportContentService
             fn (mixed $item): ?string => is_array($item) ? ($item['url'] ?? null) : null,
             array_slice($media, 1),
         )));
+        $body = $attributes['body'] ?? $this->cleaner->cleanText((string) $imported->raw_text);
+        $summary = $attributes['summary'] ?? Str::limit($body, 220);
 
         return News::query()->create([
             'imported_content_id' => $imported->id,
@@ -76,8 +86,8 @@ class ImportContentService
             'category_id' => $attributes['category_id'] ?? $this->categoryIdFromImport($imported),
             'title' => $title,
             'slug' => $attributes['slug'] ?? Str::slug($title).'-'.$imported->id,
-            'summary' => $attributes['summary'] ?? Str::limit((string) $imported->raw_text, 220),
-            'body' => $attributes['body'] ?? (string) $imported->raw_text,
+            'summary' => $summary,
+            'body' => $body,
             'featured_image_path' => $featured,
             'gallery' => $gallery,
             'origin_url' => $imported->origin_url,
@@ -87,10 +97,175 @@ class ImportContentService
             'processed_payload' => [
                 'presentation' => 'original',
                 'original_title' => $title,
-                'original_summary' => $attributes['summary'] ?? Str::limit((string) $imported->raw_text, 220),
-                'original_body' => (string) $imported->raw_text,
+                'original_summary' => $summary,
+                'original_body' => $body,
             ],
         ]);
+    }
+
+    /**
+     * Repara HTML/texto ya guardado donde Joomla dejó el mensaje de email cloaking.
+     */
+    public function scrubStoredCloakArtifacts(): int
+    {
+        $updated = 0;
+
+        ImportedContent::query()
+            ->where(function ($query): void {
+                $query->where('raw_html', 'like', '%joomla-hidden-mail%')
+                    ->orWhere('raw_text', 'like', '%protegida contra los robots%')
+                    ->orWhere('raw_text', 'like', '%protected from spambots%');
+            })
+            ->orderBy('id')
+            ->each(function (ImportedContent $imported) use (&$updated): void {
+                $rawHtml = $this->cleaner->cleanHtml((string) $imported->raw_html);
+                $rawText = filled($imported->raw_html)
+                    ? $this->cleaner->htmlToText((string) $imported->raw_html)
+                    : $this->cleaner->cleanText((string) $imported->raw_text);
+
+                if ($rawHtml === (string) $imported->raw_html && $rawText === (string) $imported->raw_text) {
+                    return;
+                }
+
+                $imported->forceFill([
+                    'raw_html' => $rawHtml !== '' ? $rawHtml : $imported->raw_html,
+                    'raw_text' => $rawText,
+                ])->save();
+
+                $updated++;
+            });
+
+        News::query()
+            ->with('importedContent')
+            ->where(function ($query): void {
+                $query->where('body', 'like', '%protegida contra los robots%')
+                    ->orWhere('body', 'like', '%protected from spambots%')
+                    ->orWhere('summary', 'like', '%protegida contra los robots%');
+            })
+            ->orderBy('id')
+            ->each(function (News $news) use (&$updated): void {
+                $importedText = $news->importedContent?->raw_text;
+                $body = filled($importedText) && (
+                    str_contains((string) $news->body, 'protegida contra los robots')
+                    || str_contains((string) $news->body, 'protected from spambots')
+                )
+                    ? (string) $importedText
+                    : $this->cleaner->cleanText((string) $news->body);
+
+                $summary = $this->cleaner->cleanText((string) $news->summary);
+                if (
+                    str_contains($summary, 'protegida contra los robots')
+                    || str_contains($summary, 'protected from spambots')
+                ) {
+                    $summary = Str::limit($body, 220);
+                }
+
+                $payload = is_array($news->processed_payload) ? $news->processed_payload : [];
+
+                if (isset($payload['original_body']) && is_string($payload['original_body'])) {
+                    $payload['original_body'] = filled($importedText)
+                        ? (string) $importedText
+                        : $this->cleaner->cleanText($payload['original_body']);
+                }
+
+                if (isset($payload['original_summary']) && is_string($payload['original_summary'])) {
+                    $payload['original_summary'] = $this->cleaner->cleanText($payload['original_summary']);
+                }
+
+                if (
+                    $body === (string) $news->body
+                    && $summary === (string) $news->summary
+                    && $payload === $news->processed_payload
+                ) {
+                    return;
+                }
+
+                $news->forceFill([
+                    'body' => $body,
+                    'summary' => $summary,
+                    'processed_payload' => $payload,
+                ])->save();
+
+                $updated++;
+            });
+
+        $updated += $this->reformatContactEmailsInStoredBodies();
+
+        return $updated;
+    }
+
+    /**
+     * Separa " / correo@dominio" en un párrafo propio para lectura y mailto.
+     * También reconstruye párrafos desde el HTML importado cuando aún está disponible.
+     */
+    private function reformatContactEmailsInStoredBodies(): int
+    {
+        $updated = 0;
+
+        ImportedContent::query()
+            ->where(function ($query): void {
+                $query->whereNotNull('raw_html')
+                    ->where('raw_html', '!=', '')
+                    ->orWhere('raw_text', 'like', '%/%@%')
+                    ->orWhere('raw_text', 'like', '%En la FESC%');
+            })
+            ->orderBy('id')
+            ->each(function (ImportedContent $imported) use (&$updated): void {
+                $rawHtml = filled($imported->raw_html)
+                    ? $this->cleaner->cleanHtml((string) $imported->raw_html)
+                    : (string) $imported->raw_html;
+                $rawText = filled($rawHtml)
+                    ? $this->cleaner->htmlToText($rawHtml)
+                    : $this->cleaner->cleanText((string) $imported->raw_text);
+
+                if (
+                    $rawHtml === (string) $imported->raw_html
+                    && $rawText === (string) $imported->raw_text
+                ) {
+                    return;
+                }
+
+                $imported->forceFill([
+                    'raw_html' => $rawHtml !== '' ? $rawHtml : $imported->raw_html,
+                    'raw_text' => $rawText,
+                ])->save();
+
+                $updated++;
+            });
+
+        News::query()
+            ->with('importedContent')
+            ->where(function ($query): void {
+                $query->where('body', 'like', '%/%@%')
+                    ->orWhere('body', 'like', '%En la FESC%');
+            })
+            ->orderBy('id')
+            ->each(function (News $news) use (&$updated): void {
+                $importedText = $news->importedContent?->raw_text;
+                $body = filled($importedText) && $news->admin_edited_at === null
+                    ? (string) $importedText
+                    : $this->cleaner->cleanText((string) $news->body);
+
+                if ($body === (string) $news->body) {
+                    return;
+                }
+
+                $payload = is_array($news->processed_payload) ? $news->processed_payload : [];
+                if (isset($payload['original_body']) && is_string($payload['original_body'])) {
+                    $payload['original_body'] = filled($importedText)
+                        ? (string) $importedText
+                        : $this->cleaner->cleanText($payload['original_body']);
+                }
+
+                $news->forceFill([
+                    'body' => $body,
+                    'processed_payload' => $payload,
+                ])->save();
+
+                $updated++;
+            });
+
+        return $updated;
     }
 
     /**
