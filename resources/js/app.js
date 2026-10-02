@@ -14,6 +14,11 @@ Alpine.data('adminShell', () => {
 
         init() {
             this.syncViewport();
+            this.syncShellClass();
+
+            window.requestAnimationFrame(() => {
+                document.documentElement.classList.add('admin-sidebar-ready');
+            });
 
             window.addEventListener('resize', () => {
                 const wasDesktop = this.isDesktop;
@@ -26,6 +31,8 @@ Alpine.data('adminShell', () => {
                 if (wasDesktop && ! this.isDesktop) {
                     this.open = false;
                 }
+
+                this.syncShellClass();
             }, { passive: true });
 
             window.addEventListener('keydown', (event) => {
@@ -39,12 +46,18 @@ Alpine.data('adminShell', () => {
             this.isDesktop = desktopQuery().matches;
         },
 
+        syncShellClass() {
+            document.documentElement.classList.toggle('admin-sidebar-open', this.open && this.isDesktop);
+        },
+
         toggle() {
             this.open = ! this.open;
 
             if (this.isDesktop) {
                 window.localStorage.setItem('admin-sidebar-open', this.open ? '1' : '0');
             }
+
+            this.syncShellClass();
         },
 
         closeMobile() {
@@ -392,24 +405,18 @@ if (nfcTracker instanceof HTMLElement) {
 
     syncLookAtPointer(window.innerWidth * 0.35, window.innerHeight * 0.55);
 
-    const nfcSection = document.querySelector('#nfc');
+    const howItWorks = document.querySelector('#como-funciona');
 
-    if (nfcSection instanceof HTMLElement) {
+    if (howItWorks instanceof HTMLElement) {
         const syncTrackerVisibility = () => {
             const coinRect = nfcTracker.getBoundingClientRect();
-            const sectionRect = nfcSection.getBoundingClientRect();
+            const sectionBottom = howItWorks.getBoundingClientRect().bottom;
+            const pastSection = sectionBottom <= coinRect.top;
 
-            // Solo se oculta si la moneda se solapa con #nfc (no cuando #nfc entra al viewport).
-            const overlaps =
-                coinRect.left < sectionRect.right
-                && coinRect.right > sectionRect.left
-                && coinRect.top < sectionRect.bottom
-                && coinRect.bottom > sectionRect.top;
+            nfcTracker.classList.toggle('is-hidden-by-nfc', pastSection);
+            nfcTracker.setAttribute('aria-hidden', pastSection ? 'true' : 'false');
 
-            nfcTracker.classList.toggle('is-hidden-by-nfc', overlaps);
-            nfcTracker.setAttribute('aria-hidden', overlaps ? 'true' : 'false');
-
-            if (overlaps) {
+            if (pastSection) {
                 nfcTracker.setAttribute('tabindex', '-1');
             } else {
                 nfcTracker.removeAttribute('tabindex');

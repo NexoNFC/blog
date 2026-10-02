@@ -1,38 +1,39 @@
 @props([
     'content',
     'image' => null,
-    'featured' => false,
 ])
 
 @php
     $isExternal = ($content['type'] ?? null) === 'externo' || ! empty($content['external_url']);
-    $imageSrc = $image ?? ($content['image'] ?? asset('images/campus/fachada.jpg'));
+    $imageSrc = $image ?? ($content['image'] ?? null);
 @endphp
 
 <article {{ $attributes->merge([
-    'class' => $featured
-        ? 'group glass-card glass-hover reveal flex w-full flex-col overflow-hidden sm:col-span-2 lg:col-span-2'
-        : 'group glass-card glass-hover reveal flex w-full flex-col overflow-hidden',
+    'class' => 'group glass-card glass-hover reveal flex h-full w-full min-w-0 flex-col overflow-hidden',
 ]) }}>
     <a href="{{ route('contents.show', $content['slug']) }}" class="relative block overflow-hidden">
-        <img
-            src="{{ $imageSrc }}"
-            alt=""
-            class="{{ $featured ? 'h-52' : 'h-40' }} w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
-            loading="lazy"
-        >
+        @if ($imageSrc)
+            <img
+                src="{{ $imageSrc }}"
+                alt=""
+                class="h-40 w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04] sm:h-36"
+                loading="lazy"
+            >
+        @else
+            <div class="h-40 w-full bg-gradient-to-br from-primary/15 to-secondary/10 sm:h-36" aria-hidden="true"></div>
+        @endif
         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-secondary/70 to-transparent p-4">
             <x-content.content-meta :content="$content" :on-dark="true" />
         </div>
     </a>
 
-    <div class="flex flex-col p-6">
-        <h3 @class(['font-semibold text-secondary', 'text-2xl sm:text-3xl' => $featured, 'text-xl' => ! $featured])>
+    <div class="flex flex-1 flex-col p-5">
+        <h3 class="line-clamp-3 text-lg font-semibold leading-snug text-secondary">
             <a href="{{ route('contents.show', $content['slug']) }}" class="transition hover:text-primary">
                 {{ $content['title'] }}
             </a>
         </h3>
-        <p @class(['mt-3 text-secondary-light', 'text-base' => $featured, 'text-sm' => ! $featured])>
+        <p class="mt-3 line-clamp-4 flex-1 text-sm leading-relaxed text-secondary-light">
             {{ $content['summary'] }}
         </p>
 
@@ -41,7 +42,15 @@
                 Leer noticia
             </x-ui.button>
             @if ($isExternal && ! empty($content['external_url']))
-                <x-content.external-source :url="$content['external_url']" label="Fuente oficial" />
+                <x-ui.button
+                    href="{{ $content['external_url'] }}"
+                    variant="secondary"
+                    class="!rounded-2xl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Fuente oficial
+                </x-ui.button>
             @endif
         </div>
     </div>

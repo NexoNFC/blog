@@ -12,16 +12,17 @@ class HomeController extends Controller
 {
     public function __invoke(): View
     {
-        $published = News::query()
+        $contents = News::query()
             ->published()
+            ->whereNotNull('imported_content_id')
             ->with(['category', 'importedContent'])
-            ->latest('published_at')
+            ->orderByDesc('origin_published_at')
+            ->orderByDesc('published_at')
+            ->orderByDesc('id')
+            ->limit(8)
             ->get()
-            ->map(fn (News $news): array => $news->toPublicArray());
-
-        $contents = $published->all();
-        $featured = $contents[0] ?? null;
-        $rest = array_slice($contents, 1);
+            ->map(fn (News $news): array => $news->toPublicArray())
+            ->all();
 
         $images = [];
         foreach ($contents as $content) {
@@ -38,8 +39,7 @@ class HomeController extends Controller
             ->all();
 
         return view('home', [
-            'featured' => $featured,
-            'contents' => $rest,
+            'contents' => $contents,
             'newsImages' => $images,
             'steps' => DemoCatalog::landingSteps(),
             'locations' => $locations,
