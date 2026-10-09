@@ -26,6 +26,9 @@
                 this.pendingPreview = detail.url;
                 this.removeAvatar = false;
                 this.$dispatch('open-modal', 'avatar-preview');
+                this.$nextTick(() => {
+                    this.$dispatch('avatar-editor-load', detail);
+                });
             },
             confirmPreview(detail) {
                 if (this.pendingPreview && this.pendingPreview !== detail?.url) {
@@ -177,7 +180,7 @@
                 <h2 class="text-lg font-bold tracking-tight text-secondary">Imagen no válida</h2>
                 <p class="mt-2 text-sm text-secondary-light" x-text="message"></p>
                 <div class="mt-6 flex justify-end">
-                    <x-ui.button type="button" variant="secondary" x-on:click="$dispatch('close')">
+                    <x-ui.button type="button" variant="secondary" x-on:click="$dispatch('close-modal', 'avatar-error')">
                         Entendido
                     </x-ui.button>
                 </div>

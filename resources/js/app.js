@@ -1,6 +1,8 @@
 import Alpine from 'alpinejs';
 import 'flowbite';
 import { createAdminNewsIndexState } from './admin/news-index';
+import { createAdminNfcAssociateState } from './admin/nfc-associate';
+import { createAdminNfcIndexState } from './admin/nfc-index';
 import { createToastHostState } from './admin/toast-host';
 import { createNfcTourViewerState } from './tour/alpine-tour';
 
@@ -17,6 +19,10 @@ Alpine.data('nfcTourViewer', (config = {}) => ({
 Alpine.data('toastHost', (initial = []) => createToastHostState(initial));
 
 Alpine.data('adminNewsIndex', (config = {}) => createAdminNewsIndexState(config));
+
+Alpine.data('adminNfcIndex', (config = {}) => createAdminNfcIndexState(config));
+
+Alpine.data('adminNfcAssociate', (config = {}) => createAdminNfcAssociateState(config));
 
 Alpine.data('adminShell', () => {
     const desktopQuery = () => window.matchMedia('(min-width: 640px)');
@@ -82,51 +88,6 @@ Alpine.data('adminShell', () => {
         },
     };
 });
-
-Alpine.data('nfcAssociateSearch', () => ({
-    query: '',
-
-    get normalizedQuery() {
-        return this.query.trim().toLowerCase();
-    },
-
-    matches(text) {
-        const query = this.normalizedQuery;
-
-        if (query === '') {
-            return true;
-        }
-
-        return String(text || '').includes(query);
-    },
-
-    get hasResults() {
-        const rows = this.$root.querySelectorAll('[data-nfc-news-row]');
-
-        if (rows.length === 0) {
-            return true;
-        }
-
-        return Array.from(rows).some((row) => this.matches(row.dataset.search || ''));
-    },
-
-    get resultLabel() {
-        const rows = this.$root.querySelectorAll('[data-nfc-news-row]');
-        const total = rows.length;
-
-        if (total === 0) {
-            return '';
-        }
-
-        const visible = Array.from(rows).filter((row) => this.matches(row.dataset.search || '')).length;
-
-        if (this.normalizedQuery === '') {
-            return `${total} noticia${total === 1 ? '' : 's'} publicada${total === 1 ? '' : 's'}`;
-        }
-
-        return `${visible} de ${total} coincidencia${visible === 1 ? '' : 's'}`;
-    },
-}));
 
 const positionUiTooltip = (anchor, placement = 'top') => {
     if (! (anchor instanceof HTMLElement)) {
@@ -523,7 +484,8 @@ Alpine.data('fileDropzone', (config = {}) => ({
             return;
         }
 
-        this.applyFile(file);
+        // Solo sustituye el archivo del input; no reabrir el editor de vista previa.
+        this.setInputFile(file);
     },
 
     isAccepted(file) {
@@ -740,8 +702,38 @@ Alpine.data('avatarEditor', () => ({
         this.clampOffset();
     },
 
+    async ensureImage() {
+        if (this.image instanceof HTMLImageElement && this.naturalW && this.naturalH) {
+            return true;
+        }
+
+        if (! this.url) {
+            return false;
+        }
+
+        try {
+            await new Promise((resolve, reject) => {
+                const img = new Image();
+
+                img.onload = () => {
+                    this.image = img;
+                    this.naturalW = img.naturalWidth;
+                    this.naturalH = img.naturalHeight;
+                    this.refreshScaleBounds();
+                    resolve();
+                };
+                img.onerror = () => reject(new Error('image load failed'));
+                img.src = this.url;
+            });
+
+            return true;
+        } catch {
+            return false;
+        }
+    },
+
     async exportBlob() {
-        if (! this.image || ! this.naturalW || ! this.naturalH) {
+        if (! await this.ensureImage()) {
             return null;
         }
 
@@ -773,7 +765,7 @@ Alpine.data('avatarEditor', () => ({
     },
 
     async confirm() {
-        if (this.exporting) {
+        if (this.exporting || ! this.url) {
             return;
         }
 
@@ -786,6 +778,8 @@ Alpine.data('avatarEditor', () => ({
                 this.$dispatch('dropzone-error', {
                     message: 'No fue posible preparar la foto de perfil.',
                 });
+                this.$dispatch('open-modal', 'avatar-error');
+
                 return;
             }
 
@@ -798,7 +792,8 @@ Alpine.data('avatarEditor', () => ({
                 file,
                 name: file.name,
             });
-            this.$dispatch('close');
+            // El contenido del modal está en teleport a body: close local no llega al controlador.
+            this.$dispatch('close-modal', 'avatar-preview');
         } finally {
             this.exporting = false;
         }

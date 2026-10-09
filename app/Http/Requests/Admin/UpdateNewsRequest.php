@@ -27,7 +27,6 @@ class UpdateNewsRequest extends FormRequest
             'summary' => ['required', 'string', 'max:1000'],
             'body' => ['required', 'string'],
             'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id')],
-            'origin_url' => ['nullable', 'url', 'max:2048'],
         ];
     }
 
@@ -41,7 +40,6 @@ class UpdateNewsRequest extends FormRequest
             'summary.required' => 'El resumen es obligatorio.',
             'body.required' => 'El contenido es obligatorio.',
             'category_id.exists' => 'La categoría seleccionada no es válida.',
-            'origin_url.url' => 'La URL original debe ser válida.',
         ];
     }
 
@@ -49,10 +47,6 @@ class UpdateNewsRequest extends FormRequest
     {
         if ($this->input('category_id') === '') {
             $this->merge(['category_id' => null]);
-        }
-
-        if ($this->input('origin_url') === '') {
-            $this->merge(['origin_url' => null]);
         }
     }
 }

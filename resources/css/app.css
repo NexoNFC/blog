@@ -3482,6 +3482,18 @@ html.admin-sidebar-ready .admin-main {
     padding: 0;
 }
 
+button.admin-pagination__btn,
+button.admin-pagination__page {
+    appearance: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+button.admin-pagination__btn:disabled,
+button.admin-pagination__page:disabled {
+    cursor: not-allowed;
+}
+
 .admin-pagination__btn,
 .admin-pagination__page {
     display: inline-flex;

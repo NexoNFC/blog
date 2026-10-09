@@ -105,6 +105,7 @@ class CatalogDomainTest extends TestCase
         $news = News::factory()->draft()->create([
             'title' => 'Borrador original',
             'slug' => 'borrador-original',
+            'origin_url' => 'https://www.fesc.edu.co/portal/noticia-unica',
         ]);
 
         $this->actingAs($admin)
@@ -113,12 +114,13 @@ class CatalogDomainTest extends TestCase
                 'summary' => 'Resumen corregido por el administrador',
                 'body' => 'Cuerpo revisado',
                 'category_id' => $news->category_id,
-                'origin_url' => 'https://www.fesc.edu.co/portal/',
+                'origin_url' => 'https://www.fesc.edu.co/portal/url-manipulada',
             ])
             ->assertRedirect(route('admin.news.edit', $news));
 
         $news->refresh();
         $this->assertSame('Borrador revisado', $news->title);
+        $this->assertSame('https://www.fesc.edu.co/portal/noticia-unica', $news->origin_url);
         $this->assertNotNull($news->admin_edited_at);
         $this->assertSame(ContentStatus::Draft, $news->status);
 
@@ -240,6 +242,26 @@ class CatalogDomainTest extends TestCase
             ->assertRedirect(route('admin.nfc.index'));
 
         $this->assertSame($news->id, $point->fresh()->news_id);
+
+        $other = News::factory()->published()->create([
+            'title' => 'Otra noticia para asociación reactiva',
+        ]);
+
+        $this->actingAs($admin)
+            ->withHeaders([
+                'Accept' => 'application/json',
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
+            ->patchJson(route('admin.nfc.update', $point), [
+                'news_id' => $other->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('message', 'La asociación del punto NFC se actualizó correctamente.')
+            ->assertJsonPath('point.code', $point->code)
+            ->assertJsonPath('point.news_id', $other->id)
+            ->assertJsonPath('point.news_title', $other->title);
+
+        $this->assertSame($other->id, $point->fresh()->news_id);
     }
 
     public function test_administrator_can_browse_all_news_to_associate_an_nfc_point(): void
@@ -275,9 +297,40 @@ class CatalogDomainTest extends TestCase
             ->assertSee('Noticia antigua del campus')
             ->assertSee('Noticia reciente 0')
             ->assertSee('Buscar noticia')
-            ->assertSee('nfcAssociateSearch', false)
+            ->assertSee('adminNfcAssociate', false)
             ->assertSee('Filtrar por título o resumen')
-            ->assertDontSee('name="q"', false);
+            ->assertDontSee('name="q"', false)
+            ->assertSee('admin-pagination', false);
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.nfc.associate', ['nfcPoint' => $point, 'q' => 'antigua', 'page' => 1]))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.title', 'Noticia antigua del campus')
+            ->assertJsonPath('query', 'antigua');
+
+        News::factory()->count(10)->published()->sequence(
+            fn ($sequence) => [
+                'title' => 'Noticia de relleno '.$sequence->index,
+                'origin_published_at' => now()->subHours($sequence->index + 1),
+                'published_at' => now()->subHours($sequence->index + 1),
+            ],
+        )->create();
+
+        $pageTwo = $this->actingAs($admin)
+            ->getJson(route('admin.nfc.associate', ['nfcPoint' => $point, 'page' => 2]))
+            ->assertOk()
+            ->assertJsonPath('meta.current_page', 2);
+
+        $this->assertGreaterThanOrEqual(1, count($pageTwo->json('data')));
+
+        $searchAcrossPages = $this->actingAs($admin)
+            ->getJson(route('admin.nfc.associate', ['nfcPoint' => $point, 'q' => 'antigua']))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.title', 'Noticia antigua del campus');
+
+        $this->assertSame(1, $searchAcrossPages->json('meta.current_page'));
 
         $this->actingAs($admin)
             ->from(route('admin.nfc.associate', $point))

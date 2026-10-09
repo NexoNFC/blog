@@ -42,8 +42,13 @@
 
 <div>
     <x-form.label for="is_active" required>Estado</x-form.label>
-    <x-form.select id="is_active" name="is_active" required @disabled($lockPrivileges)>
-        <option value="1" @selected((string) $selectedActive === '1')>Activo</option>
-        <option value="0" @selected((string) $selectedActive === '0')>Inactivo</option>
-    </x-form.select>
+    @if ($lockPrivileges)
+        <p class="text-sm font-medium text-secondary">Activo</p>
+        <p class="mt-1 text-xs text-secondary-light">No se puede desactivar al último administrador activo.</p>
+    @else
+        <x-form.select id="is_active" name="is_active" required>
+            <option value="1" @selected((string) $selectedActive === '1')>Activo</option>
+            <option value="0" @selected((string) $selectedActive === '0')>Inactivo</option>
+        </x-form.select>
+    @endif
 </div>

@@ -9,7 +9,10 @@
 @endsection
 
 @section('content')
-    <div x-data="nfcAssociateSearch" class="space-y-5">
+    <div
+        x-data="adminNfcAssociate({{ \Illuminate\Support\Js::from($associateConfig) }})"
+        class="space-y-5"
+    >
         <x-ui.card>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div class="min-w-0">
@@ -22,7 +25,7 @@
                     </p>
                     <p class="mt-3 text-sm text-secondary">
                         Noticia actual:
-                        <span class="font-bold">{{ $point->news?->title ?? 'Sin noticia asociada' }}</span>
+                        <span class="font-bold" x-text="point.news_title || 'Sin noticia asociada'"></span>
                     </p>
                 </div>
                 <x-nfc.point-status :status="$point->status->value" />
@@ -36,10 +39,12 @@
                     <x-form.input
                         id="nfc-news-search"
                         name="nfc_news_search"
+                        type="search"
                         placeholder="Filtrar por título o resumen"
                         autocomplete="off"
                         x-model="query"
-                        @keydown.escape.prevent="query = ''"
+                        x-on:input="onSearchInput()"
+                        x-on:keydown.escape.prevent="clearSearch()"
                     />
                 </div>
                 <x-ui.button
@@ -48,7 +53,7 @@
                     class="!rounded-2xl"
                     x-show="query.trim() !== ''"
                     x-cloak
-                    @click="query = ''"
+                    x-on:click="clearSearch()"
                 >
                     Limpiar
                 </x-ui.button>
@@ -65,42 +70,43 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($news as $item)
-                    <tr
-                        data-nfc-news-row
-                        data-search="{{ \Illuminate\Support\Str::lower(($item->title ?? '').' '.($item->summary ?? '')) }}"
-                        @class(['bg-primary-soft/40' => (int) $point->news_id === (int) $item->id])
-                        x-show="matches($el.dataset.search)"
-                    >
+                <template x-for="item in items" :key="item.id">
+                    <tr :class="{ 'bg-primary-soft/40': item.is_associated }">
                         <th scope="row" class="min-w-[16rem] max-w-xl">
-                            <p class="leading-snug">{{ $item->title }}</p>
-                            @if (filled($item->summary))
-                                <p class="mt-0.5 line-clamp-2 text-xs font-normal text-secondary-light">{{ $item->summary }}</p>
-                            @endif
+                            <p class="leading-snug" x-text="item.title"></p>
+                            <p
+                                class="mt-0.5 line-clamp-2 text-xs font-normal text-secondary-light"
+                                x-show="item.summary"
+                                x-text="item.summary"
+                            ></p>
                         </th>
-                        <td class="whitespace-nowrap text-secondary-light">
-                            {{ $item->origin_published_at?->toDateString() ?? $item->published_at?->toDateString() ?? '—' }}
-                        </td>
+                        <td class="whitespace-nowrap text-secondary-light" x-text="item.published_on || '—'"></td>
                         <td class="text-end">
-                            @if ((int) $point->news_id === (int) $item->id)
+                            <template x-if="item.is_associated">
                                 <span class="inline-flex rounded-full bg-primary-soft px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-primary">
                                     Asociada
                                 </span>
-                            @else
-                                <form method="POST" action="{{ route('admin.nfc.update', $point) }}" class="inline">
+                            </template>
+                            <template x-if="! item.is_associated">
+                                <form method="POST" :action="updateUrl" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <input type="hidden" name="news_id" value="{{ $item->id }}">
-                                    <input type="hidden" name="_return" value="{{ route('admin.nfc.associate', $point) }}">
-                                    <x-ui.button type="submit" size="sm" variant="secondary">Asociar</x-ui.button>
+                                    <input type="hidden" name="news_id" :value="item.id">
+                                    <input type="hidden" name="_return" :value="returnUrl">
+                                    <button
+                                        type="submit"
+                                        class="inline-flex items-center justify-center gap-2 rounded-2xl font-bold tracking-tight transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 px-3.5 py-2 text-xs border border-secondary/15 bg-white text-secondary shadow-sm hover:border-secondary/25 hover:bg-secondary/5"
+                                        x-bind:disabled="loading"
+                                    >
+                                        Asociar
+                                    </button>
                                 </form>
-                            @endif
+                            </template>
                         </td>
                     </tr>
-                @empty
-                @endforelse
+                </template>
 
-                <tr x-show="!hasResults" x-cloak>
+                <tr x-show="! loading && items.length === 0" x-cloak>
                     <td colspan="3">
                         <x-ui.empty-state
                             embedded
@@ -109,29 +115,19 @@
                         />
                     </td>
                 </tr>
-
-                @if ($news->isEmpty())
-                    <tr>
-                        <td colspan="3">
-                            <x-ui.empty-state
-                                embedded
-                                title="Sin resultados"
-                                description="Todavía no hay noticias publicadas para asociar."
-                            />
-                        </td>
-                    </tr>
-                @endif
             </tbody>
         </x-ui.table>
 
-        @if ($point->news_id)
-            <form method="POST" action="{{ route('admin.nfc.update', $point) }}">
+        <x-ui.pagination ajax />
+
+        <template x-if="point.news_id">
+            <form method="POST" :action="updateUrl">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="news_id" value="">
-                <input type="hidden" name="_return" value="{{ route('admin.nfc.associate', $point) }}">
+                <input type="hidden" name="_return" :value="returnUrl">
                 <x-ui.button type="submit" variant="danger" class="!rounded-2xl">Quitar noticia asociada</x-ui.button>
             </form>
-        @endif
+        </template>
     </div>
 @endsection

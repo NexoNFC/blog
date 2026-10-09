@@ -88,13 +88,18 @@
                     </x-form.select>
                 </div>
 
-                <x-ui.input
-                    label="URL original"
-                    name="origin_url"
-                    type="url"
-                    :value="old('origin_url', $news->origin_url)"
-                    placeholder="https://www.fesc.edu.co/..."
-                />
+                @if ($news->origin_url)
+                    <div class="space-y-1.5">
+                        <p class="text-sm font-semibold text-secondary">URL original</p>
+                        <a
+                            href="{{ $news->origin_url }}"
+                            class="break-all text-sm font-semibold text-primary hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >{{ $news->origin_url }}</a>
+                        <p class="text-xs text-secondary-light">La trae la extracción del portal; no se puede modificar aquí.</p>
+                    </div>
+                @endif
 
                 <p class="text-sm text-secondary-light">
                     Estado actual: {{ $news->status->value }}.

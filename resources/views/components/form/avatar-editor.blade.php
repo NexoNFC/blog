@@ -2,6 +2,7 @@
     {{ $attributes->class(['avatar-editor']) }}
     x-data="avatarEditor"
     @dropzone-preview.window="load($event.detail)"
+    @avatar-editor-load.window="load($event.detail)"
 >
     <div class="avatar-editor__stage-wrap">
         <div
@@ -70,7 +71,7 @@
             type="button"
             variant="secondary"
             class="min-w-[9.5rem] justify-center"
-            @click="$dispatch('avatar-preview-cancel'); $dispatch('close')"
+            @click="$dispatch('avatar-preview-cancel'); $dispatch('close-modal', 'avatar-preview')"
         >
             Cancelar
         </x-ui.button>

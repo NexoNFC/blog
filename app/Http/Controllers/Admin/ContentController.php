@@ -130,7 +130,6 @@ class ContentController extends Controller
             'summary',
             'body',
             'category_id',
-            'origin_url',
         ]));
 
         return redirect()
