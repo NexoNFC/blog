@@ -1,5 +1,7 @@
 import Alpine from 'alpinejs';
 import 'flowbite';
+import { createAdminNewsIndexState } from './admin/news-index';
+import { createToastHostState } from './admin/toast-host';
 import { createNfcTourViewerState } from './tour/alpine-tour';
 
 window.Alpine = Alpine;
@@ -11,6 +13,10 @@ Alpine.data('nfcTourViewer', (config = {}) => ({
         this.boot();
     },
 }));
+
+Alpine.data('toastHost', (initial = []) => createToastHostState(initial));
+
+Alpine.data('adminNewsIndex', (config = {}) => createAdminNewsIndexState(config));
 
 Alpine.data('adminShell', () => {
     const desktopQuery = () => window.matchMedia('(min-width: 640px)');

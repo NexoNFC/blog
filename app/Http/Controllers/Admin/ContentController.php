@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\ContentSourceKey;
+use App\Enums\ContentStatus;
 use App\Exceptions\AiRewriteException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateNewsRequest;
@@ -13,8 +14,12 @@ use App\Services\CatalogRewriteService;
 use App\Services\ContentIngestionService;
 use App\Services\NewsLifecycleService;
 use App\Support\MediaUrl;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use InvalidArgumentException;
 
 class ContentController extends Controller
 {
@@ -24,21 +29,22 @@ class ContentController extends Controller
         private CatalogRewriteService $rewriter,
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View|JsonResponse
     {
         $this->authorize('viewAny', News::class);
 
-        $contents = News::query()
-            ->with(['category', 'importedContent'])
-            ->latest()
-            ->paginate(10)
-            ->withQueryString()
-            ->through(fn (News $news): array => $news->toPublicArray());
+        $contents = $this->paginatedAdminNews();
+        $lastRun = ScrapeRun::query()->latest('id')->first();
+        $aiConfigured = $this->rewriter->isConfigured();
+
+        if ($request->expectsJson()) {
+            return response()->json($this->indexPayload($contents, $lastRun, $aiConfigured));
+        }
 
         return view('admin.contents.index', [
             'contents' => $contents,
-            'lastRun' => ScrapeRun::query()->latest('id')->first(),
-            'aiConfigured' => $this->rewriter->isConfigured(),
+            'lastRun' => $lastRun,
+            'aiConfigured' => $aiConfigured,
         ]);
     }
 
@@ -49,26 +55,50 @@ class ContentController extends Controller
         return view('admin.contents.create');
     }
 
-    public function ingest(): RedirectResponse
+    public function ingest(Request $request): RedirectResponse|JsonResponse
     {
         $this->authorize('create', News::class);
 
         $run = $this->ingestion->ingest('manual', ContentSourceKey::Fesc);
 
         if ($run->status->value === 'error') {
+            $message = $run->error_message ?? 'Inténtalo de nuevo más tarde.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'type' => 'danger',
+                    'title' => 'No se pudieron traer las noticias',
+                    'message' => $message,
+                    'last_run' => $this->serializeRun($run),
+                    ...$this->indexPayload($this->paginatedAdminNews(1), $run, $this->rewriter->isConfigured()),
+                ], 422);
+            }
+
             return redirect()
                 ->route('admin.news.index')
                 ->with('alert', [
                     'type' => 'danger',
                     'title' => 'No se pudieron traer las noticias',
-                    'message' => $run->error_message ?? 'Inténtalo de nuevo más tarde.',
+                    'message' => $message,
                 ]);
         }
 
-        $message = "Se revisaron {$run->contents_found} piezas. Nuevas: {$run->news_created}. Quedan en borrador hasta que las apruebes.";
+        $message = $run->news_created > 0
+            ? "Se revisaron {$run->contents_found} piezas. Nuevas: {$run->news_created}. Quedan en borrador hasta que las apruebes."
+            : "Se revisaron {$run->contents_found} piezas. Todas ya estaban en el catálogo; no hay borradores nuevos.";
 
         if (filled($run->error_message)) {
             $message .= ' '.$run->error_message;
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'type' => 'success',
+                'title' => 'Listo',
+                'message' => $message,
+                'last_run' => $this->serializeRun($run),
+                ...$this->indexPayload($this->paginatedAdminNews(1), $run, $this->rewriter->isConfigured()),
+            ]);
         }
 
         return redirect()
@@ -140,26 +170,135 @@ class ContentController extends Controller
             ->with('status', 'Se restauró el texto extraído del portal FESC.');
     }
 
-    public function publish(News $news): RedirectResponse
+    public function publish(Request $request, News $news): RedirectResponse|JsonResponse
     {
         $this->authorize('publish', $news);
 
-        $this->lifecycle->publish($news);
+        try {
+            $news = $this->lifecycle->publish($news);
+        } catch (InvalidArgumentException $exception) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $exception->getMessage(),
+                ], 422);
+            }
+
+            return redirect()
+                ->route('admin.news.index')
+                ->with('alert', [
+                    'type' => 'danger',
+                    'title' => 'No se pudo publicar',
+                    'message' => $exception->getMessage(),
+                ]);
+        }
+
+        $news->loadMissing(['category', 'importedContent']);
+        $message = 'La noticia se aprobó y publicó correctamente.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'news' => $this->toAdminArray($news),
+            ]);
+        }
 
         return redirect()
             ->route('admin.news.index')
-            ->with('status', 'La noticia se aprobó y publicó correctamente.');
+            ->with('status', $message);
     }
 
-    public function destroy(News $news): RedirectResponse
+    public function destroy(Request $request, News $news): RedirectResponse|JsonResponse
     {
         $this->authorize('archive', $news);
 
         $this->lifecycle->archive($news);
+        $news->loadMissing(['category', 'importedContent']);
+        $message = "La noticia «{$news->title}» se desaprobó y permanece en el histórico.";
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'news' => $this->toAdminArray($news),
+            ]);
+        }
 
         return redirect()
             ->route('admin.news.index')
-            ->with('status', "La noticia «{$news->title}» se desaprobó y permanece en el histórico.");
+            ->with('status', $message);
+    }
+
+    /**
+     * @return LengthAwarePaginator<int, array<string, mixed>>
+     */
+    private function paginatedAdminNews(?int $page = null): LengthAwarePaginator
+    {
+        return News::query()
+            ->with(['category', 'importedContent'])
+            ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ContentStatus::Draft->value])
+            ->latest('id')
+            ->paginate(10, ['*'], 'page', $page)
+            ->withQueryString()
+            ->through(fn (News $news): array => $this->toAdminArray($news));
+    }
+
+    /**
+     * @param  LengthAwarePaginator<int, array<string, mixed>>  $contents
+     * @return array<string, mixed>
+     */
+    private function indexPayload(LengthAwarePaginator $contents, ?ScrapeRun $lastRun, bool $aiConfigured): array
+    {
+        return [
+            'data' => array_values($contents->items()),
+            'meta' => [
+                'current_page' => $contents->currentPage(),
+                'last_page' => $contents->lastPage(),
+                'per_page' => $contents->perPage(),
+                'total' => $contents->total(),
+            ],
+            'last_run' => $this->serializeRun($lastRun),
+            'ai_configured' => $aiConfigured,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function toAdminArray(News $news): array
+    {
+        $urls = [
+            'edit' => route('admin.news.edit', $news),
+            'publish' => route('admin.news.publish', $news),
+            'destroy' => route('admin.news.destroy', $news),
+            'show' => null,
+        ];
+
+        if ($news->status === ContentStatus::Published) {
+            $urls['show'] = route('contents.show', $news);
+        }
+
+        return [
+            ...$news->toPublicArray(),
+            'urls' => $urls,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function serializeRun(?ScrapeRun $run): ?array
+    {
+        if ($run === null) {
+            return null;
+        }
+
+        return [
+            'id' => $run->id,
+            'status' => $run->status->value,
+            'contents_found' => $run->contents_found,
+            'news_created' => $run->news_created,
+            'finished_at' => $run->finished_at?->format('Y-m-d H:i'),
+            'error_message' => $run->error_message,
+        ];
     }
 
     /**

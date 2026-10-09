@@ -112,6 +112,38 @@ class NewsIngestionAdminTest extends TestCase
             ->assertSee($news->title);
     }
 
+    public function test_admin_can_publish_and_ingest_without_full_page_reload(): void
+    {
+        $this->fakeFescPortal();
+        Source::factory()->fesc()->create();
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->postJson(route('admin.news.ingest'))
+            ->assertOk()
+            ->assertJsonPath('type', 'success')
+            ->assertJsonStructure(['message', 'data', 'last_run', 'meta']);
+
+        $news = News::query()->first();
+        $this->assertNotNull($news);
+
+        $this->actingAs($admin)
+            ->postJson(route('admin.news.publish', $news))
+            ->assertOk()
+            ->assertJsonPath('news.status', 'publicado')
+            ->assertJsonPath('news.slug', $news->slug);
+
+        $this->actingAs($admin)
+            ->deleteJson(route('admin.news.destroy', $news))
+            ->assertOk()
+            ->assertJsonPath('news.status', 'archivado');
+
+        $this->actingAs($admin)
+            ->getJson(route('admin.news.index'))
+            ->assertOk()
+            ->assertJsonStructure(['data', 'meta', 'last_run', 'ai_configured']);
+    }
+
     public function test_guest_cannot_trigger_ingestion(): void
     {
         $this->post(route('admin.news.ingest'))->assertRedirect(route('login'));

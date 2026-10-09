@@ -6,6 +6,7 @@ use App\Contracts\SourceExtractor;
 use App\Enums\ContentSourceKey;
 use App\Enums\MediaKind;
 use App\Exceptions\SourceExtractionException;
+use App\Models\ImportedContent;
 use App\Models\Source;
 use App\Support\FescContentCleaner;
 use DOMDocument;
@@ -13,6 +14,8 @@ use DOMElement;
 use DOMNode;
 use DOMXPath;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -70,9 +73,17 @@ class FescPortalExtractor implements SourceExtractor
         }
 
         $limit = max(1, (int) config('ingestion.fesc.item_limit', 12));
+        $selected = $this->selectWithinLimit($discovered, $limit);
+        $knownUrls = $this->knownOriginUrls($source, $selected);
         $extracted = [];
 
-        foreach ($this->selectWithinLimit($discovered, $limit) as $item) {
+        foreach ($selected as $item) {
+            if (isset($knownUrls[$item['origin_url']])) {
+                $extracted[] = $this->stubKnownItem($item);
+
+                continue;
+            }
+
             $article = $this->extractArticle($item, $source);
 
             if ($article !== null) {
@@ -94,14 +105,17 @@ class FescPortalExtractor implements SourceExtractor
      */
     private function discoverItems(Source $source): array
     {
+        $pages = $this->fetchDiscoveryPages($source);
         $byUrl = [];
 
-        foreach ($this->homeCarouselItems($source) as $item) {
+        foreach ($this->homeCarouselItems($source, $pages['home'] ?? null) as $item) {
             $byUrl[$item['origin_url']] = $item;
         }
 
         foreach ($this->configuredListings() as $listing) {
-            foreach ($this->listingItems($source, $listing) as $item) {
+            $html = $pages[$listing['path']] ?? null;
+
+            foreach ($this->listingItems($source, $listing, $html) as $item) {
                 $existing = $byUrl[$item['origin_url']] ?? null;
 
                 if ($existing === null || ($existing['origin_published_at'] === null && $item['origin_published_at'] !== null)) {
@@ -111,6 +125,99 @@ class FescPortalExtractor implements SourceExtractor
         }
 
         return array_values($byUrl);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function fetchDiscoveryPages(Source $source): array
+    {
+        $targets = [
+            'home' => $this->homeUrl($source),
+        ];
+
+        foreach ($this->configuredListings() as $listing) {
+            $targets[$listing['path']] = $this->listingUrl($source, $listing['path']);
+        }
+
+        /** @var array<string, Response|\Throwable> $responses */
+        $responses = Http::pool(function (Pool $pool) use ($targets) {
+            foreach ($targets as $key => $url) {
+                $pool->as($key)
+                    ->timeout((int) config('ingestion.timeout', 15))
+                    ->retry((int) config('ingestion.retry_times', 2), (int) config('ingestion.retry_sleep_ms', 500))
+                    ->withUserAgent((string) config('ingestion.user_agent'))
+                    ->accept('text/html')
+                    ->get($url);
+            }
+        });
+
+        $pages = [];
+
+        foreach ($targets as $key => $url) {
+            $response = $responses[$key] ?? null;
+
+            if (! $response instanceof Response || ! $response->successful() || trim($response->body()) === '') {
+                Log::warning('No se pudo leer una página de descubrimiento FESC.', [
+                    'url' => $url,
+                    'key' => $key,
+                    'status' => $response instanceof Response ? $response->status() : null,
+                ]);
+
+                continue;
+            }
+
+            $pages[$key] = $response->body();
+        }
+
+        return $pages;
+    }
+
+    /**
+     * @param  list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>  $items
+     * @return array<string, true>
+     */
+    private function knownOriginUrls(Source $source, array $items): array
+    {
+        $urls = array_values(array_unique(array_map(
+            static fn (array $item): string => $item['origin_url'],
+            $items,
+        )));
+
+        if ($urls === []) {
+            return [];
+        }
+
+        return array_fill_keys(
+            ImportedContent::query()
+                ->where('source_id', $source->id)
+                ->whereIn('origin_url', $urls)
+                ->pluck('origin_url')
+                ->all(),
+            true,
+        );
+    }
+
+    /**
+     * @param  array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}  $item
+     * @return array<string, mixed>
+     */
+    private function stubKnownItem(array $item): array
+    {
+        $externalId = $this->externalIdFromUrl($item['origin_url']);
+
+        return [
+            'origin_url' => $item['origin_url'],
+            'external_id' => $externalId,
+            'title' => $item['title'],
+            'metadata' => [
+                'section' => $item['section'],
+                'section_label' => $item['label'],
+                'category_slug' => $item['category'],
+                'external_id' => $externalId,
+            ],
+            'origin_published_at' => $item['origin_published_at'],
+        ];
     }
 
     /**
@@ -220,19 +327,21 @@ class FescPortalExtractor implements SourceExtractor
     /**
      * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>
      */
-    private function homeCarouselItems(Source $source): array
+    private function homeCarouselItems(Source $source, ?string $html = null): array
     {
-        try {
-            $html = $this->fetchHtml(
-                $this->homeUrl($source),
-                'No se pudo leer la portada del portal FESC.',
-            );
-        } catch (SourceExtractionException $exception) {
-            Log::warning('No se pudo extraer el carrusel institucional FESC.', [
-                'reason' => $exception->getMessage(),
-            ]);
+        if ($html === null) {
+            try {
+                $html = $this->fetchHtml(
+                    $this->homeUrl($source),
+                    'No se pudo leer la portada del portal FESC.',
+                );
+            } catch (SourceExtractionException $exception) {
+                Log::warning('No se pudo extraer el carrusel institucional FESC.', [
+                    'reason' => $exception->getMessage(),
+                ]);
 
-            return [];
+                return [];
+            }
         }
 
         $xpath = $this->xpath($html);
@@ -284,20 +393,22 @@ class FescPortalExtractor implements SourceExtractor
      * @param  array{path: string, section: string, label: string, category: string}  $listing
      * @return list<array{origin_url: string, title: string, origin_published_at: ?Carbon, section: string, label: string, category: string}>
      */
-    private function listingItems(Source $source, array $listing): array
+    private function listingItems(Source $source, array $listing, ?string $html = null): array
     {
-        try {
-            $html = $this->fetchHtml(
-                $this->listingUrl($source, $listing['path']),
-                "No se pudo leer el listado {$listing['label']} del portal FESC.",
-            );
-        } catch (SourceExtractionException $exception) {
-            Log::warning('No se pudo extraer un listado FESC.', [
-                'listing' => $listing['path'],
-                'reason' => $exception->getMessage(),
-            ]);
+        if ($html === null) {
+            try {
+                $html = $this->fetchHtml(
+                    $this->listingUrl($source, $listing['path']),
+                    "No se pudo leer el listado {$listing['label']} del portal FESC.",
+                );
+            } catch (SourceExtractionException $exception) {
+                Log::warning('No se pudo extraer un listado FESC.', [
+                    'listing' => $listing['path'],
+                    'reason' => $exception->getMessage(),
+                ]);
 
-            return [];
+                return [];
+            }
         }
 
         $xpath = $this->xpath($html);

@@ -85,13 +85,12 @@ class AuthenticationTest extends TestCase
                 'No fue posible iniciar sesión',
                 'El correo electrónico o la contraseña no son correctos.',
                 'Correo electrónico',
+                'toastHost',
                 'toast-viewport',
                 'data-alert-host',
-                'No fue posible iniciar sesión',
-                'El correo electrónico o la contraseña no son correctos.',
             ], false)
             ->assertSee('x-teleport="body"', false)
-            ->assertSee('setTimeout(() => show = false, 8000)', false)
+            ->assertSee('timeout\u0022:8000', false)
             ->assertDontSee('Las credenciales no coinciden', false);
 
         $this->assertGuest();
@@ -125,11 +124,10 @@ class AuthenticationTest extends TestCase
         ])->assertRedirect('/admin/login');
 
         $this->get('/admin/login')
-            ->assertSeeInOrder([
-                'data-alert-host',
-                'No fue posible continuar',
-                'Existen campos obligatorios pendientes.',
-            ], false);
+            ->assertSee('toastHost', false)
+            ->assertSee('data-alert-host', false)
+            ->assertSee('No fue posible continuar')
+            ->assertSee('Existen campos obligatorios pendientes.');
     }
 
     public function test_users_can_logout_and_see_a_success_alert(): void
@@ -143,11 +141,10 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
 
         $this->get('/admin/login')
-            ->assertSeeInOrder([
-                'data-alert-host',
-                'La sesión se cerró correctamente.',
-            ], false)
-            ->assertSee('setTimeout(() => show = false, 5000)', false);
+            ->assertSee('toastHost', false)
+            ->assertSee('data-alert-host', false)
+            ->assertSee('La sesión se cerró correctamente.')
+            ->assertSee('timeout\u0022:5000', false);
     }
 
     public function test_public_registration_routes_do_not_exist(): void

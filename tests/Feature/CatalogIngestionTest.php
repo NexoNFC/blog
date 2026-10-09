@@ -65,8 +65,17 @@ class CatalogIngestionTest extends TestCase
         $service = app(ContentIngestionService::class);
 
         $service->ingest('manual', ContentSourceKey::Fesc);
+        $recordedAfterFirst = Http::recorded()->count();
+
         $service->ingest('manual', ContentSourceKey::Fesc);
 
+        $articleRequestsOnSecond = Http::recorded()
+            ->slice($recordedAfterFirst)
+            ->filter(fn (array $pair): bool => str_contains($pair[0]->url(), '1411-mundo-fesc')
+                || str_contains($pair[0]->url(), '1407-mundo-fesc'))
+            ->count();
+
+        $this->assertSame(0, $articleRequestsOnSecond, 'La segunda ingestión no debe volver a descargar artículos ya importados.');
         $this->assertSame(2, ImportedContent::query()->count());
         $this->assertSame(2, News::query()->count());
         $this->assertSame(2, ScrapeRun::query()->count());
