@@ -66,7 +66,7 @@
                         <p class="truncate text-sm font-bold tracking-tight text-secondary">{{ auth()->user()->name }}</p>
                         <p class="truncate text-xs text-secondary-light">{{ auth()->user()->email }}</p>
                     </div>
-                    <ul class="p-2 text-sm font-semibold text-secondary">
+                    <ul class="p-2 text-secondary">
                         <li>
                             <a href="{{ route('admin.dashboard') }}" class="admin-user-menu__item">
                                 Dashboard

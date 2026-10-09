@@ -2860,6 +2860,9 @@ img.admin-avatar {
     gap: 0.5rem;
     border-radius: 0.85rem;
     padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
     color: var(--color-secondary);
     transition: background 140ms ease, color 140ms ease;
 }
@@ -2971,8 +2974,9 @@ html.admin-sidebar-ready .admin-main {
     gap: 0.45rem;
     border-radius: 0.75rem;
     padding: 0.35rem 0.45rem;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 700;
+    letter-spacing: -0.01em;
     color: var(--color-primary);
     transition: background 140ms ease;
 }
