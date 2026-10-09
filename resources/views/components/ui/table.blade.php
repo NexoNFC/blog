@@ -1,6 +1,7 @@
 @props([
     'inset' => false,
     'wide' => false,
+    'tableClass' => '',
 ])
 
 <div {{ $attributes->merge(['class' => $inset
@@ -14,7 +15,11 @@
     @endisset
 
     <div class="relative overflow-x-auto">
-        <table class="data-table rtl:text-right {{ $wide ? 'min-w-[72rem]' : '' }}">
+        <table @class([
+            'data-table rtl:text-right',
+            'min-w-[72rem]' => $wide,
+            $tableClass => filled($tableClass),
+        ])>
             {{ $slot }}
         </table>
     </div>

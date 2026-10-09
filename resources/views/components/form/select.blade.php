@@ -46,6 +46,10 @@
         x-ref="trigger"
         class="fancy-select__trigger"
         @click.stop="toggle()"
+        @mouseenter="scheduleTipShow()"
+        @mouseleave="hideTip()"
+        @focus="scheduleTipShow()"
+        @blur="hideTip()"
         @keydown.arrow-down.prevent="open = true; $nextTick(() => positionMenu())"
         :aria-expanded="open.toString()"
         aria-haspopup="listbox"
@@ -59,6 +63,27 @@
             </svg>
         </span>
     </button>
+
+    <template x-teleport="body">
+        <div
+            x-show="tipVisible && tipText()"
+            x-cloak
+            x-transition:enter="transition ease-out duration-150"
+            x-transition:enter-start="opacity-0 translate-y-1 scale-[0.98]"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+            x-transition:leave="transition ease-in duration-100"
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+            x-transition:leave-end="opacity-0 translate-y-1 scale-[0.98]"
+            class="ui-tooltip__bubble"
+            data-placement="top"
+            :style="tipStyle"
+            role="tooltip"
+        >
+            <span class="ui-tooltip__accent" aria-hidden="true"></span>
+            <span class="ui-tooltip__brand" aria-hidden="true">FESC</span>
+            <p class="ui-tooltip__text" x-text="tipText()"></p>
+        </div>
+    </template>
 
     <template x-teleport="body">
         <div
@@ -84,6 +109,7 @@
                     :class="{
                         'is-selected': option.value === value,
                         'is-disabled': option.disabled,
+                        'is-action': Boolean(option.href),
                     }"
                     :disabled="option.disabled"
                     @click="choose(option)"
@@ -108,7 +134,6 @@
                 <option
                     value="{{ $option['value'] }}"
                     @selected($option['value'] === $current)
-                    title="{{ $option['label'] }}"
                 >
                     {{ $option['label'] }}
                 </option>

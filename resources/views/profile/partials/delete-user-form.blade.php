@@ -1,6 +1,6 @@
 <section class="space-y-6">
     <header>
-        <h2 class="font-serif text-lg font-semibold text-secondary">Eliminar cuenta</h2>
+        <h2 class="text-lg font-bold tracking-tight text-secondary">Eliminar cuenta</h2>
         <p class="mt-1 text-sm text-secondary-light">
             Al eliminar la cuenta se perderán sus datos de forma permanente.
         </p>
@@ -19,7 +19,7 @@
             @csrf
             @method('delete')
 
-            <h2 class="font-serif text-lg font-semibold text-secondary">¿Eliminar esta cuenta?</h2>
+            <h2 class="text-lg font-bold tracking-tight text-secondary">¿Eliminar esta cuenta?</h2>
             <p class="mt-1 text-sm text-secondary-light">
                 Escribe tu contraseña para confirmar que deseas eliminar la cuenta de forma permanente.
             </p>

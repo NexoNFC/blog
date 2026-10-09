@@ -10,6 +10,7 @@ use App\Models\News;
 use App\Models\ScrapeRun;
 use App\Models\Source;
 use App\Services\ContentIngestionService;
+use App\Services\ImportContentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -163,8 +164,35 @@ class CatalogIngestionTest extends TestCase
         $this->assertSame('original', $bienestar->processed_payload['presentation'] ?? null);
 
         $this->assertNotNull(News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/comunicados/1411-mundo-fesc-ratifica-su-clasificacion')->first());
-        $this->assertSame('Novedades SIG', News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/news-sig/1409-revision-direccion')->first()?->importedContent?->metadata['section_label'] ?? null);
+        $sig = News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/news-sig/1409-revision-direccion')->first();
+        $this->assertSame('Novedades SIG', $sig?->importedContent?->metadata['section_label'] ?? null);
+        $this->assertStringContainsString('comunicaciones@fesc.edu.co', (string) $sig?->body);
+        $this->assertStringContainsString("\n\nEn la FESC, Tu Futuro Sí Es Posible.", (string) $sig?->body);
+        $this->assertStringContainsString("\n\ncomunicaciones@fesc.edu.co", (string) $sig?->body);
+        $this->assertStringNotContainsString('protegida contra los robots', (string) $sig?->body);
+        $this->assertStringNotContainsString('JavaScript habilitado', (string) $sig?->body);
+        $this->assertStringNotContainsString('joomla-hidden-mail', (string) $sig?->importedContent?->raw_html);
         $this->assertSame('News Extension', News::query()->where('origin_url', 'https://www.fesc.edu.co/portal/news-extension/1405-diferenciate')->first()?->importedContent?->metadata['section_label'] ?? null);
+    }
+
+    public function test_scrub_restores_cloaked_emails_already_stored(): void
+    {
+        $imported = ImportedContent::factory()->create([
+            'raw_html' => '<p>Contacto <joomla-hidden-mail first="Y29tdW5pY2FjaW9uZXM=" last="ZmVzYy5lZHUuY28=" text="Y29tdW5pY2FjaW9uZXNAZmVzYy5lZHUuY28=">Esta dirección de correo electrónico está siendo protegida contra los robots de spam. Necesita tener JavaScript habilitado para poder verlo.</joomla-hidden-mail></p>',
+            'raw_text' => 'Contacto Esta dirección de correo electrónico está siendo protegida contra los robots de spam. Necesita tener JavaScript habilitado para poder verlo.',
+        ]);
+        $news = News::factory()->published()->create([
+            'imported_content_id' => $imported->id,
+            'body' => 'Contacto Esta dirección de correo electrónico está siendo protegida contra los robots de spam. Necesita tener JavaScript habilitado para poder verlo.',
+            'summary' => 'Contacto Esta dirección de correo electrónico está siendo protegida contra los robots de spam.',
+        ]);
+
+        $updated = app(ImportContentService::class)->scrubStoredCloakArtifacts();
+
+        $this->assertGreaterThanOrEqual(2, $updated);
+        $this->assertStringContainsString('comunicaciones@fesc.edu.co', (string) $imported->fresh()->raw_text);
+        $this->assertStringContainsString('comunicaciones@fesc.edu.co', (string) $news->fresh()->body);
+        $this->assertStringNotContainsString('JavaScript habilitado', (string) $news->fresh()->body);
     }
 
     private function fakeFescPortal(bool $withAllSections = false): void

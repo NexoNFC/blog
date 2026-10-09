@@ -1,5 +1,4 @@
 @props([
-    'featured' => null,
     'items' => [],
     'images' => [],
 ])
@@ -18,16 +17,8 @@
             </x-ui.button>
         </div>
 
-        @if ($featured || count($items))
-            <div class="mt-12 grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal-stagger data-reveal-step="70">
-                @if ($featured)
-                    <x-news.card
-                        :content="$featured"
-                        :featured="true"
-                        :image="$images[$featured['slug']] ?? null"
-                    />
-                @endif
-
+        @if (count($items))
+            <div class="news-grid mt-12" data-reveal-stagger data-reveal-step="70">
                 @foreach ($items as $item)
                     <x-news.card
                         :content="$item"
@@ -37,7 +28,7 @@
             </div>
         @else
             <div class="mt-10">
-                <x-ui.empty-state title="Aún no hay noticias publicadas" description="Pronto verás aquí lo más reciente de la comunidad FESC." />
+                <x-ui.empty-state title="Aún no hay noticias publicadas" description="Cuando el catálogo extraído del portal FESC se publique, aparecerán aquí las ocho más recientes." />
             </div>
         @endif
     </div>

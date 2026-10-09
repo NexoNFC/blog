@@ -10,7 +10,7 @@ class SourceSeeder extends Seeder
 {
     public function run(): void
     {
-        Source::query()->updateOrCreate(
+        Source::query()->firstOrCreate(
             ['key' => ContentSourceKey::Fesc->value],
             [
                 'name' => 'Portal oficial FESC',
@@ -19,7 +19,7 @@ class SourceSeeder extends Seeder
             ],
         );
 
-        Source::query()->updateOrCreate(
+        Source::query()->firstOrCreate(
             ['key' => ContentSourceKey::Instagram->value],
             [
                 'name' => 'Instagram FESC',

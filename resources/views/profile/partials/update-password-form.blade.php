@@ -1,6 +1,6 @@
 <section>
     <header>
-        <h2 class="font-serif text-lg font-semibold text-secondary">Actualizar contraseña</h2>
+        <h2 class="text-lg font-bold tracking-tight text-secondary">Actualizar contraseña</h2>
         <p class="mt-1 text-sm text-secondary-light">Usa una contraseña larga y difícil de adivinar.</p>
     </header>
 

@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
@@ -44,6 +45,21 @@ return Application::configure(basePath: dirname(__DIR__))
                     'type' => 'danger',
                     'title' => 'No se puede completar la operación',
                     'message' => $e->getMessage(),
+                ]);
+        });
+
+        $exceptions->render(function (PostTooLargeException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'El archivo es demasiado grande para subirlo.',
+                ], 413);
+            }
+
+            return back()
+                ->with('alert', [
+                    'type' => 'danger',
+                    'title' => 'Archivo demasiado grande',
+                    'message' => 'El archivo supera el tamaño máximo permitido. Usa una imagen de hasta 12 MB.',
                 ]);
         });
     })->create();

@@ -6,8 +6,8 @@
 
 <aside
     id="admin-sidebar"
-    class="admin-sidebar fixed top-0 left-0 z-40 h-full w-64 -translate-x-full border-0 border-e border-primary/10 transition-transform duration-300 ease-in-out"
-    :class="{ '!translate-x-0': open }"
+    class="admin-sidebar fixed top-0 left-0 z-40 h-full w-64 border-0 border-e border-primary/10"
+    :class="{ 'is-open': open }"
     aria-label="Administración"
 >
     <div class="flex h-full flex-col overflow-y-auto px-3 pb-4 pt-[4.75rem] sm:pt-[5rem]">
@@ -143,7 +143,7 @@
 
         <div class="admin-sidebar__footer mt-auto">
             <div class="flex items-center gap-3">
-                <span class="admin-avatar">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                <x-admin.avatar :user="auth()->user()" size="sm" />
                 <div class="min-w-0">
                     <p class="truncate text-sm font-bold tracking-tight text-secondary">{{ auth()->user()->name }}</p>
                     <p class="truncate text-xs text-secondary-light">{{ auth()->user()->email }}</p>
@@ -152,7 +152,7 @@
             <form method="POST" action="{{ route('logout') }}" class="mt-3">
                 @csrf
                 <button type="submit" class="admin-sidebar__logout">
-                    <x-icon name="logout" class="h-4 w-4" />
+                    <x-icon name="logout" class="h-3 w-3" />
                     Cerrar sesión
                 </button>
             </form>

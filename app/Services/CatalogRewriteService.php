@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\AiRewriteException;
 use App\Models\News;
+use App\Support\ContentSummary;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -55,7 +56,7 @@ class CatalogRewriteService
         $payload = $this->payload($news);
         $title = $payload['original_title'] ?? $news->importedContent?->title ?? $news->title;
         $body = $payload['original_body'] ?? $news->importedContent?->raw_text ?? $news->body;
-        $summary = $payload['original_summary'] ?? Str::limit((string) $body, 220);
+        $summary = $payload['original_summary'] ?? ContentSummary::make((string) $body);
 
         $payload['presentation'] = 'original';
 
@@ -169,7 +170,7 @@ PROMPT;
 
         $title = $this->normalizeText((string) ($decoded['title'] ?? $fallbackTitle));
         $body = trim((string) ($decoded['body'] ?? $fallbackBody));
-        $summary = $this->normalizeText((string) ($decoded['summary'] ?? Str::limit($body, 220)));
+        $summary = $this->normalizeText((string) ($decoded['summary'] ?? ContentSummary::make($body)));
 
         if ($title === '' || $body === '') {
             throw new AiRewriteException('La transcripción de IA llegó incompleta.');

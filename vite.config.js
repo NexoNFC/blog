@@ -30,4 +30,8 @@ export default defineConfig({
             ignored: ['**/storage/framework/views/**'],
         },
     },
+    build: {
+        // Three.js del recorrido 360° ya va en chunk lazy (alpine-tour).
+        chunkSizeWarningLimit: 600,
+    },
 });

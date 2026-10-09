@@ -36,13 +36,14 @@ class CatalogDomainTest extends TestCase
         $news = News::factory()->published()->create([
             'title' => 'Noticia pública de campus',
             'slug' => 'noticia-publica-campus',
+            'imported_content_id' => ImportedContent::factory(),
         ]);
 
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('Noticia pública de campus')
             ->assertSee('data-nfc-signal', false)
-            ->assertSee('red NFC activa');
+            ->assertSee('Experiencia NFC');
 
         $this->get(route('contents.show', $news->slug))
             ->assertOk()
@@ -183,7 +184,7 @@ class CatalogDomainTest extends TestCase
             ->assertOk()
             ->assertSee('data-nfc-connection', false)
             ->assertSee('Conexión NFC')
-            ->assertSee('Punto reconocido correctamente');
+            ->assertSee('Punto reconocido');
 
         $this->assertSame(1, NfcScan::query()->where('nfc_point_id', $point->id)->count());
         $this->assertSame(0, NewsView::query()->count());
@@ -227,6 +228,7 @@ class CatalogDomainTest extends TestCase
             ->assertOk()
             ->assertSee('Entrada Avenida 4')
             ->assertSee('Noticia asociable al campus')
+            ->assertSee('Buscar en todas las noticias')
             ->assertSee('Asociar')
             ->assertSee('name="news_id"', false);
 
@@ -238,6 +240,54 @@ class CatalogDomainTest extends TestCase
             ->assertRedirect(route('admin.nfc.index'));
 
         $this->assertSame($news->id, $point->fresh()->news_id);
+    }
+
+    public function test_administrator_can_browse_all_news_to_associate_an_nfc_point(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $older = News::factory()->published()->create([
+            'title' => 'Noticia antigua del campus',
+            'origin_published_at' => now()->subMonths(2),
+            'published_at' => now()->subMonths(2),
+        ]);
+        News::factory()->count(5)->published()->sequence(
+            fn ($sequence) => [
+                'title' => 'Noticia reciente '.$sequence->index,
+                'origin_published_at' => now()->subDays($sequence->index),
+                'published_at' => now()->subDays($sequence->index),
+            ],
+        )->create();
+
+        $point = NfcPoint::factory()->create([
+            'code' => 'biblioteca',
+            'name' => 'Biblioteca Moisés San Juan López',
+        ]);
+
+        $index = $this->actingAs($admin)->get(route('admin.nfc.index'));
+        $index->assertOk();
+        $index->assertSee('Noticia reciente 0');
+        $index->assertDontSee('Noticia antigua del campus', false);
+
+        $this->actingAs($admin)
+            ->get(route('admin.nfc.associate', $point))
+            ->assertOk()
+            ->assertSee('Biblioteca Moisés San Juan López')
+            ->assertSee('Noticia antigua del campus')
+            ->assertSee('Noticia reciente 0')
+            ->assertSee('Buscar noticia')
+            ->assertSee('nfcAssociateSearch', false)
+            ->assertSee('Filtrar por título o resumen')
+            ->assertDontSee('name="q"', false);
+
+        $this->actingAs($admin)
+            ->from(route('admin.nfc.associate', $point))
+            ->patch(route('admin.nfc.update', $point), [
+                'news_id' => $older->id,
+                '_return' => route('admin.nfc.associate', $point),
+            ])
+            ->assertRedirect(route('admin.nfc.associate', $point));
+
+        $this->assertSame($older->id, $point->fresh()->news_id);
     }
 
     public function test_statistics_use_recorded_visits_and_scans(): void

@@ -7,6 +7,15 @@
     <meta name="theme-color" content="#c8102e">
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        (function () {
+            try {
+                var desktop = window.matchMedia('(min-width: 640px)').matches;
+                var open = desktop && window.localStorage.getItem('admin-sidebar-open') !== '0';
+                document.documentElement.classList.toggle('admin-sidebar-open', open);
+            } catch (error) {}
+        })();
+    </script>
 </head>
 <body class="site-body admin-shell min-h-screen" x-data="adminShell">
     <div class="ambient-bg" aria-hidden="true">
@@ -29,8 +38,8 @@
         ></div>
 
         <div
-            class="admin-main min-h-screen p-4 pt-[4.75rem] transition-[margin] duration-300 sm:p-6 sm:pt-[5rem]"
-            :class="open ? 'sm:ml-64' : 'sm:ml-0'"
+            class="admin-main min-h-screen p-4 pt-[4.75rem] sm:p-6 sm:pt-[5rem]"
+            :class="{ 'is-shifted': open }"
         >
             <header class="admin-page-header mb-5">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

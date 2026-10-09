@@ -5,12 +5,31 @@
 @section('content')
     <article class="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
         <div class="glass-card px-6 py-8 sm:px-10 sm:py-12">
-            <x-content.content-meta :content="$content" />
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <x-content.content-meta :content="$content" />
+
+                @if (! empty($content['external_url']))
+                    <x-content.external-source
+                        :url="$content['external_url']"
+                        label="Ver en el sitio oficial de FESC"
+                        size="sm"
+                        class="ms-auto"
+                    />
+                @endif
+            </div>
 
             <h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">
                 <span class="gradient-text">{{ $content['title'] }}</span>
             </h1>
-            <p class="mt-4 text-lg leading-relaxed text-secondary-light">{{ $content['summary'] }}</p>
+            @php
+                $displaySummary = \App\Support\ContentSummary::forDisplay(
+                    $content['summary'] ?? null,
+                    $content['body'] ?? null,
+                );
+            @endphp
+            @if ($displaySummary !== null)
+                <p class="mt-4 text-lg leading-relaxed text-secondary-light">{{ $displaySummary }}</p>
+            @endif
 
             @if (! empty($content['image']))
                 <div class="mt-8 overflow-hidden rounded-[20px] border border-white/50 bg-white/40">
@@ -36,20 +55,10 @@
                 </div>
             @endif
 
-            <div class="mt-8 space-y-4 text-base leading-relaxed text-secondary">
-                @foreach (preg_split("/\n\n/", $content['body']) as $paragraph)
-                    <p>{{ $paragraph }}</p>
-                @endforeach
-            </div>
-
-            @if (! empty($content['external_url']))
-                <div class="mt-10">
-                    <x-content.external-source :url="$content['external_url']" label="Ver en el sitio oficial de FESC" />
-                </div>
-            @endif
+            <x-content.body :text="$content['body']" class="mt-8 space-y-4 text-base leading-relaxed text-secondary" />
 
             <div class="mt-12 border-t border-white/40 pt-6">
-                <a href="{{ route('home') }}" class="text-sm font-semibold text-primary hover:underline">Volver al inicio</a>
+                <x-ui.button href="{{ route('home') }}" variant="secondary">Volver al inicio</x-ui.button>
             </div>
         </div>
     </article>

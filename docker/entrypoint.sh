@@ -30,12 +30,11 @@ fi
 # Solo migraciones pendientes (no borra tablas ni datos existentes).
 php artisan migrate --force --no-interaction
 
-# Roles y usuarios administrativos: siempre al desplegar (idempotente).
-# No reinicia contraseñas de cuentas ya existentes.
+# Seeders en cada arranque/deploy: solo crean lo que falta (firstOrCreate / omitir si ya existe).
+# No pisan datos ya configurados (usuarios, puntos NFC, panoramas, categorías, etc.).
 php artisan db:seed --class=Database\\Seeders\\RolesAndPermissionsSeeder --force --no-interaction
 php artisan db:seed --class=Database\\Seeders\\AdminUserSeeder --force --no-interaction
 
-# Fuentes, categorías y catálogo base (idempotente).
 # Si falla, el panel sigue accesible con los usuarios ya sembrados.
 if ! php artisan db:seed --class=Database\\Seeders\\SourceSeeder --force --no-interaction; then
     echo "Advertencia: no se pudo sembrar SourceSeeder." >&2
@@ -45,8 +44,9 @@ if ! php artisan db:seed --class=Database\\Seeders\\CategorySeeder --force --no-
     echo "Advertencia: no se pudo sembrar CategorySeeder." >&2
 fi
 
+# CatalogSeeder crea puntos NFC nuevos; NfcTourSeeder solo asigna panorama si el punto aún no tiene.
 if ! php artisan db:seed --class=Database\\Seeders\\CatalogSeeder --force --no-interaction; then
-    echo "Advertencia: no se pudo sembrar CatalogSeeder." >&2
+    echo "Advertencia: no se pudo sembrar CatalogSeeder / NfcTourSeeder." >&2
 fi
 
 exec frankenphp run --config /etc/frankenphp/Caddyfile
