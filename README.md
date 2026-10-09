@@ -53,7 +53,7 @@ En Vercel → proyecto **blog**, define las variables de Laravel (`APP_KEY`, `AP
 
 ### Variables de entorno en Vercel
 
-1. En el proyecto Vercel, definir: `APP_KEY`, `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`, credenciales `DB_*` (MySQL/MariaDB) y, para los administradores iniciales, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` (y opcionalmente `ADMIN_ERICK_*` / `ADMIN_SANTIAGO_*`).
+1. En el proyecto Vercel, definir **obligatoriamente** `APP_KEY` (la misma en Production y Preview; sin ella el contenedor no arranca y el login pierde CSRF/sesión). También: `APP_URL`, `APP_ENV=production`, `APP_DEBUG=false`, credenciales `DB_*` (MySQL/MariaDB) y, para los administradores iniciales, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` (y opcionalmente `ADMIN_ERICK_*` / `ADMIN_SANTIAGO_*`). En Vercel el entrypoint usa `SESSION_DRIVER=cookie` por defecto para que las alertas de login sobrevivan entre instancias.
 2. Al arrancar el contenedor (`docker/entrypoint.sh`) se ejecutan `php artisan migrate --force` y los seeders (`RolesAndPermissionsSeeder`, `AdminUserSeeder`, `SourceSeeder`, `CategorySeeder`, `CatalogSeeder` → `NfcTourSeeder`). Son idempotentes: solo crean lo que falta (`firstOrCreate`); no reinician contraseñas ni sobrescriben puntos NFC o panoramas ya configurados.
 3. Panorámicas 360° de demo: viven en `public/images/tours/` (JPG 2:1). Para regenerarlas desde fotos fuente en `storage/app/tour-sources/`: `php artisan tours:build-panoramas`.
 

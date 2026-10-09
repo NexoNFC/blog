@@ -1,8 +1,26 @@
+@php
+    $hasFormErrors = $errors->any();
+@endphp
+
 <div class="auth-card glass-panel">
     <div class="auth-card__header">
         <h1 class="auth-card__title">Iniciar sesión</h1>
         <p class="auth-card__subtitle">Ingresa con tu cuenta de administrador FESC.</p>
     </div>
+
+    @if ($hasFormErrors)
+        <x-ui.alert
+            type="danger"
+            class="mb-4"
+            title="{{ $errors->has('credentials') ? 'No fue posible iniciar sesión' : 'Revisa los datos ingresados' }}"
+        >
+            @if ($errors->has('credentials'))
+                {{ $errors->first('credentials') }}
+            @else
+                {{ $errors->first() }}
+            @endif
+        </x-ui.alert>
+    @endif
 
     <form
         method="POST"
@@ -10,7 +28,8 @@
         class="auth-card__form"
         novalidate
         x-data="{ submitting: false }"
-        @submit="submitting = true"
+        x-on:pageshow.window="submitting = false"
+        x-on:submit="submitting = true"
     >
         @csrf
 
@@ -28,6 +47,7 @@
                 inputmode="email"
                 class="auth-card__input"
             />
+            <x-form.errors name="email" />
         </div>
 
         <div>
@@ -39,6 +59,7 @@
                 autocomplete="current-password"
                 class="auth-card__input"
             />
+            <x-form.errors name="password" />
         </div>
 
         <div class="auth-card__row">

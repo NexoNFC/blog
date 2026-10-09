@@ -4,7 +4,10 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -79,6 +82,8 @@ class AuthenticationTest extends TestCase
         $this->get('/admin/login')
             ->assertSeeInOrder([
                 'Ingresa con tu cuenta de administrador FESC.',
+                'No fue posible iniciar sesión',
+                'El correo electrónico o la contraseña no son correctos.',
                 'Correo electrónico',
                 'toast-viewport',
                 'data-alert-host',
@@ -90,6 +95,26 @@ class AuthenticationTest extends TestCase
             ->assertDontSee('Las credenciales no coinciden', false);
 
         $this->assertGuest();
+    }
+
+    public function test_expired_csrf_on_login_redirects_with_alert(): void
+    {
+        $request = Request::create('/admin/login', 'POST', [
+            'email' => 'admin@fesc.edu.co',
+            'password' => 'password',
+        ]);
+        $request->headers->set('Accept', 'text/html');
+
+        $session = $this->app->make('session.store');
+        $session->start();
+        $request->setLaravelSession($session);
+
+        $response = $this->app->make(ExceptionHandler::class)
+            ->render($request, new HttpException(419, 'CSRF token mismatch.'));
+
+        $this->assertTrue($response->isRedirect(route('login')));
+        $this->assertSame('warning', $session->get('alert.type'));
+        $this->assertSame('Sesión expirada', $session->get('alert.title'));
     }
 
     public function test_missing_fields_show_a_required_fields_alert(): void

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -60,6 +61,37 @@ return Application::configure(basePath: dirname(__DIR__))
                     'type' => 'danger',
                     'title' => 'Archivo demasiado grande',
                     'message' => 'El archivo supera el tamaño máximo permitido. Usa una imagen de hasta 12 MB.',
+                ]);
+        });
+
+        // TokenMismatchException se convierte a HttpException(419) antes de renderizar.
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Tu sesión expiró. Recarga la página e inténtalo de nuevo.',
+                ], 419);
+            }
+
+            if (! $request->isMethod('POST')) {
+                return null;
+            }
+
+            $loginAttempt = $request->is('admin/login') || $request->routeIs('login');
+            $target = $loginAttempt
+                ? route('login')
+                : (url()->previous() ?: route('home'));
+
+            return redirect()
+                ->to($target)
+                ->withInput($request->except(['password', '_token']))
+                ->with('alert', [
+                    'type' => 'warning',
+                    'title' => 'Sesión expirada',
+                    'message' => 'Por seguridad, el formulario ya no es válido. Recarga e inténtalo de nuevo.',
                 ]);
         });
     })->create();

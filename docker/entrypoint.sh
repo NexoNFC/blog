@@ -3,9 +3,15 @@ set -eu
 
 cd /app
 
-# Laravel no arranca sin APP_KEY. Si Vercel no la definió, generar una para esta instancia.
+# En Vercel cada instancia fría es un contenedor nuevo. Una APP_KEY temporal
+# invalida CSRF/sesión entre requests y deja el login sin mensajes de error.
 if [ -z "${APP_KEY:-}" ]; then
-    echo "Advertencia: APP_KEY no definida en el entorno; generando una temporal." >&2
+    if [ -n "${VERCEL:-}" ] || [ -n "${VERCEL_ENV:-}" ]; then
+        echo "Error: define APP_KEY en las variables de entorno del proyecto Vercel." >&2
+        exit 1
+    fi
+
+    echo "Advertencia: APP_KEY no definida; generando una temporal (solo local)." >&2
     APP_KEY="$(php -r 'echo "base64:" . base64_encode(random_bytes(32));')"
     export APP_KEY
 fi
@@ -17,6 +23,13 @@ if [ -z "${APP_URL:-}" ]; then
     elif [ -n "${VERCEL_URL:-}" ]; then
         export APP_URL="https://${VERCEL_URL}"
     fi
+fi
+
+# Cookie sessions: sobreviven entre instancias sin depender del SQLite efímero.
+if [ -n "${VERCEL:-}" ] || [ -n "${VERCEL_ENV:-}" ]; then
+    export SESSION_DRIVER="${SESSION_DRIVER:-cookie}"
+    export SESSION_SECURE_COOKIE="${SESSION_SECURE_COOKIE:-true}"
+    export SESSION_SAME_SITE="${SESSION_SAME_SITE:-lax}"
 fi
 
 if [ "${DB_CONNECTION:-sqlite}" = "sqlite" ]; then
