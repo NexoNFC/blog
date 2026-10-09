@@ -1,7 +1,16 @@
 import Alpine from 'alpinejs';
 import 'flowbite';
+import { createNfcTourViewerState } from './tour/alpine-tour';
 
 window.Alpine = Alpine;
+
+Alpine.data('nfcTourViewer', (config = {}) => ({
+    ...createNfcTourViewerState(config),
+
+    init() {
+        this.boot();
+    },
+}));
 
 Alpine.data('adminShell', () => {
     const desktopQuery = () => window.matchMedia('(min-width: 640px)');
@@ -113,6 +122,83 @@ Alpine.data('nfcAssociateSearch', () => ({
     },
 }));
 
+const positionUiTooltip = (anchor, placement = 'top') => {
+    if (! (anchor instanceof HTMLElement)) {
+        return {};
+    }
+
+    const rect = anchor.getBoundingClientRect();
+    const gap = 10;
+    const maxWidth = Math.min(22 * 16, window.innerWidth - 16);
+    const left = Math.min(
+        Math.max(8, rect.left + rect.width / 2),
+        window.innerWidth - 8,
+    );
+
+    if (placement === 'bottom') {
+        return {
+            position: 'fixed',
+            top: `${rect.bottom + gap}px`,
+            left: `${left}px`,
+            maxWidth: `${maxWidth}px`,
+            transform: 'translateX(-50%)',
+            zIndex: '90',
+        };
+    }
+
+    return {
+        position: 'fixed',
+        top: `${rect.top - gap}px`,
+        left: `${left}px`,
+        maxWidth: `${maxWidth}px`,
+        transform: 'translate(-50%, -100%)',
+        zIndex: '90',
+    };
+};
+
+Alpine.data('uiTooltip', (config = {}) => ({
+    content: config.content || '',
+    placement: config.placement || 'top',
+    delay: Number(config.delay ?? 140),
+    visible: false,
+    style: {},
+    showTimer: null,
+    hideTimer: null,
+
+    scheduleShow() {
+        const text = String(this.content || '').trim();
+
+        if (text === '') {
+            return;
+        }
+
+        clearTimeout(this.hideTimer);
+        clearTimeout(this.showTimer);
+        this.showTimer = setTimeout(() => {
+            this.visible = true;
+            this.$nextTick(() => {
+                this.style = positionUiTooltip(this.$el, this.placement);
+            });
+        }, this.delay);
+    },
+
+    scheduleHide() {
+        clearTimeout(this.showTimer);
+        clearTimeout(this.hideTimer);
+        this.hideTimer = setTimeout(() => {
+            this.visible = false;
+        }, 80);
+    },
+
+    setContent(next) {
+        this.content = String(next || '').trim();
+
+        if (this.content === '') {
+            this.visible = false;
+        }
+    },
+}));
+
 Alpine.data('fancySelect', () => ({
     open: false,
     value: '',
@@ -120,6 +206,9 @@ Alpine.data('fancySelect', () => ({
     disabled: false,
     options: [],
     menuStyle: {},
+    tipVisible: false,
+    tipStyle: {},
+    tipTimer: null,
     onDocumentClick: null,
     onViewportChange: null,
 
@@ -142,6 +231,12 @@ Alpine.data('fancySelect', () => ({
             }
 
             this.syncLabel();
+        });
+
+        this.$watch('open', (isOpen) => {
+            if (isOpen) {
+                this.hideTip();
+            }
         });
 
         select.addEventListener('change', () => {
@@ -172,6 +267,10 @@ Alpine.data('fancySelect', () => ({
             if (this.open) {
                 this.positionMenu();
             }
+
+            if (this.tipVisible) {
+                this.positionTip();
+            }
         };
 
         document.addEventListener('click', this.onDocumentClick);
@@ -180,6 +279,8 @@ Alpine.data('fancySelect', () => ({
     },
 
     destroy() {
+        clearTimeout(this.tipTimer);
+
         if (this.onDocumentClick) {
             document.removeEventListener('click', this.onDocumentClick);
         }
@@ -206,6 +307,37 @@ Alpine.data('fancySelect', () => ({
         this.label = match?.label || 'Seleccionar';
     },
 
+    tipText() {
+        const text = String(this.label || '').trim();
+
+        if (text === '' || text === 'Seleccionar' || text === 'Sin noticia') {
+            return '';
+        }
+
+        return text;
+    },
+
+    scheduleTipShow() {
+        if (this.open || this.disabled || this.tipText() === '') {
+            return;
+        }
+
+        clearTimeout(this.tipTimer);
+        this.tipTimer = setTimeout(() => {
+            this.tipVisible = true;
+            this.$nextTick(() => this.positionTip());
+        }, 140);
+    },
+
+    hideTip() {
+        clearTimeout(this.tipTimer);
+        this.tipVisible = false;
+    },
+
+    positionTip() {
+        this.tipStyle = positionUiTooltip(this.$refs.trigger, 'top');
+    },
+
     toggle() {
         if (this.disabled) {
             return;
@@ -217,6 +349,7 @@ Alpine.data('fancySelect', () => ({
             return;
         }
 
+        this.hideTip();
         this.open = true;
         this.$nextTick(() => this.positionMenu());
     },
@@ -273,9 +406,11 @@ Alpine.data('fancySelect', () => ({
 Alpine.data('fileDropzone', (config = {}) => ({
     dragging: false,
     fileName: '',
+    payloadData: '',
     accept: config.accept || 'image/jpeg,image/png,image/webp',
     maxSizeMb: Number(config.maxSizeMb || 2),
     previewEvent: config.previewEvent || 'dropzone-preview',
+    payloadName: config.payloadName || null,
 
     init() {
         const input = this.$refs.input;
@@ -304,7 +439,7 @@ Alpine.data('fileDropzone', (config = {}) => ({
         this.applyFile(file);
     },
 
-    applyFile(file) {
+    async applyFile(file) {
         const input = this.$refs.input;
 
         if (! (input instanceof HTMLInputElement)) {
@@ -332,12 +467,35 @@ Alpine.data('fileDropzone', (config = {}) => ({
             return;
         }
 
-        this.setInputFile(file);
+        if (this.payloadName) {
+            try {
+                this.payloadData = await this.readAsDataUrl(file);
+                this.fileName = file.name;
+                input.value = '';
+            } catch (error) {
+                this.clear();
+                this.$dispatch('dropzone-error', {
+                    message: 'No fue posible leer la imagen seleccionada.',
+                });
+                return;
+            }
+        } else {
+            this.setInputFile(file);
+        }
 
         this.$dispatch(this.previewEvent, {
             name: file.name,
             url: URL.createObjectURL(file),
             size: file.size,
+        });
+    },
+
+    readAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result || ''));
+            reader.onerror = () => reject(reader.error || new Error('read failed'));
+            reader.readAsDataURL(file);
         });
     },
 
@@ -359,7 +517,7 @@ Alpine.data('fileDropzone', (config = {}) => ({
             return;
         }
 
-        this.setInputFile(file);
+        this.applyFile(file);
     },
 
     isAccepted(file) {
@@ -396,6 +554,7 @@ Alpine.data('fileDropzone', (config = {}) => ({
         }
 
         this.fileName = '';
+        this.payloadData = '';
         this.dragging = false;
     },
 }));
@@ -641,6 +800,33 @@ Alpine.data('avatarEditor', () => ({
 }));
 
 Alpine.start();
+
+const autoGrowTextarea = (textarea) => {
+    if (! (textarea instanceof HTMLTextAreaElement)) {
+        return;
+    }
+
+    textarea.style.height = 'auto';
+    const maxHeight = Number.parseFloat(window.getComputedStyle(textarea).maxHeight) || Number.POSITIVE_INFINITY;
+    const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+};
+
+const bindAutoGrowTextareas = (root = document) => {
+    root.querySelectorAll('textarea.form-control').forEach((textarea) => {
+        if (textarea.dataset.autoGrowBound === '1') {
+            return;
+        }
+
+        textarea.dataset.autoGrowBound = '1';
+        autoGrowTextarea(textarea);
+        textarea.addEventListener('input', () => autoGrowTextarea(textarea));
+    });
+};
+
+bindAutoGrowTextareas();
+document.addEventListener('DOMContentLoaded', () => bindAutoGrowTextareas());
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasMotionOverride = () => document.documentElement.classList.contains('motion-override');

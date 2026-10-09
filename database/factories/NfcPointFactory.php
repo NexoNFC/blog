@@ -28,6 +28,11 @@ class NfcPointFactory extends Factory
             'status' => NfcPointStatus::Active,
             'kind' => 'bloque',
             'image_path' => 'images/campus/fachada.jpg',
+            'panorama_path' => null,
+            'tour_enabled' => false,
+            'tour_description' => null,
+            'nfc_marker_theta' => null,
+            'nfc_marker_phi' => null,
             'news_id' => null,
         ];
     }
@@ -36,6 +41,17 @@ class NfcPointFactory extends Factory
     {
         return $this->state(fn (): array => [
             'status' => NfcPointStatus::Inactive,
+        ]);
+    }
+
+    public function withTour(?string $panoramaPath = 'images/tours/EntradaAvenida5.jpg'): static
+    {
+        return $this->state(fn (): array => [
+            'panorama_path' => $panoramaPath,
+            'tour_enabled' => true,
+            'tour_description' => 'Gira la vista y busca el punto rojo: ahí está la tarjeta NFC.',
+            'nfc_marker_theta' => 0.5,
+            'nfc_marker_phi' => 0.1,
         ]);
     }
 }

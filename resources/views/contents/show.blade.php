@@ -21,7 +21,15 @@
             <h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">
                 <span class="gradient-text">{{ $content['title'] }}</span>
             </h1>
-            <p class="mt-4 text-lg leading-relaxed text-secondary-light">{{ $content['summary'] }}</p>
+            @php
+                $displaySummary = \App\Support\ContentSummary::forDisplay(
+                    $content['summary'] ?? null,
+                    $content['body'] ?? null,
+                );
+            @endphp
+            @if ($displaySummary !== null)
+                <p class="mt-4 text-lg leading-relaxed text-secondary-light">{{ $displaySummary }}</p>
+            @endif
 
             @if (! empty($content['image']))
                 <div class="mt-8 overflow-hidden rounded-[20px] border border-white/50 bg-white/40">

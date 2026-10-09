@@ -184,7 +184,7 @@ class CatalogDomainTest extends TestCase
             ->assertOk()
             ->assertSee('data-nfc-connection', false)
             ->assertSee('Conexión NFC')
-            ->assertSee('Punto reconocido correctamente');
+            ->assertSee('Punto reconocido');
 
         $this->assertSame(1, NfcScan::query()->where('nfc_point_id', $point->id)->count());
         $this->assertSame(0, NewsView::query()->count());

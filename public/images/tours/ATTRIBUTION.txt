@@ -1,0 +1,17 @@
+Panorámicas de demostración del recorrido 360° (JPG equirectangular 2:1).
+
+Generadas con: php artisan tours:build-panoramas
+Fuentes: fotos del campus FESC en Wikimedia Commons
+https://commons.wikimedia.org/wiki/Category:Fundación_de_Estudios_Superiores_Comfanorte
+
+Correspondencia (fuente → textura):
+- U Fesc Cúcuta jul 2021.jpg → EntradaAvenida5.jpg / PasilloSalida.jpeg
+- U Fesc 2 Cúcuta jul 2021.jpg → SalidaFesc.jpeg
+- Edificio bloque A.jpg → BloqueB.jpeg
+- Edificio bloque C.jpg → BloqueC.jpg / DireccionDeSoftware.jpeg
+- Auditorio 5° avenida.jpg → AuditorioAvenida5.jpg
+- Recepción A. T. O.jpg → Cafeteria.jpeg
+- Campo Dr fútbol FESC.jpg → Cancha.jpeg
+
+Licencia típica: CC BY-SA 4.0 (verificar cada ficha en Commons).
+Nota: no son capturas 360° nativas; son fotos adaptadas a textura esférica para demo.

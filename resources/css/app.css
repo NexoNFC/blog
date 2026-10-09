@@ -129,6 +129,15 @@
         @apply block w-full rounded-xl border border-white/60 bg-white/60 px-3 py-2.5 text-sm text-text shadow-sm backdrop-blur-md transition placeholder:text-secondary-light hover:border-secondary-light/50 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-muted/70 disabled:opacity-60;
     }
 
+    textarea.form-control {
+        resize: none;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        min-height: 5.5rem;
+        max-height: 24rem;
+        field-sizing: content;
+    }
+
     .form-control[aria-invalid='true'] {
         @apply border-danger/55 focus:border-danger focus:ring-danger/15;
     }
@@ -157,17 +166,78 @@
         color: var(--color-secondary);
     }
 
+    .ui-tooltip {
+        display: inline-flex;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .ui-tooltip__bubble {
+        pointer-events: none;
+        max-width: min(22rem, calc(100vw - 1rem));
+        border: 1px solid rgb(200 16 46 / 0.18);
+        border-radius: 0.95rem;
+        background:
+            linear-gradient(145deg, rgb(255 255 255 / 0.97), rgb(248 232 235 / 0.94));
+        padding: 0.65rem 0.8rem 0.7rem;
+        box-shadow:
+            0 14px 34px rgb(26 26 27 / 0.16),
+            0 0 0 1px rgb(255 255 255 / 0.65) inset;
+        backdrop-filter: blur(14px);
+    }
+
+    .ui-tooltip__bubble[data-placement='top'] {
+        transform-origin: bottom center;
+    }
+
+    .ui-tooltip__bubble[data-placement='bottom'] {
+        transform-origin: top center;
+    }
+
+    .ui-tooltip__accent {
+        display: block;
+        width: 2.25rem;
+        height: 0.18rem;
+        margin-bottom: 0.45rem;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--color-primary), rgb(200 16 46 / 0.35));
+    }
+
+    .ui-tooltip__brand {
+        display: block;
+        margin-bottom: 0.2rem;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-primary);
+    }
+
+    .ui-tooltip__text {
+        margin: 0;
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        color: var(--color-secondary);
+        overflow-wrap: anywhere;
+    }
+
     .fancy-select {
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
     }
 
     .fancy-select__trigger {
         display: flex;
         width: 100%;
+        max-width: 100%;
         min-width: 0;
         align-items: center;
         justify-content: space-between;
         gap: 0.75rem;
+        overflow: hidden;
         border: 1px solid rgb(67 67 69 / 0.15);
         border-radius: 0.75rem;
         background: #ffffff;
@@ -204,6 +274,7 @@
     }
 
     .fancy-select__label {
+        flex: 1 1 0%;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -2318,13 +2389,113 @@
 .nfc-point-connection {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    min-height: 6rem;
-    overflow: hidden;
+    gap: 0.7rem;
+    min-height: 0;
+    overflow: visible;
     border: 1px solid rgb(4 120 87 / 0.14);
-    border-radius: 1rem;
-    padding: 0.35rem 0.75rem 0.35rem 0.2rem;
+    border-radius: 0.85rem;
+    padding: 0.5rem 0.75rem 0.5rem 0.55rem;
     background: linear-gradient(110deg, rgb(236 253 245 / 0.74), rgb(255 255 255 / 0.35));
+}
+
+.nfc-point-connection__mark {
+    position: relative;
+    z-index: 1;
+    width: 3.15rem;
+    height: 3.15rem;
+    flex: none;
+    perspective: 900px;
+}
+
+.nfc-point-connection__coin.fesc-coin {
+    position: absolute;
+    inset: 0;
+    /* Sin órbita: el texto FESC/NFC debe verse siempre. */
+    animation: none;
+    transform: rotateX(-10deg) rotateY(-16deg);
+}
+
+.nfc-point-connection__coin .fesc-coin__face {
+    border-width: 2px;
+    border-color: rgb(200 16 46 / 0.5);
+    background:
+        radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.2) 0 42%, transparent 43%),
+        radial-gradient(circle at 32% 26%, #ffffff 0 18%, #fff7f8 40%, #f3d0d7 68%, #e8a0ad 100%);
+    box-shadow:
+        inset 0 0 0 2px rgb(255 255 255 / 0.95),
+        inset 0 0 0 4px rgb(200 16 46 / 0.28),
+        inset 0 0 0 7px rgb(255 255 255 / 0.7),
+        inset 0 0 0 9px rgb(200 16 46 / 0.16),
+        0 0 0 1px rgb(200 16 46 / 0.4),
+        0 0 0 3px rgb(255 255 255 / 0.85),
+        0 6px 16px rgb(200 16 46 / 0.18);
+    transform: translateZ(5px);
+}
+
+.nfc-point-connection__coin .fesc-coin__face--back {
+    /* Solo mostramos la cara frontal en este panel. */
+    visibility: hidden;
+}
+
+.nfc-point-connection__coin .fesc-coin__face::before {
+    inset: 14%;
+    border: 1.5px solid rgb(200 16 46 / 0.28);
+    z-index: 0;
+}
+
+.nfc-point-connection__coin .fesc-coin__face::after {
+    inset: 8%;
+    z-index: 0;
+    opacity: 0.7;
+    background:
+        radial-gradient(circle at 30% 24%, rgb(255 255 255 / 0.55), transparent 38%),
+        repeating-conic-gradient(
+            from 0deg,
+            rgb(200 16 46 / 0.18) 0 1.5deg,
+            transparent 1.5deg 7deg
+        );
+    -webkit-mask-image: radial-gradient(circle, transparent 48%, #000 54% 90%, transparent 96%);
+    mask-image: radial-gradient(circle, transparent 48%, #000 54% 90%, transparent 96%);
+}
+
+.nfc-point-connection__coin .fesc-coin__face strong,
+.nfc-point-connection__coin .fesc-coin__face small {
+    position: relative;
+    z-index: 2;
+}
+
+.nfc-point-connection__coin .fesc-coin__face--front strong {
+    font-size: 0.78rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--color-primary);
+}
+
+.nfc-point-connection__coin .fesc-coin__face--front small {
+    display: block;
+    margin-top: 0.12rem;
+    font-size: 0.45rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: rgb(158 12 36 / 0.95);
+}
+
+.nfc-point-connection__coin .fesc-coin__rim {
+    border-width: 2px;
+    border-color: rgb(200 16 46 / 0.42);
+    transform: translateZ(3px);
+}
+
+.nfc-point-connection__coin .fesc-coin__layer {
+    /* Capas gruesas tapan el texto en este tamaño; dejamos solo profundidad sutil. */
+    border-color: rgb(200 16 46 / 0.35);
+    background: radial-gradient(circle at 34% 25%, #fff7f8 0 30%, #f3d0d7 70%, #e8a0ad 100%);
+    opacity: 0.35;
+}
+
+.nfc-point-connection__coin .fesc-coin__layer--front,
+.nfc-point-connection__coin .fesc-coin__layer--front-middle {
+    opacity: 0;
 }
 
 .nfc-point-page {
@@ -2855,6 +3026,114 @@ html.admin-sidebar-ready .admin-main {
     overflow: hidden;
     border-radius: 1.35rem;
     box-shadow: 0 12px 32px rgb(26 26 27 / 0.06);
+}
+
+.data-table--nfc {
+    table-layout: fixed;
+    min-width: 64rem;
+}
+
+.data-table--nfc thead th {
+    text-align: center;
+}
+
+.data-table--nfc .data-table__col-point {
+    width: 18%;
+}
+
+.data-table--nfc .data-table__col-status {
+    width: 9%;
+    text-align: center;
+}
+
+.data-table--nfc .data-table__col-news {
+    width: 38%;
+}
+
+.data-table--nfc .data-table__col-scans {
+    width: 9%;
+    text-align: center;
+}
+
+.data-table--nfc .data-table__col-actions {
+    width: 26%;
+    text-align: right;
+}
+
+.data-table--nfc tbody .data-table__col-point {
+    text-align: left;
+}
+
+.data-table--nfc tbody .data-table__col-news {
+    text-align: left;
+}
+
+.data-table--nfc tbody th,
+.data-table--nfc tbody td {
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+    vertical-align: middle;
+}
+
+.nfc-point-cell__name {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-secondary);
+}
+
+.nfc-point-cell__meta,
+.nfc-point-cell__location {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-secondary-light);
+}
+
+.nfc-point-cell__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.nfc-point-cell__sep {
+    opacity: 0.55;
+}
+
+.nfc-scans-cell {
+    display: inline-block;
+    min-width: 2ch;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--color-secondary-light);
+}
+
+.nfc-associate-form {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nfc-associate-form__select {
+    flex: 1 1 0%;
+    width: 0;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.nfc-associate-form__submit {
+    flex: none;
+}
+
+.nfc-actions-cell {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
 }
 
 .admin-table-shell--inset {
@@ -3403,4 +3682,373 @@ html.admin-sidebar-ready .admin-main {
         display: none;
     }
 
+}
+
+/* Recorrido 360° (visor panorámico) */
+.tour-shell {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: calc(100dvh - 5.75rem);
+    height: calc(100dvh - 5.75rem);
+    background: #0b1220;
+    overflow: hidden;
+}
+
+.tour-shell__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: grab;
+}
+
+.tour-shell__canvas canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    touch-action: none;
+    cursor: grab;
+}
+
+.tour-shell__hud {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.85rem 0.85rem 5.5rem;
+    pointer-events: none;
+}
+
+.tour-shell__hud a,
+.tour-shell__hud button {
+    pointer-events: auto;
+}
+
+.tour-shell__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem 0.75rem;
+    width: min(100%, 22rem);
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.95rem;
+    background: rgb(15 23 42 / 0.58);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    backdrop-filter: blur(10px);
+}
+
+.tour-shell__eyebrow {
+    margin: 0;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.68);
+}
+
+.tour-shell__title {
+    margin: 0.1rem 0 0;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tour-shell__location {
+    margin: 0.15rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.78);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tour-shell__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.tour-shell__actions a,
+.tour-shell__actions button {
+    padding-inline: 0.65rem !important;
+    font-size: 0.72rem !important;
+}
+
+.tour-shell__hint {
+    max-width: min(100%, 20rem);
+    margin: 0;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.85rem;
+    background: rgb(15 23 42 / 0.48);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    color: rgb(255 255 255 / 0.88);
+    font-size: 0.75rem;
+    line-height: 1.35;
+}
+
+@media (min-width: 640px) {
+    .tour-shell__top {
+        width: min(100%, 26rem);
+    }
+
+    .tour-shell__title {
+        font-size: 1.1rem;
+    }
+
+    .tour-shell__hint {
+        max-width: min(100%, 24rem);
+    }
+}
+
+.tour-shell__siblings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    pointer-events: auto;
+}
+
+.tour-shell__chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    background: rgb(255 255 255 / 0.12);
+    border: 1px solid rgb(255 255 255 / 0.16);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.tour-shell__chip:hover,
+.tour-shell__chip.is-active {
+    background: rgb(200 16 46 / 0.85);
+    border-color: rgb(200 16 46 / 0.95);
+}
+
+.tour-shell__panel {
+    position: absolute;
+    z-index: 3;
+    right: 1rem;
+    bottom: 4.5rem;
+    width: min(22rem, calc(100% - 2rem));
+    border-radius: 1.25rem;
+    background: rgb(255 255 255 / 0.94);
+    border: 1px solid rgb(255 255 255 / 0.55);
+    padding: 1.1rem 1.15rem 1.2rem;
+    box-shadow: 0 18px 40px rgb(15 23 42 / 0.25);
+}
+
+.tour-shell__close {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.7rem;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: rgb(15 23 42 / 0.55);
+}
+
+.tour-shell__help {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    background: rgb(15 23 42 / 0.55);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    color: rgb(255 255 255 / 0.85);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.tour-shell__panel[style*='display: none'],
+.tour-shell__panel[x-cloak] {
+    pointer-events: none !important;
+}
+
+.admin-nfc-marker-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 0.85rem 0.7rem 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid rgb(200 16 46 / 0.14);
+    background: linear-gradient(120deg, rgb(255 248 236 / 0.95), rgb(255 255 255 / 0.55));
+}
+
+/* Moneda del marcador NFC: admin preview + tour 360 (misma pieza visual). */
+.admin-nfc-marker-preview__coin,
+.tour-nfc-coin {
+    position: relative;
+    width: 4.25rem;
+    height: 4.25rem;
+    flex: none;
+    perspective: 900px;
+}
+
+.tour-nfc-coin {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 10px 16px rgb(15 23 42 / 0.35));
+}
+
+.tour-nfc-coin--preview {
+    cursor: default;
+    pointer-events: none;
+}
+
+.admin-nfc-marker-preview__coin-body.fesc-coin,
+.tour-nfc-coin__body.fesc-coin {
+    position: absolute;
+    inset: 0;
+    animation: fesc-coin-orbit 10s linear infinite;
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__face,
+.tour-nfc-coin__body .fesc-coin__face {
+    border-width: 2px;
+    border-color: rgb(255 210 120 / 0.55);
+    clip-path: circle(50%);
+    color: #9e0c24;
+    background:
+        radial-gradient(circle at 30% 24%, #ffffff 0 16%, #fff4e4 34%, #f0c878 58%, #d4a017 78%, #b8860b 100%);
+    box-shadow:
+        inset 0 0 0 2px rgb(255 255 255 / 0.85),
+        inset 0 0 0 4px rgb(200 16 46 / 0.35),
+        inset 0 0 0 7px rgb(255 236 190 / 0.75),
+        inset 0 0 0 10px rgb(184 134 11 / 0.35),
+        0 0 0 2px rgb(255 220 150 / 0.45),
+        0 0 0 4px rgb(200 16 46 / 0.22),
+        0 8px 18px rgb(200 16 46 / 0.22);
+    transform: translateZ(5px);
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__face--back,
+.tour-nfc-coin__body .fesc-coin__face--back {
+    color: #1a1a1b;
+    background:
+        radial-gradient(circle at 30% 24%, #fff8ec 0 14%, #f5d78a 36%, #e8b84a 60%, #c8102e 86%, #9e0c24 100%);
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__face strong,
+.tour-nfc-coin__body .fesc-coin__face strong {
+    font-size: 0.82rem;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__face small,
+.tour-nfc-coin__body .fesc-coin__face small {
+    display: block;
+    margin-top: 0.12rem;
+    font-size: 0.42rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: rgb(110 20 35 / 0.9);
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__rim,
+.tour-nfc-coin__body .fesc-coin__rim {
+    border-width: 2px;
+    border-color: rgb(200 16 46 / 0.45);
+    transform: translateZ(3px);
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__layer,
+.tour-nfc-coin__body .fesc-coin__layer {
+    border-color: rgb(158 12 36 / 0.55);
+    background: radial-gradient(circle at 34% 25%, #fff8ec 0 12%, #f0c878 38%, #c8102e 72%, #7a0918 100%);
+    opacity: 0.45;
+}
+
+.admin-nfc-marker-preview__coin-body .fesc-coin__layer--front,
+.admin-nfc-marker-preview__coin-body .fesc-coin__layer--front-middle,
+.tour-nfc-coin__body .fesc-coin__layer--front,
+.tour-nfc-coin__body .fesc-coin__layer--front-middle {
+    opacity: 0.15;
+}
+
+.tour-viewer__labels {
+    z-index: 1;
+}
+
+.admin-tour-preview {
+    position: relative;
+    min-height: 34rem;
+    height: min(70vh, 40rem);
+    overflow: hidden;
+    background: #0b1220;
+    border-radius: inherit;
+}
+
+.admin-tour-preview__canvas,
+.admin-tour-preview__canvas.tour-viewer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    overflow: hidden;
+}
+
+.admin-tour-preview__canvas canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: crosshair;
+}
+
+.admin-tour-preview .tour-viewer__labels {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden;
+    background: transparent;
+}
+
+.admin-tour-preview__empty {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgb(11 18 32 / 0.92);
+}
+
+.admin-tour-preview__help {
+    position: absolute;
+    z-index: 2;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    margin: 0;
+    padding: 0.55rem 0.8rem;
+    border-radius: 0.85rem;
+    background: rgb(15 23 42 / 0.62);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    color: rgb(255 255 255 / 0.9);
+    font-size: 0.8rem;
+    pointer-events: none;
 }

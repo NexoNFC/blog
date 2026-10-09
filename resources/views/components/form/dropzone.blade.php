@@ -7,6 +7,7 @@
     'title' => 'Haz clic para subir',
     'subtitle' => 'o arrastra y suelta la imagen aquí',
     'previewEvent' => 'dropzone-preview',
+    'payloadName' => null,
 ])
 
 @php
@@ -19,6 +20,7 @@
         accept: @js($accept),
         maxSizeMb: {{ (int) $maxSizeMb }},
         previewEvent: @js($previewEvent),
+        payloadName: @js($payloadName),
     })"
 >
     <label
@@ -46,11 +48,15 @@
         <input
             x-ref="input"
             id="{{ $id }}"
-            name="{{ $name }}"
+            @if (! $payloadName) name="{{ $name }}" @endif
             type="file"
             class="sr-only"
             accept="{{ $accept }}"
             @change="onChange($event)"
         >
     </label>
+
+    @if ($payloadName)
+        <input type="hidden" name="{{ $payloadName }}" x-model="payloadData">
+    @endif
 </div>

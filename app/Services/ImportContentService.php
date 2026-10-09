@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ImportedContent;
 use App\Models\News;
 use App\Models\Source;
+use App\Support\ContentSummary;
 use App\Support\FescContentCleaner;
 use Illuminate\Support\Str;
 
@@ -78,7 +79,7 @@ class ImportContentService
             array_slice($media, 1),
         )));
         $body = $attributes['body'] ?? $this->cleaner->cleanText((string) $imported->raw_text);
-        $summary = $attributes['summary'] ?? Str::limit($body, 220);
+        $summary = $attributes['summary'] ?? ContentSummary::make((string) $body);
 
         return News::query()->create([
             'imported_content_id' => $imported->id,
@@ -157,7 +158,7 @@ class ImportContentService
                     str_contains($summary, 'protegida contra los robots')
                     || str_contains($summary, 'protected from spambots')
                 ) {
-                    $summary = Str::limit($body, 220);
+                    $summary = ContentSummary::make($body);
                 }
 
                 $payload = is_array($news->processed_payload) ? $news->processed_payload : [];

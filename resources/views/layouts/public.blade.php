@@ -30,11 +30,13 @@
     <div class="site-content flex min-h-screen flex-col">
         <x-navigation.navbar />
 
-        <main class="flex-1 pt-[5.75rem]">
+        <main @class(['flex-1 pt-[5.75rem]', 'flex flex-col' => request()->routeIs('nfc.tour')])>
             @yield('content')
         </main>
 
-        <x-navigation.site-footer />
+        @unless (request()->routeIs('nfc.tour'))
+            <x-navigation.site-footer />
+        @endunless
         <x-ui.alert-host />
     </div>
 
@@ -48,22 +50,7 @@
         >
             <span class="fesc-coin-scene__gimbal" data-nfc-gimbal>
                 <x-nfc.signal class="fesc-coin-scene__signal" compact aria-hidden="true">
-                    <span class="fesc-coin" aria-hidden="true">
-                        <span class="fesc-coin__layer fesc-coin__layer--back"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--back-middle"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--middle"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--front-middle"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--front"></span>
-                        <span class="fesc-coin__face fesc-coin__face--front">
-                            <strong>FESC</strong>
-                            <small>CÚCUTA</small>
-                        </span>
-                        <span class="fesc-coin__face fesc-coin__face--back">
-                            <strong>NFC</strong>
-                            <small>CÚCUTA</small>
-                        </span>
-                        <span class="fesc-coin__rim"></span>
-                    </span>
+                    <x-nfc.coin />
                 </x-nfc.signal>
             </span>
         </button>

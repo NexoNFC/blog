@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ContentController as AdminContentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NfcPointController as AdminNfcPointController;
+use App\Http\Controllers\Admin\NfcTourController as AdminNfcTourController;
 use App\Http\Controllers\Admin\StatisticsController as AdminStatisticsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NfcPointController;
+use App\Http\Controllers\NfcTourController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/contenidos/{slug}', [ContentController::class, 'show'])->name('contents.show');
 
 Route::get('/nfc/{code}', [NfcPointController::class, 'show'])->name('nfc.show');
+Route::get('/nfc/{code}/tour', [NfcTourController::class, 'show'])->name('nfc.tour');
 
 Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', DashboardController::class)->name('dashboard');
@@ -81,6 +84,14 @@ Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admi
     Route::get('/nfc/{nfcPoint}/associate', [AdminNfcPointController::class, 'associate'])
         ->middleware('permission:nfc.manage-content')
         ->name('nfc.associate');
+
+    Route::get('/nfc/{nfcPoint}/tour', [AdminNfcTourController::class, 'edit'])
+        ->middleware('permission:nfc.manage-content')
+        ->name('nfc.tour.edit');
+
+    Route::patch('/nfc/{nfcPoint}/tour', [AdminNfcTourController::class, 'update'])
+        ->middleware('permission:nfc.manage-content')
+        ->name('nfc.tour.update');
 
     Route::patch('/nfc/{nfcPoint}', [AdminNfcPointController::class, 'update'])
         ->middleware('permission:nfc.manage-content')
