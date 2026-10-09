@@ -157,6 +157,17 @@ class DemoCatalog
                 'image' => 'images/campus/edificio-avenida-5.jpg',
                 'content_slugs' => ['evento-oficial-fesc'],
             ],
+            [
+                'code' => 'cafeteria',
+                'identifier' => 'NFC-008',
+                'name' => 'Cafetería',
+                'location' => 'Zona de alimentación del campus',
+                'description' => 'Información y novedades asociadas a la cafetería institucional.',
+                'status' => 'activo',
+                'kind' => 'espacio',
+                'image' => 'images/campus/edificio-04.jpg',
+                'content_slugs' => ['comunicado-calendario'],
+            ],
         ];
     }
 
@@ -169,7 +180,7 @@ class DemoCatalog
             [
                 'icon' => 'search',
                 'title' => 'Encuentra un punto NFC',
-                'description' => 'Están en entradas, bloques, biblioteca y auditorio.',
+                'description' => 'Están en entradas, bloques, biblioteca, cafetería y auditorio.',
             ],
             [
                 'icon' => 'smartphone-rotate',

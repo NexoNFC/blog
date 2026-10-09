@@ -50,7 +50,7 @@ class NfcTourSeeder extends Seeder
                 'description' => 'Recorre el Bloque C y localiza el marcador rojo de la tarjeta NFC.',
             ],
             'biblioteca' => [
-                'path' => 'images/tours/Cafeteria.jpeg',
+                'path' => 'images/tours/DireccionDeSoftware.jpeg',
                 'theta' => -1.05,
                 'phi' => -0.02,
                 'description' => 'Gira la vista en la biblioteca y encuentra el punto rojo de la tarjeta NFC.',
@@ -60,6 +60,12 @@ class NfcTourSeeder extends Seeder
                 'theta' => 0.9,
                 'phi' => 0.05,
                 'description' => 'Explora el Auditorio Avenida 5 y busca el punto rojo de la tarjeta NFC.',
+            ],
+            'cafeteria' => [
+                'path' => 'images/tours/Cafeteria.jpeg',
+                'theta' => 0.75,
+                'phi' => -0.04,
+                'description' => 'Recorre la cafetería en 360° y localiza el marcador rojo de la tarjeta NFC.',
             ],
         ];
     }
