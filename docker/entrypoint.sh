@@ -32,6 +32,14 @@ if [ -n "${VERCEL:-}" ] || [ -n "${VERCEL_ENV:-}" ]; then
     export SESSION_SAME_SITE="${SESSION_SAME_SITE:-lax}"
 fi
 
+# Neon pooler (PgBouncer) rompe DDL de migrate; preferir host directo si llegó el pooler.
+if [ -n "${DB_HOST:-}" ] && printf '%s' "$DB_HOST" | grep -q -- '-pooler.'; then
+    export DB_HOST="$(printf '%s' "$DB_HOST" | sed 's/-pooler\././')"
+fi
+if [ -n "${DB_URL:-}" ] && printf '%s' "$DB_URL" | grep -q -- '-pooler.'; then
+    export DB_URL="$(printf '%s' "$DB_URL" | sed 's/-pooler\././')"
+fi
+
 if [ "${DB_CONNECTION:-sqlite}" = "sqlite" ]; then
     db_file="${DB_DATABASE:-/app/database/database.sqlite}"
     mkdir -p "$(dirname "$db_file")"
