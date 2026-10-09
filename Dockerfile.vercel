@@ -13,7 +13,7 @@ RUN npm run build
 FROM dunglas/frankenphp:1-php8.4-bookworm AS base
 
 RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && install-php-extensions intl zip bcmath pdo_mysql opcache
+    && install-php-extensions intl zip bcmath pdo_mysql pdo_pgsql opcache
 
 WORKDIR /app
 
@@ -64,8 +64,7 @@ ENV PORT=80 \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
     QUEUE_CONNECTION=sync \
-    DB_CONNECTION=sqlite \
-    DB_DATABASE=/app/database/database.sqlite
+    DB_CONNECTION=pgsql
 
 USER www-data
 
