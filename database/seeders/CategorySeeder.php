@@ -18,7 +18,7 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::query()->updateOrCreate(
+            Category::query()->firstOrCreate(
                 ['slug' => $category['slug']],
                 ['name' => $category['name']],
             );

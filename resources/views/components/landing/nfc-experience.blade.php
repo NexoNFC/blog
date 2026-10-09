@@ -57,22 +57,7 @@
                 </div>
 
                 <div class="nfc-stage__chip nfc-stage__chip--coin">
-                    <span class="fesc-coin nfc-stage__coin" aria-hidden="true">
-                        <span class="fesc-coin__layer fesc-coin__layer--back"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--back-middle"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--middle"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--front-middle"></span>
-                        <span class="fesc-coin__layer fesc-coin__layer--front"></span>
-                        <span class="fesc-coin__face fesc-coin__face--front">
-                            <strong>FESC</strong>
-                            <small>CÚCUTA</small>
-                        </span>
-                        <span class="fesc-coin__face fesc-coin__face--back">
-                            <strong>NFC</strong>
-                            <small>CÚCUTA</small>
-                        </span>
-                        <span class="fesc-coin__rim"></span>
-                    </span>
+                    <x-nfc.coin class="nfc-stage__coin" />
                 </div>
 
                 <div class="nfc-stage__phone">

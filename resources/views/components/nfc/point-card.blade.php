@@ -37,10 +37,14 @@
         <h3 class="mt-5 text-xl font-semibold text-secondary group-hover:text-primary">
             {{ $location['name'] }}
         </h3>
-        <p class="mt-2 text-sm text-secondary-light">{{ $location['detail'] }}</p>
+        @if (! empty($location['detail']) && strcasecmp(trim((string) $location['detail']), trim((string) $location['name'])) !== 0)
+            <p class="mt-2 text-sm text-secondary-light">{{ $location['detail'] }}</p>
+        @endif
 
         @if ($href)
-            <span class="mt-auto pt-5 text-sm font-semibold text-primary">Explorar este punto</span>
+            <span class="mt-auto pt-5 text-sm font-semibold text-primary">
+                {{ ! empty($location['has_tour']) ? 'Explorar en 360°' : 'Explorar este punto' }}
+            </span>
         @endif
     </div>
 </{{ $tag }}>

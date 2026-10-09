@@ -55,9 +55,15 @@
             continue;
         }
 
+        $toastTitle = $errorBagTitles[$bagName] ?? 'No fue posible continuar';
+
+        if ($bagName === 'default' && $bag->has('panorama')) {
+            $toastTitle = 'No se pudo guardar el recorrido';
+        }
+
         $toasts[] = [
             'type' => 'danger',
-            'title' => $errorBagTitles[$bagName] ?? 'No fue posible continuar',
+            'title' => $toastTitle,
             'messages' => array_values(array_unique($bag->all())),
             'timeout' => $timeoutFor('danger'),
         ];

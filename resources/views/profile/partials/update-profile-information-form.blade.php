@@ -146,6 +146,7 @@
                 rows="4"
                 maxlength="280"
                 class="form-control"
+                data-auto-grow
                 placeholder="Breve presentación para tu cuenta de administrador FESC."
             >{{ old('bio', $user->bio) }}</textarea>
             <p class="mt-1 text-xs text-secondary-light">Hasta 280 caracteres.</p>

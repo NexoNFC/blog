@@ -32,15 +32,26 @@
                     {{ $content['title'] }}
                 </h1>
 
-                @if (! empty($content['summary']))
+                @php
+                    $displaySummary = \App\Support\ContentSummary::forDisplay(
+                        $content['summary'] ?? null,
+                        $content['body'] ?? null,
+                    );
+                @endphp
+
+                @if ($displaySummary !== null)
                     <p class="mt-4 max-w-4xl text-base leading-relaxed text-secondary-light sm:text-lg">
-                        {{ $content['summary'] }}
+                        {{ $displaySummary }}
                     </p>
                 @endif
 
                 <x-content.body
                     :text="$content['body']"
-                    class="mt-8 max-w-4xl space-y-4 text-base leading-relaxed text-secondary sm:text-[1.05rem]"
+                    @class([
+                        'max-w-4xl space-y-4 text-base leading-relaxed text-secondary sm:text-[1.05rem]',
+                        'mt-8' => $displaySummary !== null,
+                        'mt-6' => $displaySummary === null,
+                    ])
                 />
 
                 @if (! empty($content['external_url']))

@@ -26,5 +26,7 @@ class CatalogSeeder extends Seeder
                 ],
             );
         }
+
+        $this->call(NfcTourSeeder::class);
     }
 }

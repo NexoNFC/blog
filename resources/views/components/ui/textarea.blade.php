@@ -17,6 +17,7 @@
     <textarea
         @if ($name) name="{{ $name }}" id="{{ $name }}" @endif
         rows="{{ $rows }}"
+        data-auto-grow
         @if ($required) required @endif
         @if ($name && $errors->has($name)) aria-invalid="true" @endif
         {{ $attributes->except('class')->class(['form-control']) }}
